@@ -12,7 +12,9 @@ interface MealRepository {
 
     fun addMealEntry(mealEntry: MealEntry)
 
-    fun removeMealEntry()
+    fun editMealEntry(mealEntry: MealEntry)
+
+    fun removeMealEntry(mealEntry: MealEntry)
 
     fun getCurrentMeal(): List<MealEntry>
 

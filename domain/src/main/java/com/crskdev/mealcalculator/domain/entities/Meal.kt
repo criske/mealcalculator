@@ -9,5 +9,5 @@ data class Meal(val id: Int = -1,
                 val carbohydrate: Carbohydrate,
                 val fat: Fat,
                 val protein: Float,
-                val glycemicLoad: Int,
+                val glycemicLoad: Float,
                 val date: String? = null)

@@ -16,8 +16,8 @@ fun MealEntry.normalize(): Food =
         ((quantity * food.calories) / 100).roundToInt(),
         Carbohydrate(
             ((quantity * food.carbohydrates.total) / 100),
-            ((quantity * food.carbohydrates.sugar) / 100),
-            ((quantity * food.carbohydrates.fiber) / 100)
+            ((quantity * food.carbohydrates.fiber) / 100),
+            ((quantity * food.carbohydrates.sugar) / 100)
         ),
         Fat(
             ((quantity * food.fat.total) / 100),
