@@ -27,7 +27,7 @@ interface FoodActionInteractor {
         sealed class Error : Throwable(), Response {
             class EmptyFields(vararg val fieldIndices: Int) : Error()
             class NegativeFields(vararg val fieldIndices: Int) : Error()
-            class GIOutOfBounds(val value: UInt?, val min: Int = 0, val max: Int = 100) : Error()
+            class GIOutOfBounds(val value: Int?, val min: Int = 0, val max: Int = 100) : Error()
             object InvalidName : Error()
             class Other(throwable: Throwable) : Error()
             class Composite(vararg val errors: Error) : Error()
@@ -108,7 +108,7 @@ class FoodActionInteractorImpl(
         }
 
         food.gi?.let {
-            if (it !in 0U..100U) {
+            if (it !in 0..100) {
                 errors.add(Response.Error.GIOutOfBounds(it))
             }
         }
