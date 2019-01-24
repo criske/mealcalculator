@@ -1,6 +1,7 @@
 package com.crskdev.mealcalculator.domain.interactors
 
 import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.domain.gateway.FoodRepository
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor.*
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -54,7 +55,10 @@ class FoodActionInteractorImpl(
                         checkFieldValidation(request.food)
                         foodRepository.create(request.food)
                     }
-                    is Request.Edit -> foodRepository.edit(request.food)
+                    is Request.Edit -> {
+                        checkFieldValidation(request.food)
+                        foodRepository.edit(request.food)
+                    }
                     is Request.Delete -> foodRepository.delete(request.id)
                 }
                 response(Response.OK)
@@ -119,16 +123,3 @@ class FoodActionInteractorImpl(
     }
 }
 
-interface FoodRepository : Transactionable<FoodRepository> {
-
-    fun create(food: Food)
-
-    fun edit(food: Food)
-
-    fun delete(id: Int)
-
-}
-
-interface Transactionable<T> {
-    fun runTransaction(block: T.() -> Unit)
-}

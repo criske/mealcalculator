@@ -27,11 +27,11 @@ glycemic_index
 data class Food(val id: Int = -1,
                 val name: String,
                 val picture: String?,
-                val calories: UInt,
+                val calories: Int,
                 val carbohydrates: Carbohydrate,
                 val fat: Fat,
                 val proteins: Float,
-                val gi: UInt?)
+                val gi: Int?)
 
 data class Fat(val total: Float, val saturated: Float, val unsaturated: Float)
 
