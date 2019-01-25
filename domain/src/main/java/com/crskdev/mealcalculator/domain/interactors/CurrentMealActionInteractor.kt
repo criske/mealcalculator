@@ -23,7 +23,7 @@ interface CurrentMealActionInteractor {
         object StartMeal : Request()
         class AddEntry(val entry: MealEntry) : Request()
         class EditEntry(val entry: MealEntry) : Request()
-        class RemoveEntry(val id: Long) : Request()
+        class RemoveEntry(val entry: MealEntry) : Request()
         class SaveMeal(val meal: Meal) : Request()
         object DiscardMeal : Request()
     }
@@ -36,7 +36,7 @@ interface CurrentMealActionInteractor {
         sealed class Error : Throwable(), Response {
             object NegativeOrZeroQuantity : Error()
             object MealNotStarted : Error()
-            class Other(throwable: Throwable) : Error()
+            class Other(val throwable: Throwable) : Error()
         }
     }
 
@@ -60,7 +60,7 @@ class CurrenMealActionInteractorImpl(
             }
             switchSelectOnReceive(action) { job, request ->
                 launch(errHandler + job + dispatchers.DEFAULT) {
-                    var response: Response = Response.OK
+                    var finalResponse: Response = Response.OK
                     when (request) {
                         is Request.StartMeal -> {
                             mealRepository.runTransaction {
@@ -68,7 +68,7 @@ class CurrenMealActionInteractorImpl(
                                 val todayMealNumber = getAllTodayMealCount()
                                 val date = DateString()
                                 if (todayMealNumber == 0) {
-                                    startAllTodayMeal(date)
+                                    startAllTodayMeal(Meal.empty(0, 0, date))
                                 }
                                 val id = getAllTodayMealId()
                                 val startedMeal = Meal.empty(id, todayMealNumber + 1, date)
@@ -77,14 +77,24 @@ class CurrenMealActionInteractorImpl(
                         }
                         is Request.AddEntry -> {
                             checkQuantity(request.entry.quantity)
-                            mealRepository.addCurrentMealEntry(request.entry)
+                            mealRepository.runTransaction {
+                                val existentMealWithFood =
+                                    existentCurrentMealEntryWithFood(request.entry.food.id)
+                                //update quantity if food already exists and request quantity is different
+                                if (existentMealWithFood?.quantity?.equals(request.entry.quantity)?.not() == true) {
+                                    editCurrentMealEntry(existentMealWithFood.copy(quantity = request.entry.quantity))
+                                } else {
+                                    addCurrentMealEntry(request.entry)
+                                }
+                            }
+
                         }
                         is Request.EditEntry -> {
                             checkQuantity(request.entry.quantity)
                             mealRepository.editCurrentMealEntry(request.entry)
                         }
                         is Request.RemoveEntry -> {
-                            mealRepository.removeCurrentMealEntry(request.id)
+                            mealRepository.removeCurrentMealEntry(request.entry)
                         }
                         is Request.SaveMeal -> {
                             mealRepository.runTransaction {
@@ -92,17 +102,17 @@ class CurrenMealActionInteractorImpl(
                                     ?: throw Response.Error.MealNotStarted
                                 saveAllToday(allTodayMeal + request.meal)
                                 discardCurrentMealEntries()
-                                response = Response.MealSaved
+                                finalResponse = Response.MealSaved
                             }
                         }
                         is Request.DiscardMeal -> {
                             mealRepository.runTransaction {
                                 discardCurrentMealEntries()
-                                response = Response.MealDiscarded
+                                finalResponse = Response.MealDiscarded
                             }
                         }
                     }
-                    response(response)
+                    response(finalResponse)
                 }
             }
         }

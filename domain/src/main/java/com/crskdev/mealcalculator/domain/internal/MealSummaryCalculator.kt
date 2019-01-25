@@ -33,10 +33,9 @@ internal class MealSummaryCalculator {
 
         val glycemicLoad = foods.fold(0f) { acc, curr ->
             curr.gi
-                ?.times(curr.carbohydrates.total)
-                ?.div(carbohydrates.total)
-                ?.plus(acc)
-                ?: 0f
+                .times(curr.carbohydrates.total)
+                .div(carbohydrates.total)
+                .plus(acc)
         }
 
         val calories = foods.sumBy { it.calories }

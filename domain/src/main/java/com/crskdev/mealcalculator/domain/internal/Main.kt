@@ -67,7 +67,11 @@ internal class Main {
 
     internal class FoodRepositoryImpl : FoodRepository {
 
-        override suspend fun search(like: String): List<Food> {
+        override suspend fun find(like: String, observer: (List<Food>) -> Unit) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override suspend fun findAll(observer: (List<Food>) -> Unit) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
@@ -77,7 +81,7 @@ internal class Main {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun delete(id: Int) {
+        override fun delete(food: Food) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 

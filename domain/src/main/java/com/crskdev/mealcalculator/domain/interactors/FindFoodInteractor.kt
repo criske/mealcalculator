@@ -3,7 +3,7 @@ package com.crskdev.mealcalculator.domain.interactors
 import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.domain.gateway.FoodRepository
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
-import com.crskdev.mealcalculator.domain.interactors.SearchFoodInteractor.Response
+import com.crskdev.mealcalculator.domain.interactors.FindFoodInteractor.Response
 import com.crskdev.mealcalculator.domain.utils.switchSelectOnReceive
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-interface SearchFoodInteractor {
+interface FindFoodInteractor {
 
     suspend fun request(searchQuery: ReceiveChannel<String>, response: (Response) -> Unit)
 
     sealed class Response {
 
-        class SearchList(val list: List<Food>) : Response()
+        class FoundList(val list: List<Food>) : Response()
         /**
          * Rule: when response is an empty list. User has the posibility to create
          * a new food item with searched query as name.
@@ -30,19 +30,26 @@ interface SearchFoodInteractor {
 }
 
 
-class SearchFoodInteractorImpl(
+class FindFoodInteractorImpl(
     private val dispatchers: GatewayDispatchers,
     private val foodRepository: FoodRepository
-) : SearchFoodInteractor {
+) : FindFoodInteractor {
 
     override suspend fun request(searchQuery: ReceiveChannel<String>, response: (Response) -> Unit) {
         coroutineScope {
             switchSelectOnReceive(searchQuery) { job, query ->
                 launch(job + dispatchers.DEFAULT) {
-                    val searchList = foodRepository.search(query)
-                    response(Response.SearchList(searchList))
-                    if (searchList.isEmpty() && query.length >= 3) {
-                        response(Response.CreateNewFoodWithQueryNameWhenEmpty(query))
+                    if (query.isEmpty()) {
+                        foodRepository.findAll {
+                            response(Response.FoundList(it))
+                        }
+                    } else {
+                        foodRepository.find(query) {
+                            response(Response.FoundList(it))
+                            if (it.isEmpty() && query.length >= 3) {
+                                response(Response.CreateNewFoodWithQueryNameWhenEmpty(query))
+                            }
+                        }
                     }
                 }
             }

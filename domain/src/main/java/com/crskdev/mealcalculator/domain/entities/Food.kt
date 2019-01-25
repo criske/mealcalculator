@@ -24,14 +24,14 @@ glycemic_index
  * Created by Cristian Pela on 23.01.2019.
  */
 
-data class Food(val id: Long = -1,
+data class Food(val id: Long = 0,
                 val name: String,
                 val picture: String?,
                 val calories: Int,
                 val carbohydrates: Carbohydrate,
                 val fat: Fat,
                 val proteins: Float,
-                val gi: Int?)
+                val gi: Int)
 
 data class Fat(val total: Float, val saturated: Float, val unsaturated: Float)
 

@@ -16,16 +16,19 @@ interface MealRepository : Transactionable<MealRepository> {
 
     fun getAllTodayMealId(): Long
 
-    fun startAllTodayMeal(dateString: String)
+    fun startAllTodayMeal(meal: Meal)
 
     fun addCurrentMealEntry(mealEntry: MealEntry)
 
     fun editCurrentMealEntry(mealEntry: MealEntry)
 
-    fun removeCurrentMealEntry(id: Long)
+    fun removeCurrentMealEntry(mealEntry: MealEntry)
+
+    fun existentCurrentMealEntryWithFood(foodId: Long): MealEntry?
 
     fun discardCurrentMealEntries()
 
     suspend fun observeCurrentMealEntries(observer: (List<MealEntry>) -> Unit)
 
+    suspend fun observeJournalMeals(observer: (List<Meal>) -> Unit)
 }

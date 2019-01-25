@@ -19,7 +19,7 @@ interface FoodActionInteractor {
     sealed class Request {
         class Create(val food: Food) : Request()
         class Edit(val food: Food) : Request()
-        class Delete(val id: Int) : Request()
+        class Delete(val food: Food) : Request()
     }
 
     interface Response {
@@ -59,7 +59,7 @@ class FoodActionInteractorImpl(
                         checkFieldValidation(request.food)
                         foodRepository.edit(request.food)
                     }
-                    is Request.Delete -> foodRepository.delete(request.id)
+                    is Request.Delete -> foodRepository.delete(request.food)
                 }
                 response(Response.OK)
             }

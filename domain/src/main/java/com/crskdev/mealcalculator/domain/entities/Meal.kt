@@ -3,7 +3,7 @@ package com.crskdev.mealcalculator.domain.entities
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-data class Meal(val id: Long = -1,
+data class Meal(val id: Long = 0,
                 val numberOfTheDay: Int = 1,
                 val calories: Int,
                 val carbohydrate: Carbohydrate,

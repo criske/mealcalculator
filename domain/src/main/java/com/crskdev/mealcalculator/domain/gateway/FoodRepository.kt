@@ -8,9 +8,11 @@ interface FoodRepository : Transactionable<FoodRepository> {
 
     fun edit(food: Food)
 
-    fun delete(id: Int)
+    fun delete(food: Food)
 
-    suspend fun search(like: String): List<Food>
+    suspend fun find(like: String, observer: (List<Food>) -> Unit)
+
+    suspend fun findAll(observer: (List<Food>) -> Unit)
 
 }
 
