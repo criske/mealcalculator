@@ -24,17 +24,10 @@ class CurrentMealDisplayInteractorImpl(
         launch(dispatchers.DEFAULT) {
             mealRepository.observeCurrentMealEntries {
                 val mealSummary = MealSummaryCalculator().calculate(it)
-                val currentMeal = mealRepository.getCurrentMeal()
-                response(
-                    mealSummary.copy(
-                        id = currentMeal.id,
-                        numberOfTheDay = currentMeal.numberOfTheDay,
-                        date = currentMeal.date
-                    )
-                )
+                response(mealSummary)
             }
         }
         Unit
     }
-    
+
 }

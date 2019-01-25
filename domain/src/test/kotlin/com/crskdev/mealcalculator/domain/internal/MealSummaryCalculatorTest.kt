@@ -6,8 +6,6 @@ import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.domain.entities.MealEntry
 import org.junit.Test
 
-import org.junit.Assert.*
-
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
@@ -52,9 +50,9 @@ class MealSummaryCalculatorTest {
         val meal = MealSummaryCalculator().run {
             calculate(
                 listOf(
-                    MealEntry(128f, oatmeal),
-                    MealEntry(95f, apple),
-                    MealEntry(198f, greekYogurt)
+                    MealEntry(-1, -1, "",1,128, oatmeal),
+                    MealEntry(-1, -1, "",1,95, apple),
+                    MealEntry(-1, -1, "",1,198, greekYogurt)
                 )
             )
         }

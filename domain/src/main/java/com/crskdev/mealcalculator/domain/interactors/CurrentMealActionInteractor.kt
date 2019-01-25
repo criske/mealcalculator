@@ -23,7 +23,7 @@ interface CurrentMealActionInteractor {
         object StartMeal : Request()
         class AddEntry(val entry: MealEntry) : Request()
         class EditEntry(val entry: MealEntry) : Request()
-        class RemoveEntry(val entry: MealEntry) : Request()
+        class RemoveEntry(val id: Long) : Request()
         class SaveMeal(val meal: Meal) : Request()
         object DiscardMeal : Request()
     }
@@ -35,6 +35,7 @@ interface CurrentMealActionInteractor {
         object MealDiscarded : Response
         sealed class Error : Throwable(), Response {
             object NegativeOrZeroQuantity : Error()
+            object MealNotStarted : Error()
             class Other(throwable: Throwable) : Error()
         }
     }
@@ -64,34 +65,38 @@ class CurrenMealActionInteractorImpl(
                         is Request.StartMeal -> {
                             mealRepository.runTransaction {
                                 discardCurrentMealEntries()
-                                val mealNumber = getTodayMealCount() + 1
+                                val todayMealNumber = getAllTodayMealCount()
                                 val date = DateString()
-                                val meal = Meal.empty(mealNumber, date)
-                                startCurrentMeal(meal)
+                                if (todayMealNumber == 0) {
+                                    startAllTodayMeal(date)
+                                }
+                                val id = getAllTodayMealId()
+                                val startedMeal = Meal.empty(id, todayMealNumber + 1, date)
+                                response(Response.MealStarted(startedMeal))
                             }
                         }
                         is Request.AddEntry -> {
                             checkQuantity(request.entry.quantity)
-                            mealRepository.addMealEntry(request.entry)
+                            mealRepository.addCurrentMealEntry(request.entry)
                         }
                         is Request.EditEntry -> {
                             checkQuantity(request.entry.quantity)
-                            mealRepository.editMealEntry(request.entry)
+                            mealRepository.editCurrentMealEntry(request.entry)
                         }
                         is Request.RemoveEntry -> {
-                            checkQuantity(request.entry.quantity)
-                            mealRepository.removeMealEntry(request.entry)
+                            mealRepository.removeCurrentMealEntry(request.id)
                         }
                         is Request.SaveMeal -> {
                             mealRepository.runTransaction {
-                                saveMealToJournal(request.meal)
+                                val allTodayMeal = getAllTodayMeal()
+                                    ?: throw Response.Error.MealNotStarted
+                                saveAllToday(allTodayMeal + request.meal)
                                 discardCurrentMealEntries()
                                 response = Response.MealSaved
                             }
                         }
                         is Request.DiscardMeal -> {
                             mealRepository.runTransaction {
-                                discardCurrentMeal()
                                 discardCurrentMealEntries()
                                 response = Response.MealDiscarded
                             }
@@ -102,8 +107,7 @@ class CurrenMealActionInteractorImpl(
             }
         }
 
-
-    private fun checkQuantity(quantity: Float) {
+    private fun checkQuantity(quantity: Int) {
         if (quantity <= 0)
             throw Response.Error.NegativeOrZeroQuantity
     }

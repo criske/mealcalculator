@@ -24,7 +24,7 @@ glycemic_index
  * Created by Cristian Pela on 23.01.2019.
  */
 
-data class Food(val id: Int = -1,
+data class Food(val id: Long = -1,
                 val name: String,
                 val picture: String?,
                 val calories: Int,

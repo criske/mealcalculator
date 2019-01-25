@@ -8,7 +8,7 @@ import java.util.*
  */
 internal object DateString {
 
-    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
 
     fun obtain(): String = dateFormatter.format(Date())
 

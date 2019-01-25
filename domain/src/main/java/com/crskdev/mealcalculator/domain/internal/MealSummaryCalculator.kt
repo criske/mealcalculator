@@ -1,7 +1,6 @@
 package com.crskdev.mealcalculator.domain.internal
 
 import com.crskdev.mealcalculator.domain.entities.*
-import kotlin.math.roundToInt
 
 /**
  * Created by Cristian Pela on 24.01.2019.
@@ -9,9 +8,11 @@ import kotlin.math.roundToInt
 internal class MealSummaryCalculator {
 
     fun calculate(entries: List<MealEntry>): Meal {
+        assert(entries.isNotEmpty())
+
         //Glycemic Load = GI x Carbohydrate (g) content per portion ÷ 100.
         //The GL of a mixed meal or diet can simply be calculated by summing together the GL values for each ingredient or component.
-        val foods = entries.map { it.normalize() }
+        val foods = entries.map { it.foodBasedOnQuantity() }
 
         val carbohydrates = foods
             .map { it.carbohydrates }
@@ -53,7 +54,15 @@ internal class MealSummaryCalculator {
 
         val proteins = entries.sumByDouble { it.food.proteins.toDouble() }.toFloat()
 
-        return Meal(-1, 1, calories, carbohydrates, fats, proteins, glycemicLoad)
+        val (id, number, date) = entries.first().let {
+            Triple(
+                it.mealId,
+                it.mealNumber,
+                it.mealDate
+            )
+        }
+
+        return Meal(id, number, calories, carbohydrates, fats, proteins, glycemicLoad, date)
     }
 
 }

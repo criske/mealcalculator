@@ -6,26 +6,25 @@ import com.crskdev.mealcalculator.domain.entities.MealEntry
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-interface MealRepository: Transactionable<MealRepository> {
+interface MealRepository : Transactionable<MealRepository> {
 
-    fun startCurrentMeal(meal: Meal)
+    fun getAllTodayMeal(): Meal?
 
-    fun getCurrentMeal(): Meal
+    fun saveAllToday(meal: Meal)
 
-    fun discardCurrentMeal()
+    fun getAllTodayMealCount(): Int
 
-    fun getTodayMealCount(): Int
+    fun getAllTodayMealId(): Long
 
+    fun startAllTodayMeal(dateString: String)
 
-    fun addMealEntry(mealEntry: MealEntry)
+    fun addCurrentMealEntry(mealEntry: MealEntry)
 
-    fun editMealEntry(mealEntry: MealEntry)
+    fun editCurrentMealEntry(mealEntry: MealEntry)
 
-    fun removeMealEntry(mealEntry: MealEntry)
+    fun removeCurrentMealEntry(id: Long)
 
     fun discardCurrentMealEntries()
-
-    fun saveMealToJournal(meal: Meal)
 
     suspend fun observeCurrentMealEntries(observer: (List<MealEntry>) -> Unit)
 
