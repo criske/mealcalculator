@@ -10,23 +10,31 @@ import kotlinx.coroutines.launch
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-interface CurrentMealSummaryInteractor {
+interface CurrentMealDisplayInteractor {
 
     suspend fun request(response: (Meal) -> Unit)
 }
 
 
-class CurrentMealSummaryInteractorImpl(
+class CurrentMealDisplayInteractorImpl(
     private val dispatchers: GatewayDispatchers,
-    private val mealRepository: MealRepository) : CurrentMealSummaryInteractor {
+    private val mealRepository: MealRepository) : CurrentMealDisplayInteractor {
+
     override suspend fun request(response: (Meal) -> Unit) = coroutineScope {
         launch(dispatchers.DEFAULT) {
-            mealRepository.observeCurrentMeal {
+            mealRepository.observeCurrentMealEntries {
                 val mealSummary = MealSummaryCalculator().calculate(it)
-                val mealOfTheDay = mealRepository.getTodayMealCount()
-                response(mealSummary.copy(numberOfTheDay = mealOfTheDay))
+                val currentMeal = mealRepository.getCurrentMeal()
+                response(
+                    mealSummary.copy(
+                        id = currentMeal.id,
+                        numberOfTheDay = currentMeal.numberOfTheDay,
+                        date = currentMeal.date
+                    )
+                )
             }
         }
         Unit
     }
+    
 }

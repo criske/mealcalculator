@@ -1,6 +1,6 @@
 package com.crskdev.mealcalculator.domain.interactors
 
-import com.crskdev.mealcalculator.domain.Main
+import com.crskdev.mealcalculator.domain.internal.Main
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
 import com.crskdev.mealcalculator.domain.entities.Food

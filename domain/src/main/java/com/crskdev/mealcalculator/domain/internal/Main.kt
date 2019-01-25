@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.crskdev.mealcalculator.domain
+package com.crskdev.mealcalculator.domain.internal
 
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
@@ -29,7 +29,10 @@ internal class Main {
                 38
             )
 
-            val interactor = FoodActionInteractorImpl(GatewayDispatchersImpl, FoodRepositoryImpl())
+            val interactor = FoodActionInteractorImpl(
+                GatewayDispatchersImpl,
+                FoodRepositoryImpl()
+            )
 
             runBlocking {
                 interactor.request(FoodActionInteractor.Request.Create(apple)) {

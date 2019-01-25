@@ -22,7 +22,7 @@ class CurrentMealEntryDisplayInteractorImpl(
 
     override suspend fun request(response: (List<MealEntry>) -> Unit) = coroutineScope {
         launch(dispatchers.DEFAULT) {
-            mealRepository.observeCurrentMeal {
+            mealRepository.observeCurrentMealEntries {
                 response(it)
             }
         }

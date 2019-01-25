@@ -6,9 +6,16 @@ import com.crskdev.mealcalculator.domain.entities.MealEntry
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-interface MealRepository {
+interface MealRepository: Transactionable<MealRepository> {
+
+    fun startCurrentMeal(meal: Meal)
+
+    fun getCurrentMeal(): Meal
+
+    fun discardCurrentMeal()
 
     fun getTodayMealCount(): Int
+
 
     fun addMealEntry(mealEntry: MealEntry)
 
@@ -16,12 +23,10 @@ interface MealRepository {
 
     fun removeMealEntry(mealEntry: MealEntry)
 
-    fun getCurrentMeal(): List<MealEntry>
-
-    fun discardCurrentMeal()
+    fun discardCurrentMealEntries()
 
     fun saveMealToJournal(meal: Meal)
 
-    suspend fun observeCurrentMeal(observer: (List<MealEntry>) -> Unit)
+    suspend fun observeCurrentMealEntries(observer: (List<MealEntry>) -> Unit)
 
 }
