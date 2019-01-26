@@ -23,7 +23,9 @@ interface FoodActionInteractor {
     }
 
     interface Response {
-        object OK : Response
+        object Created : Response
+        object Edited : Response
+        object Deleted : Response
         sealed class Error : Throwable(), Response {
             class EmptyFields(vararg val fieldIndices: Int) : Error()
             class NegativeFields(vararg val fieldIndices: Int) : Error()
@@ -50,18 +52,24 @@ class FoodActionInteractorImpl(
                 response(err)
             }
             launch(errHandler + dispatchers.DEFAULT) {
+                var finalResponse: Response
                 when (request) {
                     is Request.Create -> {
                         checkFieldValidation(request.food)
                         foodRepository.create(request.food)
+                        finalResponse = Response.Created
                     }
                     is Request.Edit -> {
                         checkFieldValidation(request.food)
                         foodRepository.edit(request.food)
+                        finalResponse = Response.Edited
                     }
-                    is Request.Delete -> foodRepository.delete(request.food)
+                    is Request.Delete -> {
+                        foodRepository.delete(request.food)
+                        finalResponse = Response.Deleted
+                    }
                 }
-                response(Response.OK)
+                response(finalResponse)
             }
             Unit
         }

@@ -5,4 +5,4 @@ pluginManagement {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
 }
-include ':app', ':domain', ':data'
+include ':app', ':domain', ':data', ':presentation'
