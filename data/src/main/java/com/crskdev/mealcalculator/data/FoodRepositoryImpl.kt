@@ -19,9 +19,8 @@ class FoodRepositoryImpl(private val db: MealCalculatorDatabase) : FoodRepositor
         db.foodDao()
     }
 
-    override fun create(food: Food) {
+    override fun create(food: Food): Long =
         foodDao.insert(food.toDb())
-    }
 
     override fun edit(food: Food) {
         foodDao.insert(food.toDb())
@@ -30,6 +29,9 @@ class FoodRepositoryImpl(private val db: MealCalculatorDatabase) : FoodRepositor
     override fun delete(food: Food) {
         foodDao.delete(food.toDb())
     }
+
+    override fun findById(id: Long): Food? =
+        foodDao.findById(id)?.toDomain()
 
     override suspend fun find(like: String, observer: (List<Food>) -> Unit) =
         coroutineScope {

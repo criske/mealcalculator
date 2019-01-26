@@ -23,7 +23,7 @@ interface FoodActionInteractor {
     }
 
     interface Response {
-        object Created : Response
+        class Created(val foodId: Long) : Response
         object Edited : Response
         object Deleted : Response
         sealed class Error : Throwable(), Response {
@@ -31,7 +31,7 @@ interface FoodActionInteractor {
             class NegativeFields(vararg val fieldIndices: Int) : Error()
             class GIOutOfBounds(val value: Int?, val min: Int = 0, val max: Int = 100) : Error()
             object InvalidName : Error()
-            class Other(throwable: Throwable) : Error()
+            class Other(val throwable: Throwable) : Error()
             class Composite(vararg val errors: Error) : Error()
         }
     }
@@ -56,8 +56,8 @@ class FoodActionInteractorImpl(
                 when (request) {
                     is Request.Create -> {
                         checkFieldValidation(request.food)
-                        foodRepository.create(request.food)
-                        finalResponse = Response.Created
+                        val id = foodRepository.create(request.food)
+                        finalResponse = Response.Created(id)
                     }
                     is Request.Edit -> {
                         checkFieldValidation(request.food)

@@ -4,11 +4,13 @@ import com.crskdev.mealcalculator.domain.entities.Food
 
 interface FoodRepository : Transactionable<FoodRepository> {
 
-    fun create(food: Food)
+    fun create(food: Food): Long
 
     fun edit(food: Food)
 
     fun delete(food: Food)
+
+    fun findById(id: Long): Food?
 
     suspend fun find(like: String, observer: (List<Food>) -> Unit)
 
