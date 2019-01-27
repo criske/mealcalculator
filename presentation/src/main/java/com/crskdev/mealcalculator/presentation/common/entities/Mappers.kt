@@ -1,8 +1,6 @@
 package com.crskdev.mealcalculator.presentation.common.entities
 
-import com.crskdev.mealcalculator.domain.entities.Carbohydrate
-import com.crskdev.mealcalculator.domain.entities.Fat
-import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.domain.entities.*
 
 /**
  * Created by Cristian Pela on 26.01.2019.
@@ -40,3 +38,19 @@ fun FoodVM.toDomain(): Food = Food(
     proteins.toFloat(),
     gi.toInt()
 )
+
+fun FoodVM.toDomainUnchecked(): FoodUnchecked =
+    FoodUnchecked(
+        id, name, picture, calories,
+        CarbohydrateUnchecked(
+            carbohydrates.total,
+            carbohydrates.fiber,
+            carbohydrates.sugar
+        ),
+        FatUnchecked(
+            fat.total,
+            fat.saturated,
+            fat.unsaturated
+        ),
+        proteins, gi
+    )

@@ -18,35 +18,35 @@ internal class Main {
     companion object {
         @JvmStatic
         fun main(@Suppress("UnusedMainParameter") args: Array<String>) {
-            val apple = Food(
-                -1,
-                "",
-                null,
-                52,
-                Carbohydrate(14f, 2.4f, 10f),
-                Fat(0.2f, 0f, 0.1f),
-                0.3f,
-                38
-            )
-
-            val interactor = FoodActionInteractorImpl(
-                GatewayDispatchersImpl,
-                FoodRepositoryImpl()
-            )
-
-            runBlocking {
-                interactor.request(FoodActionInteractor.Request.Create(apple)) {
-                    when(it){
-                        is FoodActionInteractor.Response.Error.Composite ->{
-                            it.errors.forEach {
-                                println(it)
-                            }
-                        }
-                        else -> println(it)
-                    }
-                }
-            }
-
+//            val apple = Food(
+//                -1,
+//                "",
+//                null,
+//                52,
+//                Carbohydrate(14f, 2.4f, 10f),
+//                Fat(0.2f, 0f, 0.1f),
+//                0.3f,
+//                38
+//            )
+//
+//            val interactor = FoodActionInteractorImpl(
+//                GatewayDispatchersImpl,
+//                FoodRepositoryImpl()
+//            )
+//
+//            runBlocking {
+//                interactor.request(FoodActionInteractor.Request.Create(apple)) {
+//                    when(it){
+//                        is FoodActionInteractor.Response.Error.Composite ->{
+//                            it.errors.forEach {
+//                                println(it)
+//                            }
+//                        }
+//                        else -> println(it)
+//                    }
+//                }
+//            }
+//
         }
 
     }
@@ -66,6 +66,13 @@ internal class Main {
     }
 
     internal class FoodRepositoryImpl : FoodRepository {
+        override fun create(food: Food): Long {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun findById(id: Long): Food? {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
 
         override suspend fun find(like: String, observer: (List<Food>) -> Unit) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -75,7 +82,6 @@ internal class Main {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun create(food: Food) {}
 
         override fun edit(food: Food) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

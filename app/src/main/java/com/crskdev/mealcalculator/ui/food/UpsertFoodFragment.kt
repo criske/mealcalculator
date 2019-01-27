@@ -1,4 +1,4 @@
-package com.crskdev.mealcalculator.food
+package com.crskdev.mealcalculator.ui.food
 
 
 import android.os.Bundle

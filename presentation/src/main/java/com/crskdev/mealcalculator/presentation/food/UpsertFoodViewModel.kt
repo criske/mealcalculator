@@ -1,5 +1,6 @@
 package com.crskdev.mealcalculator.presentation.food
 
+import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
@@ -39,18 +40,18 @@ class UpsertFoodViewModel(
         const val FIELD_FATS_UNSATURATED = 8
         const val FIELD_PROTEINS = 9
         const val FIELD_GI = 10
+        const val FIELD_NONE = Int.MAX_VALUE
     }
 
     sealed class Error {
-        sealed class FieldError(vararg val fieldIndices: Int) : Error() {
-            class Empty(vararg fieldIndices: Int) : FieldError(*fieldIndices)
-            class Negative(vararg fieldIndices: Int) : FieldError(*fieldIndices)
-            object InvalidName : FieldError(FIELD_NAME)
-            class GIOutOfBounds(val value: Int?, val min: Int = 0, val max: Int = 100) : FieldError(
-                FIELD_GI
-            )
+        sealed class FieldError : Error() {
+            object Empty : FieldError()
+            object Negative : FieldError()
+            object InvalidName : FieldError()
+            class GIOutOfBounds(val value: Int?, val min: Int = 0, val max: Int = 100) :
+                FieldError()
 
-            class NumberType(vararg fieldIndices: Int) : FieldError(*fieldIndices)
+            object NumberType : FieldError()
         }
 
         class FoodNotFound(val id: Long) : Error()
@@ -68,7 +69,11 @@ class UpsertFoodViewModel(
     }
 
 
-    private val errLiveData: LiveData<Error> = SingleLiveEvent<Error>()
+    private val errLiveData: LiveData<SparseArrayCompat<MutableList<Error>>> =
+        SingleLiveEvent<SparseArrayCompat<MutableList<Error>>>()
+
+    private val clerErrorsLiveData: LiveData<Unit> =
+        SingleLiveEvent<Unit>()
 
     private val retainedModelLiveData: LiveData<FoodVM> = MutableLiveData<FoodVM>()
 
@@ -83,7 +88,9 @@ class UpsertFoodViewModel(
                                 retainedModelLiveData.mutablePost(it.food.toVM())
                             }
                             is GetFoodInteractor.Response.NotFound -> {
-                                errLiveData.mutablePost(FoodNotFound(it.id))
+                                errLiveData.mutablePost(ErrorCollector().apply {
+                                    addErrorToCollector(this, FIELD_NONE, Error.FoodNotFound(it.id))
+                                })
                             }
                         }
                     }
@@ -107,25 +114,21 @@ class UpsertFoodViewModel(
     fun upsert(foodVM: FoodVM) {
         retainedModelLiveData.value?.let {
             launch {
-
                 val request = if (upsertType is UpsertType.Edit) {
-                    FoodActionInteractor.Request.Edit(it.toDomain())
+                    FoodActionInteractor.Request.Edit(it.toDomainUnchecked())
                 } else {
-                    FoodActionInteractor.Request.Create(it.toDomain())
+                    FoodActionInteractor.Request.Create(it.toDomainUnchecked())
                 }
-
                 foodActionInteractor.request(request) {
+                    clerErrorsLiveData.mutablePost(Unit)
                     when (it) {
-                        FoodActionInteractor.Response.Edited,
                         is FoodActionInteractor.Response.Created -> {
                             retainedModelLiveData.mutablePost(FoodVM.empty())
                         }
                         is FoodActionInteractor.Response.Error -> {
-                            val errCollector = mutableListOf<Error>()
+                            val errCollector = ErrorCollector()
                             handleUpsertError(errCollector, it)
-                            errCollector.forEach { errVM ->
-                                errLiveData.mutablePost(errVM)
-                            }
+                            errLiveData.mutablePost(errCollector)
                         }
                     }
                 }
@@ -133,23 +136,44 @@ class UpsertFoodViewModel(
         } ?: throw IllegalStateException("No model is set")
     }
 
-    private fun handleUpsertError(collector: MutableList<Error>, err: FoodActionInteractor.Response.Error) {
+    private fun handleUpsertError(collector: ErrorCollector, err: FoodActionInteractor.Response.Error) {
         when (err) {
             is FoodActionInteractor.Response.Error.EmptyFields ->
-                collector.add(FieldError.Empty(*err.fieldIndices))
+                err.fieldIndices.forEach {
+                    addErrorToCollector(collector, it, Error.FieldError.Empty)
+                }
+            is FoodActionInteractor.Response.Error.InvalidNumberType -> {
+                err.fieldIndices.forEach {
+                    addErrorToCollector(collector, it, Error.FieldError.NumberType)
+                }
+            }
             is FoodActionInteractor.Response.Error.NegativeFields ->
-                collector.add(FieldError.Negative(*err.fieldIndices))
+                err.fieldIndices.forEach {
+                    addErrorToCollector(collector, it, Error.FieldError.Negative)
+                }
             is FoodActionInteractor.Response.Error.GIOutOfBounds ->
-                collector.add(FieldError.GIOutOfBounds(err.value, err.min, err.max))
+                addErrorToCollector(
+                    collector,
+                    FIELD_GI,
+                    FieldError.GIOutOfBounds(err.value, err.min, err.max)
+                )
             FoodActionInteractor.Response.Error.InvalidName ->
-                collector.add(FieldError.InvalidName)
+                addErrorToCollector(collector, FIELD_NAME, FieldError.InvalidName)
             is FoodActionInteractor.Response.Error.Other ->
-                collector.add(Other(err.throwable))
+                addErrorToCollector(collector, FIELD_NONE, Error.Other(err.throwable))
             is FoodActionInteractor.Response.Error.Composite ->
                 err.errors.forEach {
                     handleUpsertError(collector, it)
                 }
         }
+    }
+
+    private fun addErrorToCollector(collector: ErrorCollector, field: Int, error: Error) {
+        val errors = collector.get(field, mutableListOf())
+        if (errors.isEmpty()) {
+            collector.put(field, errors)
+        }
+        errors.add(error)
     }
 
     fun setPicture(path: String?) {
@@ -160,18 +184,21 @@ class UpsertFoodViewModel(
                 launch(dispatchers.DEFAULT) {
                     try {
                         val imgStr = pictureToStringConverter.convert(path)
-                        retainedModelLiveData.mutableSet(it.copy(picture = imgStr))
+                        retainedModelLiveData.mutablePost(it.copy(picture = imgStr))
                     } catch (ex: Exception) {
-                        errLiveData.mutablePost(Other(ex))
+                        errLiveData.mutablePost(ErrorCollector().apply {
+                            addErrorToCollector(this, FIELD_NONE, Other(ex))
+                        })
                     }
-
                 }
             }
         } ?: throw IllegalStateException("No model is set")
     }
 
+
 }
 
+typealias ErrorCollector = SparseArrayCompat<MutableList<UpsertFoodViewModel.Error>>
 
 
 

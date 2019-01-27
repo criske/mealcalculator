@@ -23,7 +23,6 @@ import androidx.room.*
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
-
     ],
     indices = [
         Index("fk_m_id", unique = true)
