@@ -3,9 +3,6 @@ package com.crskdev.mealcalculator.presentation.food
 import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.crskdev.mealcalculator.domain.entities.Carbohydrate
-import com.crskdev.mealcalculator.domain.entities.Fat
-import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.domain.interactors.GetFoodInteractor
@@ -55,7 +52,7 @@ class UpsertFoodViewModel(
         }
 
         class FoodNotFound(val id: Long) : Error()
-        class Other(throwable: Throwable) : Error()
+        class Other(val throwable: Throwable) : Error()
     }
 
     sealed class UpsertType {
@@ -69,13 +66,13 @@ class UpsertFoodViewModel(
     }
 
 
-    private val errLiveData: LiveData<SparseArrayCompat<MutableList<Error>>> =
+    val errLiveData: LiveData<SparseArrayCompat<MutableList<Error>>> =
         SingleLiveEvent<SparseArrayCompat<MutableList<Error>>>()
 
-    private val clerErrorsLiveData: LiveData<Unit> =
+    val clearErrorsLiveData: LiveData<Unit> =
         SingleLiveEvent<Unit>()
 
-    private val retainedModelLiveData: LiveData<FoodVM> = MutableLiveData<FoodVM>()
+    val retainedModelLiveData: LiveData<FoodVM> = MutableLiveData<FoodVM>()
 
     init {
 
@@ -115,15 +112,23 @@ class UpsertFoodViewModel(
         retainedModelLiveData.value?.let {
             launch {
                 val request = if (upsertType is UpsertType.Edit) {
-                    FoodActionInteractor.Request.Edit(it.toDomainUnchecked())
+                    FoodActionInteractor.Request.Edit(
+                        foodVM.copy(
+                            id = upsertType.foodId,
+                            picture = it.picture
+                        ).toDomainUnchecked()
+                    )
                 } else {
-                    FoodActionInteractor.Request.Create(it.toDomainUnchecked())
+                    FoodActionInteractor.Request.Create(foodVM.copy(picture = it.picture).toDomainUnchecked())
                 }
                 foodActionInteractor.request(request) {
-                    clerErrorsLiveData.mutablePost(Unit)
+                    clearErrorsLiveData.mutablePost(Unit)
                     when (it) {
                         is FoodActionInteractor.Response.Created -> {
                             retainedModelLiveData.mutablePost(FoodVM.empty())
+                        }
+                        is FoodActionInteractor.Response.Edited -> {
+                            retainedModelLiveData.mutablePost(it.food.toVM())
                         }
                         is FoodActionInteractor.Response.Error -> {
                             val errCollector = ErrorCollector()
@@ -176,14 +181,14 @@ class UpsertFoodViewModel(
         errors.add(error)
     }
 
-    fun setPicture(path: String?) {
+    fun setPicture(bitmap: Any?, sizePx: Int = 100) {
         retainedModelLiveData.value?.let {
-            if (path == null) {
+            if (bitmap == null) {
                 retainedModelLiveData.mutableSet(it.copy(picture = null))
             } else {
                 launch(dispatchers.DEFAULT) {
                     try {
-                        val imgStr = pictureToStringConverter.convert(path)
+                        val imgStr = pictureToStringConverter.convertAbstract(bitmap, sizePx)
                         retainedModelLiveData.mutablePost(it.copy(picture = imgStr))
                     } catch (ex: Exception) {
                         errLiveData.mutablePost(ErrorCollector().apply {

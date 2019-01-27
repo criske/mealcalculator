@@ -19,7 +19,7 @@ interface FoodActionInteractor {
 
     suspend fun request(request: Request, response: (Response) -> Unit)
 
-    companion object {
+    object Fields {
         const val FIELD_NAME = 1
         const val FIELD_CALORIES = 2
         const val FIELD_CARBS_TOTAL = 3
@@ -41,7 +41,7 @@ interface FoodActionInteractor {
 
     interface Response {
         class Created(val foodId: Long) : Response
-        object Edited : Response
+        class Edited(val food: Food) : Response
         object Deleted : Response
         sealed class Error : Throwable(), Response {
             class EmptyFields(vararg val fieldIndices: Int) : Error()
@@ -80,7 +80,7 @@ class FoodActionInteractorImpl(
                     is Request.Edit -> {
                         val checkedFood = checkFieldValidation(request.food)
                         foodRepository.edit(checkedFood)
-                        finalResponse = Response.Edited
+                        finalResponse = Response.Edited(checkedFood)
                     }
                     is Request.Delete -> {
                         foodRepository.delete(request.food)
@@ -99,34 +99,34 @@ class FoodActionInteractorImpl(
 
         val blankFields = mutableListOf<Int>()
         if (unchecked.name.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_NAME)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_NAME)
         }
         if (unchecked.calories.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_CALORIES)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_CALORIES)
         }
         if (unchecked.carbohydrates.total.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_CARBS_TOTAL)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_CARBS_TOTAL)
         }
         if (unchecked.carbohydrates.fiber.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_CARBS_FIBER)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_CARBS_FIBER)
         }
         if (unchecked.carbohydrates.sugar.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_CARBS_SUGAR)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_CARBS_SUGAR)
         }
         if (unchecked.fat.total.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_FATS_TOTAL)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_FATS_TOTAL)
         }
         if (unchecked.fat.saturated.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_FATS_SATURATED)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_FATS_SATURATED)
         }
         if (unchecked.fat.unsaturated.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_FATS_UNSATURATED)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_FATS_UNSATURATED)
         }
         if (unchecked.proteins.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_PROTEINS)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_PROTEINS)
         }
         if (unchecked.gi.isBlank()) {
-            blankFields.add(FoodActionInteractor.FIELD_GI)
+            blankFields.add(FoodActionInteractor.Fields.FIELD_GI)
         }
         if (blankFields.isNotEmpty()) {
             errors.add(Response.Error.EmptyFields(*blankFields.toIntArray()))
@@ -134,32 +134,41 @@ class FoodActionInteractorImpl(
 
         //***conversion
         val badTypeFields = mutableListOf<Int>()
-        val calories = unchecked.calories.toIntOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_CALORIES)
+        val calories = unchecked.calories.trim().toIntOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_CALORIES)
         } ?: 0
-        val carbTotal = unchecked.carbohydrates.total.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_CARBS_TOTAL)
+        val carbTotal = unchecked.carbohydrates.total.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_CARBS_TOTAL)
         } ?: 0f
-        val fibers = unchecked.carbohydrates.fiber.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_CARBS_FIBER)
+        val fibers = unchecked.carbohydrates.fiber.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_CARBS_FIBER)
         } ?: 0f
-        val sugars = unchecked.carbohydrates.sugar.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_CARBS_SUGAR)
+        val sugars = unchecked.carbohydrates.sugar.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_CARBS_SUGAR)
         } ?: 0f
-        val fatTotal = unchecked.fat.total.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_FATS_TOTAL)
+        val fatTotal = unchecked.fat.total.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_FATS_TOTAL)
         } ?: 0f
-        val saturated = unchecked.fat.saturated.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_FATS_SATURATED)
+        val saturated = unchecked.fat.saturated.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_FATS_SATURATED)
         } ?: 0f
-        val unsaturated = unchecked.fat.unsaturated.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_FATS_UNSATURATED)
+        val unsaturated = unchecked.fat.unsaturated.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_FATS_UNSATURATED)
         } ?: 0f
-        val proteins = unchecked.proteins.toFloatOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_PROTEINS)
+        val proteins = unchecked.proteins.trim().toFloatOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_PROTEINS)
         } ?: 0f
-        val gi = unchecked.gi.toIntOrNull().apply {
-            badTypeFields.add(FoodActionInteractor.FIELD_GI)
+        val gi = unchecked.gi.trim().toIntOrNull().apply {
+            if (this == null)
+                badTypeFields.add(FoodActionInteractor.Fields.FIELD_GI)
         } ?: 0
         if (badTypeFields.isNotEmpty()) {
             errors.add(Response.Error.InvalidNumberType(*badTypeFields.toIntArray()))

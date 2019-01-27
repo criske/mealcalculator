@@ -3,4 +3,17 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="food_name">Name</string>
+    <string name="food_calories">Calories</string>
+    <string name="food_total">Total</string>
+    <string name="food_fiber">Fibers</string>
+    <string name="food_sugars">Sugars</string>
+    <string name="food_fats">Fats</string>
+    <string name="food_carbs">Carbohydrates</string>
+    <string name="food_fats_saturated">Saturated</string>
+    <string name="food_fat_unsaturated">Unsaturated</string>
+    <string name="food_proteins">Proteins</string>
+    <string name="food_glycemic_index">Glycemic Index</string>
+    <string name="submit">Submit</string>
+    <string name="per_100g">Per 100g</string>
 </resources>
