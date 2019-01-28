@@ -37,6 +37,7 @@ import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companio
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_GI
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_NAME
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_PROTEINS
+import com.crskdev.mealcalculator.utils.dpToPx
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
 import kotlinx.android.synthetic.main.fragment_upsert_food.*
 
@@ -95,7 +96,7 @@ class UpsertFoodFragment : Fragment() {
             resources,
             BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
         ).apply {
-            cornerRadius = 5f
+            cornerRadius = 5f.dpToPx(resources)
         }
     }
 

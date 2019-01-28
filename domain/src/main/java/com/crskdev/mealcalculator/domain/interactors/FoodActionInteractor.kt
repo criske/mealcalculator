@@ -218,7 +218,7 @@ class FoodActionInteractorImpl(
             errors.add(Response.Error.NegativeFields(*negativeFields.toIntArray()))
         }
 
-        food.gi?.let {
+        food.gi.let {
             if (it !in 0..100) {
                 errors.add(Response.Error.GIOutOfBounds(it))
             }
@@ -232,7 +232,15 @@ class FoodActionInteractorImpl(
             }
         }
 
-        return food
+        return food.let {
+            //since most of the packages have total and saturated fats,
+            // adjust fats unsaturated if 0 as a diff between total and unsaturated
+            if (it.fat.unsaturated == 0f) {
+                it.copy(fat = it.fat.copy(unsaturated = it.fat.total - it.fat.saturated))
+            } else {
+                it
+            }
+        }
     }
 }
 

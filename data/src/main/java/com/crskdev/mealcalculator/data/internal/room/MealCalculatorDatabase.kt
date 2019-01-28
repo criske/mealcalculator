@@ -36,27 +36,31 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
                 INSTANCE ?: buildDatabase(context, null, block)?.also { INSTANCE = it }
             }
 
-        fun persistent(context: Context): MealCalculatorDatabase =
+        fun persistent(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
                 INSTANCE ?: buildDatabase(context, "meal-calculator.db")?.also { INSTANCE = it }
             }
 
-        private fun buildDatabase(context: Context, name: String?, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
-            if (name == null) {
+        private fun buildDatabase(context: Context, name: String?, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase {
+            val executor = Executors.newSingleThreadExecutor()
+            return if (name == null) {
                 Room.inMemoryDatabaseBuilder(context, MealCalculatorDatabase::class.java)
-            } else {
-                Room.databaseBuilder(context, MealCalculatorDatabase::class.java, name)
-            }.addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    val executor = Executors.newSingleThreadExecutor()
-                    executor.execute {
-                        if (name == null) {
-                            inMemory(context, block)
-                        } else {
-                            persistent(context)
+                    .build()
+                    .apply {
+                        executor.execute {
+                            block(this)
                         }
                     }
-                }
-            }).build()
+            } else {
+                Room.databaseBuilder(context, MealCalculatorDatabase::class.java, name)
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            executor.execute {
+                                persistent(context, block)
+                            }
+                        }
+                    }).build()
+            }
+        }
     }
 }

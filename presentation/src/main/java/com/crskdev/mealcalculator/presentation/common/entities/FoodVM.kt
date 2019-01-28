@@ -15,7 +15,7 @@ data class FoodVM(val id: Long = 0,
         fun empty(): FoodVM = FoodVM(
             0, "", null, "",
             CarbohydrateVM("", "", ""),
-            FatVM("", "", ""), "", ""
+            FatVM("", "", "0"), "", "0"
         )
     }
 }
