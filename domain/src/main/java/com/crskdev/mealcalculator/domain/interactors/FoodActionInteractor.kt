@@ -75,7 +75,7 @@ class FoodActionInteractorImpl(
                     is Request.Create -> {
                         val checkedFood = checkFieldValidation(request.food)
                         val id = foodRepository.create(checkedFood)
-                        finalResponse = Response.Created(id)
+                        finalResponse = Response.Created(id.firstOrNull() ?: -1)
                     }
                     is Request.Edit -> {
                         val checkedFood = checkFieldValidation(request.food)

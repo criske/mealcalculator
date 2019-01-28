@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.crskdev.mealcalculator.ui.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_findFoodFragment"
+            app:destination="@id/findFoodFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_upsertFoodFragment"
+            app:destination="@id/upsertFoodFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/findFoodFragment"
+        android:name="com.crskdev.mealcalculator.ui.food.FindFoodFragment"
+        android:label="fragment_find_food"
+        tools:layout="@layout/fragment_find_food" >
+        <argument
+            android:name="type"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_findFoodFragment_to_upsertFoodFragment"
+            app:destination="@id/upsertFoodFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/upsertFoodFragment"
+        android:name="com.crskdev.mealcalculator.ui.food.UpsertFoodFragment"
+        android:label="fragment_upsert_food"
+        tools:layout="@layout/fragment_upsert_food" >
+        <argument
+            android:name="name"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long" />
+    </fragment>
+
+</navigation>

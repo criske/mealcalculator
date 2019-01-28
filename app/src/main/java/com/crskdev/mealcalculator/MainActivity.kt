@@ -1,21 +1,17 @@
 package com.crskdev.mealcalculator
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.navigation.findNavController
+import com.crskdev.mealcalculator.ui.common.di.DiActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : DiActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        dependencyGraph().inject(this)
         setContentView(R.layout.activity_main)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+    override fun onNavigateUp(): Boolean = findNavController(R.id.navContainer).navigateUp()
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-    }
 }

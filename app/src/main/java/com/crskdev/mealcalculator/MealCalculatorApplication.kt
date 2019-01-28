@@ -2,8 +2,13 @@
 
 package com.crskdev.mealcalculator
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.crskdev.mealcalculator.data.FoodRepositoryImpl
 import com.crskdev.mealcalculator.data.MealRepositoryImpl
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
@@ -18,6 +23,14 @@ import com.crskdev.mealcalculator.platform.PictureToStringConverterImpl
 import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
 import com.crskdev.mealcalculator.presentation.common.services.PictureToStringConverter
 import com.crskdev.mealcalculator.presentation.common.utils.cast
+import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
+import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
+import com.crskdev.mealcalculator.ui.common.di.BaseDependencyGraph
+import com.crskdev.mealcalculator.ui.food.FindFoodFragment
+import com.crskdev.mealcalculator.ui.food.UpsertFoodFragment
+import com.crskdev.mealcalculator.ui.food.UpsertFoodFragmentArgs
+import com.crskdev.mealcalculator.utils.viewModelFromProvider
+import kotlin.reflect.KClass
 
 /**
  * Created by Cristian Pela on 28.01.2019.
@@ -35,7 +48,7 @@ class MealCalculatorApplication : Application() {
 fun Context.dependencyGraph() =
     this.applicationContext.cast<MealCalculatorApplication>().dependencyGraph
 
-class DependencyGraph(private val context: Context) {
+class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val db: MealCalculatorDatabase by lazy {
         MealCalculatorDatabase.inMemory(context) {
@@ -50,9 +63,7 @@ class DependencyGraph(private val context: Context) {
                         Fat(7f, 1.3f, 5.7f),
                         13.5f,
                         55
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Auchan Naut Granoro",
@@ -62,9 +73,7 @@ class DependencyGraph(private val context: Context) {
                         Fat(1.3f, 0.1f, 1.2f),
                         4.3f,
                         28
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Kaufland Migdale Macinate Mandelin",
@@ -74,9 +83,7 @@ class DependencyGraph(private val context: Context) {
                         Fat(55f, 4.7f, 50.3f),
                         24f,
                         0
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Sanovita Seminte de In",
@@ -119,4 +126,29 @@ class DependencyGraph(private val context: Context) {
     val findFoodInteractor: () -> FindFoodInteractor = {
         FindFoodInteractorImpl(dispatchers, foodRepository)
     }
+
+    //******************************* view models *************************************************
+    val upsertFoodViewModel: () -> UpsertFoodViewModel = {
+        with(fragment<UpsertFoodFragment>()) {
+            viewModelFromProvider(this) {
+                val args = UpsertFoodFragmentArgs.fromBundle(this.arguments!!)
+                UpsertFoodViewModel(
+                    UpsertFoodViewModel.UpsertType.decide(args.id.takeIf { it > 0 }, args.name),
+                    getFoodInteractor(),
+                    foodActionInteractor(),
+                    pictureToStringConverter(),
+                    dispatchers
+                )
+            }
+        }
+    }
+    val findFoodViewModel: () -> FindFoodViewModel = {
+        with(fragment<FindFoodFragment>()) {
+            viewModelFromProvider(this) {
+                FindFoodViewModel(findFoodInteractor())
+            }
+        }
+    }
+
 }
+

@@ -19,8 +19,8 @@ class FoodRepositoryImpl(private val db: MealCalculatorDatabase) : FoodRepositor
         db.foodDao()
     }
 
-    override fun create(food: Food): Long =
-        foodDao.insert(food.toDb())
+    override fun create(vararg food: Food): LongArray =
+        foodDao.insert(*food.map { it.toDb() }.toTypedArray())
 
     override fun edit(food: Food) {
         foodDao.insert(food.toDb())

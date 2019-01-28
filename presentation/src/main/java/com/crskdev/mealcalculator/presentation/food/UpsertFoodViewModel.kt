@@ -72,10 +72,11 @@ class UpsertFoodViewModel(
     val clearErrorsLiveData: LiveData<Unit> =
         SingleLiveEvent<Unit>()
 
-    val retainedModelLiveData: LiveData<FoodVM> = MutableLiveData<FoodVM>()
+    val retainedModelLiveData: LiveData<FoodVM> = MutableLiveData<FoodVM>().apply {
+        value = FoodVM.empty()
+    }
 
     init {
-
         when (upsertType) {
             is UpsertType.Edit -> {
                 launch {
@@ -94,7 +95,7 @@ class UpsertFoodViewModel(
                 }
             }
             is UpsertType.Create -> {
-                upsertType.withName?.let {
+                upsertType.withName?.also {
                     retainedModelLiveData.mutableSet(FoodVM.empty().copy(name = it))
                 }
 

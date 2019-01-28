@@ -4,7 +4,7 @@ import com.crskdev.mealcalculator.domain.entities.Food
 
 interface FoodRepository : Transactionable<FoodRepository> {
 
-    fun create(food: Food): Long
+    fun create(vararg food: Food): LongArray
 
     fun edit(food: Food)
 

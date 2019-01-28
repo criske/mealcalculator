@@ -13,15 +13,15 @@ import com.crskdev.mealcalculator.domain.entities.Food
 internal interface FoodDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(foodDb: FoodDb): Long
+    fun insert(vararg foodDb: FoodDb): LongArray
 
     @Delete
     fun delete(foodDb: FoodDb)
 
-    @Query("SELECT * FROM ${Tables.FOODS} WHERE name LIKE :like ORDER BY name")
+    @Query("SELECT * FROM ${Tables.FOODS} WHERE name LIKE :like ORDER BY name ASC")
     fun find(like: String): DataSource.Factory<Int, FoodDb>
 
-    @Query("SELECT * FROM ${Tables.FOODS} ORDER BY name")
+    @Query("SELECT * FROM ${Tables.FOODS} ORDER BY name ASC")
     fun findAll(): DataSource.Factory<Int, FoodDb>
 
     @Query("SELECT * FROM ${Tables.FOODS} WHERE food_id=:id")

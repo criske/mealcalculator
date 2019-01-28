@@ -6,22 +6,17 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.crskdev.mealcalculator.R
-import com.crskdev.mealcalculator.dependencyGraph
 import com.crskdev.mealcalculator.presentation.common.entities.CarbohydrateVM
 import com.crskdev.mealcalculator.presentation.common.entities.FatVM
 import com.crskdev.mealcalculator.presentation.common.entities.FoodVM
@@ -37,8 +32,8 @@ import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companio
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_GI
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_NAME
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_PROTEINS
-import com.crskdev.mealcalculator.utils.dpToPx
-import com.crskdev.mealcalculator.utils.viewModelFromProvider
+import com.crskdev.mealcalculator.ui.common.di.DiFragment
+import com.crskdev.mealcalculator.utils.ProjectDrawableUtils
 import kotlinx.android.synthetic.main.fragment_upsert_food.*
 
 
@@ -46,13 +41,15 @@ import kotlinx.android.synthetic.main.fragment_upsert_food.*
  * A simple [Fragment] subclass.
  *
  */
-class UpsertFoodFragment : Fragment() {
+class UpsertFoodFragment : DiFragment() {
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE = 10000
     }
 
-    lateinit var viewModel: UpsertFoodViewModel
+    private val viewModel: UpsertFoodViewModel by lazy {
+        di.upsertFoodViewModel()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -66,38 +63,10 @@ class UpsertFoodFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = viewModelFromProvider(this) {
-            with(context!!.dependencyGraph()) {
-                UpsertFoodViewModel(
-                    UpsertFoodViewModel.UpsertType.decide(null, "Oatmeal"),
-                    getFoodInteractor(),
-                    foodActionInteractor(),
-                    pictureToStringConverter(),
-                    dispatchers
-                )
-            }
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_upsert_food, container, false)
-    }
-
-    private fun convertStrToBitmap(base64Str: String): Drawable {
-        val decodedBytes = Base64.decode(
-            base64Str.substring(base64Str.indexOf(",") + 1),
-            Base64.DEFAULT
-        )
-        return RoundedBitmapDrawableFactory.create(
-            resources,
-            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-        ).apply {
-            cornerRadius = 5f.dpToPx(resources)
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -154,9 +123,14 @@ class UpsertFoodFragment : Fragment() {
                 editInputUpsertFoodProteins.editText?.setText(it.proteins)
                 editInputUpsertFoodGI.editText?.setText(it.gi)
                 if (it.picture == null) {
-                    imageUpsertFood.setImageResource(R.drawable.ic_launcher_background)
+                    imageUpsertFood.setImageResource(R.drawable.ic_food_black_64dp)
                 } else {
-                    imageUpsertFood.setImageDrawable(convertStrToBitmap(it.picture as String))
+                    imageUpsertFood.setImageDrawable(
+                        ProjectDrawableUtils.convertStrToRoundedDrawable(
+                            resources,
+                            it.picture as String
+                        )
+                    )
                 }
             })
             errLiveData.observe(thisFragment, Observer {

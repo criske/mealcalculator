@@ -66,9 +66,10 @@ internal class Main {
     }
 
     internal class FoodRepositoryImpl : FoodRepository {
-        override fun create(food: Food): Long {
+        override fun create(vararg food: Food): LongArray {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
+
 
         override fun findById(id: Long): Food? {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

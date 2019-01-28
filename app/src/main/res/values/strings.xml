@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">mealcalculator</string>
+    <string name="app_name">Meal Calculator</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -16,4 +16,7 @@
     <string name="food_glycemic_index">Glycemic Index</string>
     <string name="submit">Submit</string>
     <string name="per_100g">Per 100g</string>
+    <string name="search">Search</string>
+    <string name="new_food">New food</string>
+    <string name="journal">Journal</string>
 </resources>
