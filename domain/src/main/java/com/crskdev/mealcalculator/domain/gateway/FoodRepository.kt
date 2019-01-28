@@ -6,6 +6,8 @@ interface FoodRepository : Transactionable<FoodRepository> {
 
     fun create(vararg food: Food): LongArray
 
+    fun createSingle(food: Food): Long
+
     fun edit(food: Food)
 
     fun delete(food: Food)

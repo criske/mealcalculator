@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.crskdev.mealcalculator.ui.common.di
 
 import android.app.Activity

@@ -5,6 +5,7 @@ import com.crskdev.mealcalculator.domain.gateway.FoodRepository
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.interactors.FindFoodInteractor.Response
 import com.crskdev.mealcalculator.domain.utils.switchSelectOnReceive
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -38,7 +39,12 @@ class FindFoodInteractorImpl(
     override suspend fun request(searchQuery: ReceiveChannel<String>, response: (Response) -> Unit) {
         coroutineScope {
             switchSelectOnReceive(searchQuery) { job, query ->
-                launch(job + dispatchers.DEFAULT) {
+                var err = job + CoroutineExceptionHandler { coroutineContext, throwable ->
+                    println(throwable)
+                }
+
+
+                launch(err +  dispatchers.DEFAULT) {
                     if (query.isEmpty()) {
                         foodRepository.findAll {
                             response(Response.FoundList(it))

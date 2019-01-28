@@ -12,8 +12,12 @@ import com.crskdev.mealcalculator.domain.entities.Food
 @Dao
 internal interface FoodDao {
 
+    //Note: app becomes unresponsive on queries when using this in consecutive way. Do not use!!!! Use in inset single in transactions instead
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg foodDb: FoodDb): LongArray
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSingle(foodDb: FoodDb): Long
 
     @Delete
     fun delete(foodDb: FoodDb)

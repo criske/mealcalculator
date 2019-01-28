@@ -72,8 +72,7 @@ class UpsertFoodFragment : DiFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         btnUpsertFoodChangeImage.setOnClickListener {
-            if (ContextCompat
-                    .checkSelfPermission(it.context, Manifest.permission.CAMERA)
+            if (ContextCompat.checkSelfPermission(it.context, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), 1337)
