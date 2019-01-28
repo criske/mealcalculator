@@ -6,23 +6,22 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.crskdev.mealcalculator.R
-import com.crskdev.mealcalculator.data.FoodRepositoryImpl
-import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
-import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractorImpl
-import com.crskdev.mealcalculator.domain.interactors.GetFoodInteractorImpl
-import com.crskdev.mealcalculator.platform.PictureToStringConverterImpl
-import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
+import com.crskdev.mealcalculator.dependencyGraph
 import com.crskdev.mealcalculator.presentation.common.entities.CarbohydrateVM
 import com.crskdev.mealcalculator.presentation.common.entities.FatVM
 import com.crskdev.mealcalculator.presentation.common.entities.FoodVM
@@ -40,10 +39,6 @@ import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companio
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_PROTEINS
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
 import kotlinx.android.synthetic.main.fragment_upsert_food.*
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
-import android.util.Base64
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 
 
 /**
@@ -73,20 +68,15 @@ class UpsertFoodFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = viewModelFromProvider(this) {
-            val db = MealCalculatorDatabase.inMemory(this.context!!)
-            val foodRepository = FoodRepositoryImpl(db)
-            val getFoodInteractor =
-                GetFoodInteractorImpl(PlatformGatewayDispatchers, foodRepository)
-            val foodActionInteractor =
-                FoodActionInteractorImpl(PlatformGatewayDispatchers, foodRepository)
-
-            UpsertFoodViewModel(
-                UpsertFoodViewModel.UpsertType.decide(null, "Oatmeal"),
-                getFoodInteractor,
-                foodActionInteractor,
-                PictureToStringConverterImpl(),
-                PlatformGatewayDispatchers
-            )
+            with(context!!.dependencyGraph()) {
+                UpsertFoodViewModel(
+                    UpsertFoodViewModel.UpsertType.decide(null, "Oatmeal"),
+                    getFoodInteractor(),
+                    foodActionInteractor(),
+                    pictureToStringConverter(),
+                    dispatchers
+                )
+            }
         }
     }
 
@@ -96,13 +86,15 @@ class UpsertFoodFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_upsert_food, container, false)
     }
 
-    private fun convertStrToBitmap(base64Str: String): Drawable{
+    private fun convertStrToBitmap(base64Str: String): Drawable {
         val decodedBytes = Base64.decode(
             base64Str.substring(base64Str.indexOf(",") + 1),
             Base64.DEFAULT
         )
-        return RoundedBitmapDrawableFactory.create(resources,
-            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)).apply {
+        return RoundedBitmapDrawableFactory.create(
+            resources,
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        ).apply {
             cornerRadius = 5f
         }
     }
@@ -160,9 +152,9 @@ class UpsertFoodFragment : Fragment() {
                 editInputUpsertFoodFatSaturated.editText?.setText(it.fat.saturated)
                 editInputUpsertFoodProteins.editText?.setText(it.proteins)
                 editInputUpsertFoodGI.editText?.setText(it.gi)
-                if(it.picture == null){
+                if (it.picture == null) {
                     imageUpsertFood.setImageResource(R.drawable.ic_launcher_background)
-                }else {
+                } else {
                     imageUpsertFood.setImageDrawable(convertStrToBitmap(it.picture as String))
                 }
             })

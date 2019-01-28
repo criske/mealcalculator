@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.crskdev.mealcalculator.data.internal.room.entities.FoodDb
 import com.crskdev.mealcalculator.data.internal.room.entities.MealDb
 import com.crskdev.mealcalculator.data.internal.room.entities.MealEntryDb
+import java.util.concurrent.Executors
 
 /**
  * Created by Cristian Pela on 25.01.2019.
@@ -25,8 +27,36 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
     internal abstract fun mealEntryDao(): MealEntryDao
 
     companion object {
-        fun inMemory(context: Context): MealCalculatorDatabase =
-            Room.inMemoryDatabaseBuilder(context, MealCalculatorDatabase::class.java).build()
-        fun persistent(context: Context): MealCalculatorDatabase = TODO()
+
+        @Volatile
+        private var INSTANCE: MealCalculatorDatabase? = null
+
+        fun inMemory(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
+            INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
+                INSTANCE ?: buildDatabase(context, null, block)?.also { INSTANCE = it }
+            }
+
+        fun persistent(context: Context): MealCalculatorDatabase =
+            INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
+                INSTANCE ?: buildDatabase(context, "meal-calculator.db")?.also { INSTANCE = it }
+            }
+
+        private fun buildDatabase(context: Context, name: String?, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
+            if (name == null) {
+                Room.inMemoryDatabaseBuilder(context, MealCalculatorDatabase::class.java)
+            } else {
+                Room.databaseBuilder(context, MealCalculatorDatabase::class.java, name)
+            }.addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    val executor = Executors.newSingleThreadExecutor()
+                    executor.execute {
+                        if (name == null) {
+                            inMemory(context, block)
+                        } else {
+                            persistent(context)
+                        }
+                    }
+                }
+            }).build()
     }
 }
