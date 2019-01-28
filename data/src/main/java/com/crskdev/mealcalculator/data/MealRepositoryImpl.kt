@@ -1,11 +1,11 @@
 package com.crskdev.mealcalculator.data
 
-import com.crskdev.arch.coroutines.paging.onPaging
-import com.crskdev.arch.coroutines.paging.setupPagedListBuilder
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
 import com.crskdev.mealcalculator.data.internal.room.entities.toDb
 import com.crskdev.mealcalculator.data.internal.room.entities.toDomain
 import com.crskdev.mealcalculator.data.internal.runTransactionDelegate
+import com.crskdev.mealcalculator.data.internal.utils.onPaging
+import com.crskdev.mealcalculator.data.internal.utils.setupPagedListBuilder
 import com.crskdev.mealcalculator.data.internal.utils.toChannel
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.domain.entities.MealEntry

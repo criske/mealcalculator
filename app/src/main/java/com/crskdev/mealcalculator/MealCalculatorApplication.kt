@@ -63,9 +63,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Fat(7f, 1.3f, 5.7f),
                         13.5f,
                         55
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Auchan Naut Granoro",
@@ -75,9 +73,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Fat(1.3f, 0.1f, 1.2f),
                         4.3f,
                         28
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Kaufland Migdale Macinate Mandelin",
@@ -87,9 +83,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Fat(55f, 4.7f, 50.3f),
                         24f,
                         0
-                    )
-                )
-                create(
+                    ),
                     Food(
                         0,
                         "Sanovita Seminte de In",
