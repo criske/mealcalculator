@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -33,7 +32,7 @@ import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companio
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_NAME
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_PROTEINS
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.utils.ProjectDrawableUtils
+import com.crskdev.mealcalculator.utils.ProjectImageUtils
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import kotlinx.android.synthetic.main.fragment_upsert_food.*
 
@@ -55,11 +54,11 @@ class UpsertFoodFragment : DiFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             data?.extras?.get("data")?.cast<Bitmap>()?.also {
-                viewModel.setPicture(
-                    it, context!!
-                        .resources
-                        .getDimensionPixelSize(R.dimen.food_image_size)
-                )
+                val size = context!!
+                    .resources
+                    .getDimensionPixelSize(R.dimen.food_image_size)
+                val bitmapBase64 = ProjectImageUtils.convertBitmapToBase64String(it, size)
+                viewModel.upsertWithOutSave(extractFoodVM().copy(picture = bitmapBase64))
             }
         }
     }
@@ -87,26 +86,7 @@ class UpsertFoodFragment : DiFragment() {
         }
 
         buttonUpsertFood.setOnClickListener {
-            viewModel.upsert(
-                FoodVM(
-                    0,
-                    editInputUpsertFoodName.editText?.text?.toString() ?: "",
-                    null,
-                    editInputUpsertFoodCalories.editText?.text?.toString() ?: "",
-                    CarbohydrateVM(
-                        editInputUpsertFoodCarbsTotal.editText?.text?.toString() ?: "",
-                        editInputUpsertFoodCarbFiber.editText?.text?.toString() ?: "",
-                        editInputUpsertFoodCarbSugar.editText?.text?.toString() ?: ""
-                    ),
-                    FatVM(
-                        editInputUpsertFoodFatTotal.editText?.text?.toString() ?: "",
-                        editInputUpsertFoodFatSaturated.editText?.text?.toString() ?: "",
-                        editInputUpsertFoodFatUnsaturated.editText?.text?.toString() ?: ""
-                    ),
-                    editInputUpsertFoodProteins.editText?.text?.toString() ?: "",
-                    editInputUpsertFoodGI.editText?.text?.toString() ?: ""
-                )
-            )
+            viewModel.upsert(extractFoodVM())
         }
 
         with(viewModel) {
@@ -126,7 +106,7 @@ class UpsertFoodFragment : DiFragment() {
                     imageUpsertFood.setImageResource(R.drawable.ic_food_black_64dp)
                 } else {
                     imageUpsertFood.setImageDrawable(
-                        ProjectDrawableUtils.convertStrToRoundedDrawable(
+                        ProjectImageUtils.convertStrToRoundedDrawable(
                             resources,
                             it.picture as String
                         )
@@ -183,6 +163,27 @@ class UpsertFoodFragment : DiFragment() {
                 editInputUpsertFoodGI.editText?.error = null
             })
         }
+    }
+
+    private fun extractFoodVM(): FoodVM {
+        return FoodVM(
+            0,
+            editInputUpsertFoodName.editText?.text?.toString() ?: "",
+            null,
+            editInputUpsertFoodCalories.editText?.text?.toString() ?: "",
+            CarbohydrateVM(
+                editInputUpsertFoodCarbsTotal.editText?.text?.toString() ?: "",
+                editInputUpsertFoodCarbFiber.editText?.text?.toString() ?: "",
+                editInputUpsertFoodCarbSugar.editText?.text?.toString() ?: ""
+            ),
+            FatVM(
+                editInputUpsertFoodFatTotal.editText?.text?.toString() ?: "",
+                editInputUpsertFoodFatSaturated.editText?.text?.toString() ?: "",
+                editInputUpsertFoodFatUnsaturated.editText?.text?.toString() ?: ""
+            ),
+            editInputUpsertFoodProteins.editText?.text?.toString() ?: "",
+            editInputUpsertFoodGI.editText?.text?.toString() ?: ""
+        )
     }
 
     private fun getFieldEditText(field: Int): EditText? {

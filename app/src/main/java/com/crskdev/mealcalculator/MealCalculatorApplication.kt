@@ -2,13 +2,8 @@
 
 package com.crskdev.mealcalculator
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.crskdev.mealcalculator.data.FoodRepositoryImpl
 import com.crskdev.mealcalculator.data.MealRepositoryImpl
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
@@ -19,10 +14,8 @@ import com.crskdev.mealcalculator.domain.gateway.FoodRepository
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import com.crskdev.mealcalculator.domain.interactors.*
-import com.crskdev.mealcalculator.platform.PictureToStringConverterImpl
 import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
 import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
-import com.crskdev.mealcalculator.presentation.common.services.PictureToStringConverter
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
@@ -31,7 +24,6 @@ import com.crskdev.mealcalculator.ui.food.FindFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragmentArgs
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
-import kotlin.reflect.KClass
 
 /**
  * Created by Cristian Pela on 28.01.2019.
@@ -112,10 +104,6 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     ///****************************Interactors*****************
 
-    val pictureToStringConverter: () -> PictureToStringConverter = {
-        PictureToStringConverterImpl()
-    }
-
     val getFoodInteractor: () -> GetFoodInteractor = {
         GetFoodInteractorImpl(dispatchers, foodRepository)
     }
@@ -136,9 +124,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 UpsertFoodViewModel(
                     UpsertFoodViewModel.UpsertType.decide(args.id.takeIf { it > 0 }, args.name),
                     getFoodInteractor(),
-                    foodActionInteractor(),
-                    pictureToStringConverter(),
-                    dispatchers
+                    foodActionInteractor()
                 )
             }
         }

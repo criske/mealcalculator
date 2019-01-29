@@ -30,8 +30,8 @@ class FindFoodViewModel(
     init {
         launch {
             searchLiveData
-                .interval(300, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
+                .interval(300, TimeUnit.MILLISECONDS)
                 .toChannel { ch ->
                     findFoodInteractor.request(ch) {
                         when (it) {

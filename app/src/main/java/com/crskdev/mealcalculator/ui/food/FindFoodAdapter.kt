@@ -10,8 +10,6 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
 import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
-import com.crskdev.mealcalculator.utils.ProjectDrawableUtils
-import kotlinx.android.synthetic.main.item_food_display.view.*
 
 /**
  * Created by Cristian Pela on 28.01.2019.

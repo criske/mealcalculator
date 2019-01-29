@@ -11,7 +11,6 @@ import com.crskdev.mealcalculator.presentation.common.entities.*
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
-import com.crskdev.mealcalculator.presentation.common.services.PictureToStringConverter
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Error.*
 import kotlinx.coroutines.launch
 
@@ -21,9 +20,7 @@ import kotlinx.coroutines.launch
 class UpsertFoodViewModel(
     private val upsertType: UpsertType,
     private val getFoodInteractor: GetFoodInteractor,
-    private val foodActionInteractor: FoodActionInteractor,
-    private val pictureToStringConverter: PictureToStringConverter,
-    private val dispatchers: GatewayDispatchers
+    private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel() {
 
     companion object {
@@ -109,6 +106,10 @@ class UpsertFoodViewModel(
         }
     }
 
+    fun upsertWithOutSave(foodVM: FoodVM) {
+        retainedModelLiveData.mutableSet(foodVM)
+    }
+
     fun upsert(foodVM: FoodVM) {
         retainedModelLiveData.value?.let {
             launch {
@@ -181,26 +182,6 @@ class UpsertFoodViewModel(
         }
         errors.add(error)
     }
-
-    fun setPicture(bitmap: Any?, sizePx: Int = 100) {
-        retainedModelLiveData.value?.let {
-            if (bitmap == null) {
-                retainedModelLiveData.mutableSet(it.copy(picture = null))
-            } else {
-                launch(dispatchers.DEFAULT) {
-                    try {
-                        val imgStr = pictureToStringConverter.convertAbstract(bitmap, sizePx)
-                        retainedModelLiveData.mutablePost(it.copy(picture = imgStr))
-                    } catch (ex: Exception) {
-                        errLiveData.mutablePost(ErrorCollector().apply {
-                            addErrorToCollector(this, FIELD_NONE, Other(ex))
-                        })
-                    }
-                }
-            }
-        } ?: throw IllegalStateException("No model is set")
-    }
-
 
 }
 
