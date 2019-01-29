@@ -60,7 +60,7 @@ class MealRepositoryImpl(private val db: MealCalculatorDatabase) : MealRepositor
     }
 
     override fun editCurrentMealEntry(mealEntry: MealEntry) {
-        mealEntryDao.insert(mealEntry.toDb())
+        mealEntryDao.update(mealEntry.toDb())
     }
 
     override fun removeCurrentMealEntry(mealEntry: MealEntry) {

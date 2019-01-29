@@ -31,7 +31,7 @@ data class Food(val id: Long = 0,
                 val carbohydrates: Carbohydrate,
                 val fat: Fat,
                 val proteins: Float,
-                val gi: Int)
+                val gi: Float)
 
 data class Fat(val total: Float, val saturated: Float, val unsaturated: Float)
 

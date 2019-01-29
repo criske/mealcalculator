@@ -166,10 +166,10 @@ class FoodActionInteractorImpl(
             if (this == null)
                 badTypeFields.add(FoodActionInteractor.Fields.FIELD_PROTEINS)
         } ?: 0f
-        val gi = unchecked.gi.trim().toIntOrNull().apply {
+        val gi = unchecked.gi.trim().toFloatOrNull().apply {
             if (this == null)
                 badTypeFields.add(FoodActionInteractor.Fields.FIELD_GI)
-        } ?: 0
+        } ?: 0f
         if (badTypeFields.isNotEmpty()) {
             errors.add(Response.Error.InvalidNumberType(*badTypeFields.toIntArray()))
         }
@@ -220,7 +220,7 @@ class FoodActionInteractorImpl(
 
         food.gi.let {
             if (it !in 0..100) {
-                errors.add(Response.Error.GIOutOfBounds(it))
+                errors.add(Response.Error.GIOutOfBounds(it.toInt()))
             }
         }
 

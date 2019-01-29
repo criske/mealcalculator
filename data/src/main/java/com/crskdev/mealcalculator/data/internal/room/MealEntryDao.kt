@@ -15,6 +15,9 @@ internal interface MealEntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(mealEntry: MealEntryDb)
 
+    @Update
+    fun update(mealEntry: MealEntryDb)
+
     @Delete
     fun delete(mealEntry: MealEntryDb)
 

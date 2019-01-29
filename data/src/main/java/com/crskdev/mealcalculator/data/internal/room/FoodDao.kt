@@ -18,6 +18,9 @@ internal interface FoodDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSingle(foodDb: FoodDb): Long
 
+    @Update
+    fun update(foodDb: FoodDb)
+
     @Delete
     fun delete(foodDb: FoodDb)
 

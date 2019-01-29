@@ -51,7 +51,11 @@ class FindFoodFragment : DiFragment() {
         with(recyclerFoodsSearch) {
             adapter = FindFoodAdapter(LayoutInflater.from(context)) {
                 when (it) {
-                    is FoodDisplayItemAction.Select -> selectedFoodViewModel.selectFood(it.food)
+                    is FoodDisplayItemAction.Select -> {
+                        selectedFoodViewModel.selectFood(it.food)
+                        if(FindFoodFragmentArgs.fromBundle(arguments!!).popOnSelectItem)
+                            findNavController().popBackStack()
+                    }
                     is FoodDisplayItemAction.Edit -> findNavController().navigate(
                         FindFoodFragmentDirections
                             .actionFindFoodFragmentToUpsertFoodFragment(null, it.food.id)

@@ -36,7 +36,7 @@ fun FoodVM.toDomain(): Food = Food(
         fat.unsaturated.toFloat()
     ),
     proteins.toFloat(),
-    gi.toInt()
+    gi.toFloat()
 )
 
 fun FoodVM.toDomainUnchecked(): FoodUnchecked =

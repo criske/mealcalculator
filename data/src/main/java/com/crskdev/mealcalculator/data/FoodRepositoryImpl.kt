@@ -26,7 +26,7 @@ class FoodRepositoryImpl(private val db: MealCalculatorDatabase) : FoodRepositor
         foodDao.insertSingle(food.toDb())
 
     override fun edit(food: Food) {
-        foodDao.insert(food.toDb())
+        foodDao.update(food.toDb())
     }
 
     override fun delete(food: Food) {

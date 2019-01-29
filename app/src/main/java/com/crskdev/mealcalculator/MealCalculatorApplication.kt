@@ -19,10 +19,12 @@ import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
+import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.di.BaseDependencyGraph
 import com.crskdev.mealcalculator.ui.food.FindFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragmentArgs
+import com.crskdev.mealcalculator.ui.meal.MealFragment
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
 
 /**
@@ -44,7 +46,7 @@ fun Context.dependencyGraph() =
 class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val db: MealCalculatorDatabase by lazy {
-        MealCalculatorDatabase.inMemory(context) {
+        MealCalculatorDatabase.persistent(context) {
             foodRepository.runTransaction {
                 create(
                     Food(
@@ -55,7 +57,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Carbohydrate(58.7f, 10f, 0.7f),
                         Fat(7f, 1.3f, 5.7f),
                         13.5f,
-                        55
+                        55f
                     ),
                     Food(
                         0,
@@ -65,7 +67,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Carbohydrate(8.6f, 4.5f, 0f),
                         Fat(1.3f, 0.1f, 1.2f),
                         4.3f,
-                        28
+                        28f
                     ),
                     Food(
                         0,
@@ -75,7 +77,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Carbohydrate(4.3f, 9.2f, 4.2f),
                         Fat(55f, 4.7f, 50.3f),
                         24f,
-                        0
+                        0f
                     ),
                     Food(
                         0,
@@ -85,7 +87,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                         Carbohydrate(10.4f, 26.9f, 0.4f),
                         Fat(41f, 2.8f, 0f),
                         24f,
-                        0
+                        0f
                     )
                 )
             }
@@ -116,6 +118,18 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         FindFoodInteractorImpl(dispatchers, foodRepository)
     }
 
+    val currentMealActionInteractor: () -> CurrentMealActionInteractor = {
+        CurrenMealActionInteractorImpl(dispatchers, mealRepository)
+    }
+
+    val currentMealEntryDisplayInteractor: () -> CurrentMealEntryDisplayInteractor = {
+        CurrentMealEntryDisplayInteractorImpl(dispatchers, mealRepository)
+    }
+
+    val currentMealDisplayInteractor: () -> CurrentMealDisplayInteractor = {
+        CurrentMealDisplayInteractorImpl(dispatchers, mealRepository)
+    }
+
     //******************************* view models *************************************************
     val upsertFoodViewModel: () -> UpsertFoodViewModel = {
         with(fragment<UpsertFoodFragment>()) {
@@ -140,6 +154,17 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
     val selectedFoodViewModel: () -> SelectedFoodViewModel = {
         viewModelFromProvider(activity<MainActivity>()) {
             SelectedFoodViewModel()
+        }
+    }
+
+    val mealViewModel: () -> MealViewModel = {
+        viewModelFromProvider(fragment<MealFragment>()) {
+            MealViewModel(
+                currentMealDisplayInteractor(),
+                currentMealEntryDisplayInteractor(),
+                currentMealActionInteractor(),
+                foodActionInteractor()
+            )
         }
     }
 

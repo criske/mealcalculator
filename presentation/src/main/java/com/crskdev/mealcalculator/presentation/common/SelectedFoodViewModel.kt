@@ -1,9 +1,9 @@
 package com.crskdev.mealcalculator.presentation.common
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 
 /**
@@ -11,7 +11,7 @@ import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
  */
 class SelectedFoodViewModel : ViewModel() {
 
-    val selectedFoodLiveData: LiveData<Food> = MutableLiveData<Food>()
+    val selectedFoodLiveData: LiveData<Food> = SingleLiveEvent<Food>()
 
     fun selectFood(food: Food) {
         selectedFoodLiveData.mutableSet(food)

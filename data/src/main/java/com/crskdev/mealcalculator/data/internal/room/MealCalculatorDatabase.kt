@@ -29,7 +29,8 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
     companion object {
 
         @Volatile
-        private var INSTANCE: MealCalculatorDatabase? = null
+        @PublishedApi
+        internal var INSTANCE: MealCalculatorDatabase? = null
 
         fun inMemory(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
@@ -38,10 +39,12 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
         fun persistent(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
-                INSTANCE ?: buildDatabase(context, "meal-calculator.db")?.also { INSTANCE = it }
+                INSTANCE ?: buildDatabase(context, "meal-calculator.db", block)?.also {
+                    INSTANCE = it
+                }
             }
 
-        private fun buildDatabase(context: Context, name: String?, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase {
+        private fun buildDatabase(context: Context, name: String?, block: (MealCalculatorDatabase) -> Unit): MealCalculatorDatabase {
             val executor = Executors.newSingleThreadExecutor()
             return if (name == null) {
                 Room.inMemoryDatabaseBuilder(context, MealCalculatorDatabase::class.java)
@@ -56,7 +59,8 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             executor.execute {
-                                persistent(context, block)
+                                val db = persistent(context, block)
+                                block(db)
                             }
                         }
                     }).build()

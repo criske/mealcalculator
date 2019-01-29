@@ -34,8 +34,9 @@ interface CurrentMealActionInteractor {
         object MealSaved : Response
         object MealDiscarded : Response
         sealed class Error : Throwable(), Response {
-            object NegativeOrZeroQuantity : Error()
+            object NegativeQuantity : Error()
             object MealNotStarted : Error()
+            object EmptyMeal: Error()
             class Other(val throwable: Throwable) : Error()
         }
     }
@@ -97,12 +98,16 @@ class CurrenMealActionInteractorImpl(
                             mealRepository.removeCurrentMealEntry(request.entry)
                         }
                         is Request.SaveMeal -> {
-                            mealRepository.runTransaction {
-                                val allTodayMeal = getAllTodayMeal()
-                                    ?: throw Response.Error.MealNotStarted
-                                saveAllToday(allTodayMeal + request.meal)
-                                discardCurrentMealEntries()
-                                finalResponse = Response.MealSaved
+                            if(request.meal.calories > 0) {
+                                mealRepository.runTransaction {
+                                    val allTodayMeal = getAllTodayMeal()
+                                        ?: throw Response.Error.MealNotStarted
+                                    saveAllToday(allTodayMeal + request.meal)
+                                    discardCurrentMealEntries()
+                                    finalResponse = Response.MealSaved
+                                }
+                            }else{
+                                finalResponse = Response.Error.EmptyMeal
                             }
                         }
                         is Request.DiscardMeal -> {
@@ -118,8 +123,8 @@ class CurrenMealActionInteractorImpl(
         }
 
     private fun checkQuantity(quantity: Int) {
-        if (quantity <= 0)
-            throw Response.Error.NegativeOrZeroQuantity
+        if (quantity < 0)
+            throw Response.Error.NegativeQuantity
     }
 
 }

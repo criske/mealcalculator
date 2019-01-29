@@ -24,19 +24,14 @@ internal class MealSummaryCalculator {
                 )
             }
 
-        assert(
-            foods.fold(0f) { acc, curr ->
-                curr.carbohydrates.total.div(carbohydrates.total)
-                    .plus(acc)
-            } == 1.0f
-        )
+//        val glycemicLoad = foods.fold(0f) { acc, curr ->
+//            curr.gi
+//                .times(curr.carbohydrates.total)
+//                .div(100)
+//                .plus(acc)
+//        }
 
-        val glycemicLoad = foods.fold(0f) { acc, curr ->
-            curr.gi
-                .times(curr.carbohydrates.total)
-                .div(carbohydrates.total)
-                .plus(acc)
-        }
+        val glycemicLoad = foods.sumByDouble { it.gi.toDouble() }.toFloat()
 
         val calories = foods.sumBy { it.calories }
 
@@ -51,7 +46,7 @@ internal class MealSummaryCalculator {
             }
 
 
-        val proteins = entries.sumByDouble { it.food.proteins.toDouble() }.toFloat()
+        val proteins = foods.sumByDouble { it.proteins.toDouble() }.toFloat()
 
         val (id, number, date) = entries.first().let {
             Triple(

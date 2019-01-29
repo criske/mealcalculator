@@ -25,6 +25,8 @@ internal suspend fun <T> LiveData<T>.toChannel(mainDispatcher: CoroutineDispatch
             observeForever(observer)
         }
         sendChannel.invokeOnClose {
-            this@toChannel.removeObserver(observer)
+            launch(mainDispatcher) {
+                this@toChannel.removeObserver(observer)
+            }
         }
     }

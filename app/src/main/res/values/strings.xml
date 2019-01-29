@@ -23,4 +23,7 @@
     <string name="delete">Delete</string>
     <string name="warning">Warning</string>
     <string name="msg_warning_delete_food">Are you sure you want to delete \"%1$s\" permanently from database?</string>
+    <string name="grams">Grams</string>
+    <string name="add">Add</string>
+    <string name="save">Save</string>
 </resources>

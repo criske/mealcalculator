@@ -1,22 +1,50 @@
 package com.crskdev.mealcalculator.data.internal.room.entities
 
 import com.crskdev.mealcalculator.domain.entities.*
+import kotlin.math.roundToInt
 
 /**
  * Created by Cristian Pela on 25.01.2019.
  */
 ///mappers
 internal fun FoodDb.toDomain(): Food =
-    Food(id, name, picture, calories, carbohydrate.toDomain(), fat.toDomain(), proteins, gi)
+    Food(
+        id,
+        name,
+        picture,
+        calories,
+        carbohydrate.toDomain(),
+        fat.toDomain(),
+        proteins,
+        gi.toFloat()
+    )
 
 internal fun Food.toDb(): FoodDb =
-    FoodDb(id, name, picture, calories, carbohydrates.toDb(), fat.toDb(), proteins, gi)
+    FoodDb(id, name, picture, calories, carbohydrates.toDb(), fat.toDb(), proteins, gi.roundToInt())
 
 internal fun MealDb.toDomain(): Meal =
-    Meal(id, numberOfTheDay, calories, carbohydrate.toDomain(), fat.toDomain(), protein, glycemicLoad, date)
+    Meal(
+        id,
+        numberOfTheDay,
+        calories,
+        carbohydrate.toDomain(),
+        fat.toDomain(),
+        protein,
+        glycemicLoad,
+        date
+    )
 
 internal fun Meal.toDb(): MealDb =
-    MealDb(id, numberOfTheDay, calories, carbohydrate.toDb(), fat.toDb(), protein, glycemicLoad, date)
+    MealDb(
+        id,
+        numberOfTheDay,
+        calories,
+        carbohydrate.toDb(),
+        fat.toDb(),
+        protein,
+        glycemicLoad,
+        date
+    )
 
 internal fun Carbohydrate.toDb(): CarbohydrateDb =
     CarbohydrateDb(total, fiber, sugar)
