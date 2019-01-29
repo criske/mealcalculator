@@ -8,22 +8,28 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
+import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
 import com.crskdev.mealcalculator.utils.ProjectDrawableUtils
 import kotlinx.android.synthetic.main.item_food_display.view.*
 
 /**
  * Created by Cristian Pela on 28.01.2019.
  */
-class FindFoodAdapter(private val inflater: LayoutInflater) : PagedListAdapter<Food, FindFoodVH>(
-    object : DiffUtil.ItemCallback<Food>() {
-        override fun areItemsTheSame(oldItem: Food, newItem: Food): Boolean =
-            oldItem.id == newItem.id
+class FindFoodAdapter(private val inflater: LayoutInflater,
+                      private val action: (FoodDisplayItemAction) -> Unit) :
+    PagedListAdapter<Food, FindFoodVH>(
+        object : DiffUtil.ItemCallback<Food>() {
+            override fun areItemsTheSame(oldItem: Food, newItem: Food): Boolean =
+                oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Food, newItem: Food): Boolean = oldItem == newItem
-    }) {
+            override fun areContentsTheSame(oldItem: Food, newItem: Food): Boolean =
+                oldItem == newItem
+        }) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FindFoodVH =
         FindFoodVH(
-            inflater.inflate(R.layout.item_food_display, parent, false)
+            inflater.inflate(R.layout.item_food_display, parent, false),
+            action
         )
 
     override fun onBindViewHolder(holder: FindFoodVH, position: Int) {
@@ -31,38 +37,20 @@ class FindFoodAdapter(private val inflater: LayoutInflater) : PagedListAdapter<F
             holder.bind(it)
         } ?: holder.clear()
     }
+
 }
 
 
-class FindFoodVH(view: View) : RecyclerView.ViewHolder(view) {
+class FindFoodVH(view: View, action: (FoodDisplayItemAction) -> Unit) :
+    RecyclerView.ViewHolder(view) {
 
-    private var food: Food? = null
+    private val delegate = FoodDisplayBindItemDelegate(itemView, action)
 
     fun bind(food: Food) {
-        this.food = food
-        with(itemView) {
-            textFoodDisplayName.text = food.name
-            textFoodDisplayCalories.text = "${food.calories}kCal."
-            textFoodDisplayMacros.text = buildString {
-                append("C:${food.carbohydrates.total}g\n")
-                append("F:${food.fat.total}g\n")
-                append("P:${food.proteins}g")
-            }
-            food.picture?.also {
-                imageFoodDisplay.setImageDrawable(
-                    ProjectDrawableUtils.convertStrToRoundedDrawable(resources, it)
-                )
-            } ?: imageFoodDisplay.setImageResource(R.drawable.ic_food_black_64dp)
-            Unit
-        }
+        delegate.bind(food)
     }
 
     fun clear() {
-        food = null
-        with(itemView) {
-            textFoodDisplayName.text = null
-            textFoodDisplayCalories.text = null
-            textFoodDisplayMacros.text = null
-        }
+        delegate.clear()
     }
 }

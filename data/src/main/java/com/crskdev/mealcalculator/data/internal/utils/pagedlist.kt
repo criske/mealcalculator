@@ -11,7 +11,6 @@ import kotlinx.coroutines.channels.actor
 import kotlin.coroutines.CoroutineContext
 
 
-
 /**
  * Created by Cristian Pela on 14.11.2018.
 
@@ -60,18 +59,18 @@ suspend fun <Key, Value> ReadyPagedListBuilder<Key, Value>.onPaging(job: Job? = 
         var lastPage: PagedList<Value>? = null
         val invalidatedCallback = object : DataSource.InvalidatedCallback {
             override fun onInvalidated() {
-                val dis = this
-                runBlocking(parentContext + fetchDispatcher) {
-                    val lastKey = lastPage?.lastKey as? Key
-                    do {
-                        lastPage?.dataSource?.removeInvalidatedCallback(dis)
-                        lastPage = recreate(lastKey).build(parentContext).apply {
-                            dataSource.addInvalidatedCallback(dis)
+                val callback = this
+                val lastKey = lastPage?.lastKey as? Key
+                do {
+                    lastPage = lastPage?.run {
+                        dataSource.removeInvalidatedCallback(callback)
+                        detach()
+                        recreate(lastKey).build(parentContext).apply {
+                            dataSource.addInvalidatedCallback(callback)
                         }
-                    } while (lastPage?.isDetached == true)
-                    lastPage?.let { sendChannel.send(it) }
-                    Unit
-                }
+                    }
+                } while (lastPage?.isDetached == true)
+                lastPage?.also { sendChannel.offer(it) }
             }
         }
         sendChannel.send(build(parentContext).apply {

@@ -34,6 +34,7 @@ import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companio
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_PROTEINS
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.ProjectDrawableUtils
+import com.crskdev.mealcalculator.utils.showSimpleToast
 import kotlinx.android.synthetic.main.fragment_upsert_food.*
 
 
@@ -167,7 +168,7 @@ class UpsertFoodFragment : DiFragment() {
                             }
                         }
                     }
-                    Toast.makeText(context, textErrors, Toast.LENGTH_LONG).show()
+                    context?.showSimpleToast(textErrors)
                 }
             })
             clearErrorsLiveData.observe(thisFragment, Observer {

@@ -21,6 +21,7 @@ import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.platform.PictureToStringConverterImpl
 import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
+import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.services.PictureToStringConverter
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
@@ -145,8 +146,14 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
     val findFoodViewModel: () -> FindFoodViewModel = {
         with(fragment<FindFoodFragment>()) {
             viewModelFromProvider(this) {
-                FindFoodViewModel(findFoodInteractor())
+                FindFoodViewModel(findFoodInteractor(), foodActionInteractor())
             }
+        }
+    }
+
+    val selectedFoodViewModel: () -> SelectedFoodViewModel = {
+        viewModelFromProvider(activity<MainActivity>()) {
+            SelectedFoodViewModel()
         }
     }
 

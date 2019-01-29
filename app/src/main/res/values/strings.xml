@@ -19,4 +19,8 @@
     <string name="search">Search</string>
     <string name="new_food">New food</string>
     <string name="journal">Journal</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="warning">Warning</string>
+    <string name="msg_warning_delete_food">Are you sure you want to delete \"%1$s\" permanently from database?</string>
 </resources>

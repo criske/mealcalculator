@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.domain.interactors.FindFoodInteractor
+import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
+import com.crskdev.mealcalculator.presentation.common.livedata.distinctUntilChanged
 import com.crskdev.mealcalculator.presentation.common.livedata.interval
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
@@ -15,7 +17,8 @@ import java.util.concurrent.TimeUnit
  * Created by Cristian Pela on 26.01.2019.
  */
 class FindFoodViewModel(
-    private val findFoodInteractor: FindFoodInteractor
+    private val findFoodInteractor: FindFoodInteractor,
+    private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel() {
 
     private val searchLiveData = MutableLiveData<String>().apply {
@@ -28,6 +31,7 @@ class FindFoodViewModel(
         launch {
             searchLiveData
                 .interval(300, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
                 .toChannel { ch ->
                     findFoodInteractor.request(ch) {
                         when (it) {
@@ -41,6 +45,14 @@ class FindFoodViewModel(
 
     fun search(query: String) {
         searchLiveData.value = query
+    }
+
+    fun delete(food: Food) {
+        launch {
+            foodActionInteractor.request(FoodActionInteractor.Request.Delete(food)) {
+                //no-op
+            }
+        }
     }
 
 }

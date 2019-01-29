@@ -40,3 +40,32 @@ fun <T> LiveData<T>.interval(itemThreshold: Int): LiveData<T> {
     })
     return mutableLiveData
 }
+
+fun <T> LiveData<T>.distinctUntilChanged(): LiveData<T> {
+    val mutableLiveData: MediatorLiveData<T> = MediatorLiveData()
+    mutableLiveData.addSource(this, object : Observer<T> {
+        var lastValue: T? = null
+        override fun onChanged(t: T) {
+            if (lastValue != t) {
+                mutableLiveData.value = t
+                lastValue = t
+            }
+        }
+    })
+    return mutableLiveData
+}
+
+inline fun <T> LiveData<T>.distinctUntilChanged(crossinline predicate: (T, T) -> Boolean): LiveData<T> {
+    val mutableLiveData: MediatorLiveData<T> = MediatorLiveData()
+    mutableLiveData.addSource(this, object : Observer<T> {
+        var lastValue: T? = null
+        override fun onChanged(t: T) {
+            val prevT = lastValue
+            if (prevT == null || predicate(prevT, t)) {
+                mutableLiveData.value = t
+                lastValue = t
+            }
+        }
+    })
+    return mutableLiveData
+}
