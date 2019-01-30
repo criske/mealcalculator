@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.Design.Light.NoActionBar">
@@ -6,8 +6,21 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:listDivider">@color/colorPrimary</item>
     </style>
 
+    <style name="AppToolbar">
+        <!--<item name="android:elevation" tools:targetApi="lollipop">5dp</item>-->
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <!--<item name="android:background">@color/colorPrimaryFaint</item>-->
+        <item name="android:tint">@color/colorPrimary</item>
+        <item name="android:theme">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
+    </style>
+
+    <style name="AppToolbar.Nav">
+        <item name="navigationIcon">@drawable/ic_arrow_back_black_24dp</item>
+    </style>
     <style name="TextFoodSectionHeader">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
         <item name="android:textSize">18dp</item>

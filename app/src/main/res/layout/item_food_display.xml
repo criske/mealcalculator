@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
     android:layout_height="120dp">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -36,6 +38,8 @@
         tools:text="260 kCal" />
 
     <ImageView
+        android:background="@drawable/round_rectangle"
+        android:scaleType="fitXY"
         android:id="@+id/imageFoodDisplay"
         android:layout_width="@dimen/food_image_size"
         android:layout_height="@dimen/food_image_size"

@@ -30,15 +30,15 @@ class HomeFragment : Fragment() {
             inflateMenu(R.menu.menu_home)
             setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.action_home_menu_search -> {
+                    R.id.action_home_menu_foods -> {
                         findNavController().navigate(HomeFragmentDirections
                             .actionHomeFragmentToFindFoodFragment())
                     }
-                    R.id.action_home_menu_new_food -> {
+                    R.id.action_home_menu_foods-> {
                         findNavController().navigate(HomeFragmentDirections
                             .actionHomeFragmentToUpsertFoodFragment(null, -1))
                     }
-                    R.id.action_home_menu_journal -> {
+                    R.id.action_home_menu_meal_journal -> {
 
                     }
                 }

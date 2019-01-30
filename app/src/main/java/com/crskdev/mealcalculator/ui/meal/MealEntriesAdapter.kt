@@ -1,8 +1,11 @@
 package com.crskdev.mealcalculator.ui.meal
 
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
@@ -59,8 +62,10 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
         }
     }
 
+
     init {
         with(itemView) {
+            clipToOutline = true
             buttonMealQuantityAdd.setOnClickListener {
                 mealEntry?.let { m ->
                     try {

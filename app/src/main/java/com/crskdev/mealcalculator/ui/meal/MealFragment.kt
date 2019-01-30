@@ -8,12 +8,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.utils.showSimpleAlertDialog
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import kotlinx.android.synthetic.main.fragment_meal.*
 
@@ -48,7 +46,6 @@ class MealFragment : DiFragment() {
                         viewModel.deleteFood(it.food)
                     }
                 }
-                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             }
         }
         with(toolbarMeal) {
@@ -67,6 +64,9 @@ class MealFragment : DiFragment() {
                     }
                 }
                 true
+            }
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
             }
             Unit
         }

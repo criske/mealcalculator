@@ -11,14 +11,14 @@
         android:id="@+id/toolbarMeal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+        android:theme="@style/AppToolbar.Nav" />
 
     <TextView
+        android:background="@drawable/round_rectangle"
         android:id="@+id/textMealSummary"
         android:layout_width="match_parent"
-        android:layout_height="56dp" />
+        android:layout_margin="4dp"
+        android:layout_height="80dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMealEntries"

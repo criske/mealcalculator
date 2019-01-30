@@ -73,8 +73,17 @@ class UpsertFoodFragment : DiFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         with(toolbarUpsertFood) {
+            inflateMenu(R.menu.menu_upsert)
             setNavigationOnClickListener {
                 findNavController().popBackStack()
+            }
+            setOnMenuItemClickListener {
+                when(it.itemId){
+                    R.id.action_menu_upsert_save ->{
+                        viewModel.upsert(extractFoodVM())
+                    }
+                }
+                true
             }
         }
 
@@ -92,10 +101,6 @@ class UpsertFoodFragment : DiFragment() {
             }
         }
 
-        buttonUpsertFood.setOnClickListener {
-            viewModel.upsert(extractFoodVM())
-        }
-
         with(viewModel) {
             val thisFragment = this@UpsertFoodFragment
             retainedModelLiveData.observe(thisFragment, Observer {
@@ -109,16 +114,11 @@ class UpsertFoodFragment : DiFragment() {
                 editInputUpsertFoodFatSaturated.editText?.setText(it.fat.saturated)
                 editInputUpsertFoodProteins.editText?.setText(it.proteins)
                 editInputUpsertFoodGI.editText?.setText(it.gi)
-                if (it.picture == null) {
-                    imageUpsertFood.setImageResource(R.drawable.ic_food_black_64dp)
-                } else {
-                    imageUpsertFood.setImageDrawable(
-                        ProjectImageUtils.convertStrToRoundedDrawable(
-                            resources,
-                            it.picture as String
-                        )
-                    )
-                }
+                imageUpsertFood.setImageDrawable(
+                    it.picture?.let { p ->
+                        ProjectImageUtils.convertStrToRoundedDrawable(resources, p)
+                    }
+                )
             })
             errLiveData.observe(thisFragment, Observer {
                 for (field in UpsertFoodViewModel.FIELD_NAME..UpsertFoodViewModel.FIELD_GI) {

@@ -1,9 +1,13 @@
 package com.crskdev.mealcalculator.ui.common
 
 import android.content.DialogInterface
+import android.graphics.PorterDuff
 import android.view.ContextMenu
 import android.view.MenuInflater
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.toColorFilter
 import androidx.core.view.forEach
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
@@ -69,11 +73,18 @@ class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDispl
                 append("F:${food.fat.total}g\n")
                 append("P:${food.proteins}g")
             }
-            food.picture?.also {
-                imageFoodDisplay.setImageDrawable(
-                    ProjectImageUtils.convertStrToRoundedDrawable(resources, it)
+
+            val picture = food.picture?.let {
+                ProjectImageUtils.convertStrToRoundedDrawable(resources, it)
+            } ?: ContextCompat.getDrawable(context, R.drawable.ic_food_black_24dp)?.apply {
+                colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorPrimary
+                    )
                 )
-            } ?: imageFoodDisplay.setImageResource(R.drawable.ic_food_black_64dp)
+            }
+            imageFoodDisplay.setImageDrawable(picture)
             Unit
         }
     }
