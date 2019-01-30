@@ -8,13 +8,13 @@
     tools:context=".ui.food.UpsertFoodFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbarUpsertFood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@android:drawable/arrow_up_float"
+        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
         app:title="@string/per_100g" />
 
     <androidx.core.widget.NestedScrollView

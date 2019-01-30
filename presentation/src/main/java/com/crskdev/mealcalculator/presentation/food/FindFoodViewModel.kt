@@ -36,7 +36,7 @@ class FindFoodViewModel(
                     findFoodInteractor.request(ch) {
                         when (it) {
                             is FindFoodInteractor.Response.FoundList -> foodsLiveData.mutablePost(it.list)
-                            is FindFoodInteractor.Response.CreateNewFoodWithQueryNameWhenEmpty -> TODO()
+                            is FindFoodInteractor.Response.CreateNewFoodWithQueryNameWhenEmpty ->{}
                         }
                     }
                 }

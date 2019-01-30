@@ -83,7 +83,7 @@ class MealViewModel(
             mealActionLiveData.value = CurrentMealActionInteractor.Request.AddEntry(
                 MealEntry(0, it.id, it.date, it.numberOfTheDay, 0, food)
             )
-        } ?: throw IllegalStateException("Meal Model Not Set")
+        }
     }
 
     fun removeEntry(entry: MealEntry) {

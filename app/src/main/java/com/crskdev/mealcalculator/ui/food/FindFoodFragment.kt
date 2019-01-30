@@ -3,11 +3,9 @@ package com.crskdev.mealcalculator.ui.food
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.widget.doAfterTextChanged
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -43,9 +41,36 @@ class FindFoodFragment : DiFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        editFoodsSearch.doAfterTextChanged { e ->
-            e?.also {
-                viewModel.search(it.toString())
+        with(toolbarFoodsSearch) {
+            inflateMenu(R.menu.menu_find_food)
+            setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+            menu.findItem(R.id.action_menu_find_food_search)
+                .actionView.cast<SearchView>()
+                .also { searchView ->
+                    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                        override fun onQueryTextSubmit(query: String?): Boolean = false
+
+                        override fun onQueryTextChange(newText: String?): Boolean {
+                            newText?.also {
+                                viewModel.search(it)
+                            }
+                            return true
+                        }
+                    })
+                }
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.action_menu_find_food_new -> {
+                        findNavController().navigate(
+                            FindFoodFragmentDirections
+                                .actionFindFoodFragmentToUpsertFoodFragment(null, 0)
+                        )
+                    }
+                }
+                true
             }
         }
         with(recyclerFoodsSearch) {
@@ -53,7 +78,7 @@ class FindFoodFragment : DiFragment() {
                 when (it) {
                     is FoodDisplayItemAction.Select -> {
                         selectedFoodViewModel.selectFood(it.food)
-                        if(FindFoodFragmentArgs.fromBundle(arguments!!).popOnSelectItem)
+                        if (FindFoodFragmentArgs.fromBundle(arguments!!).popOnSelectItem)
                             findNavController().popBackStack()
                     }
                     is FoodDisplayItemAction.Edit -> findNavController().navigate(
