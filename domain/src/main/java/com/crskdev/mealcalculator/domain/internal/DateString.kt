@@ -10,7 +10,7 @@ internal object DateString {
 
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
 
-    fun obtain(): String = dateFormatter.format(Date())
+    fun obtain(date: Date = Date()): String = dateFormatter.format(date)
 
     operator fun invoke(): String = obtain()
 }

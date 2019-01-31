@@ -14,6 +14,8 @@ interface FoodRepository : Transactionable<FoodRepository> {
 
     fun findById(id: Long): Food?
 
+    fun findAllByIds(ids: List<Long>): List<Food>
+
     suspend fun find(like: String, observer: (List<Food>) -> Unit)
 
     suspend fun findAll(observer: (List<Food>) -> Unit)

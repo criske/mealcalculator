@@ -26,6 +26,8 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
     internal abstract fun mealEntryDao(): MealEntryDao
 
+
+
     companion object {
 
         @Volatile
@@ -34,12 +36,12 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
         fun inMemory(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
-                INSTANCE ?: buildDatabase(context, null, block)?.also { INSTANCE = it }
+                INSTANCE ?: buildDatabase(context, null, block).also { INSTANCE = it }
             }
 
         fun persistent(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
-                INSTANCE ?: buildDatabase(context, "meal-calculator.db", block)?.also {
+                INSTANCE ?: buildDatabase(context, "meal-calculator.db", block).also {
                     INSTANCE = it
                 }
             }
@@ -59,8 +61,8 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             executor.execute {
-                                val db = persistent(context, block)
-                                block(db)
+                                val persistentDb = persistent(context, block)
+                                block(persistentDb)
                             }
                         }
                     }).build()

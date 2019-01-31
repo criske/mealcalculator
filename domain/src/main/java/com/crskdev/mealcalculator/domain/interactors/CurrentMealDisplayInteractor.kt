@@ -3,6 +3,7 @@ package com.crskdev.mealcalculator.domain.interactors
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
 import com.crskdev.mealcalculator.domain.entities.Meal
+import com.crskdev.mealcalculator.domain.gateway.CurrentMealEntryManager
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import com.crskdev.mealcalculator.domain.internal.DateString
@@ -21,14 +22,16 @@ interface CurrentMealDisplayInteractor {
 
 class CurrentMealDisplayInteractorImpl(
     private val dispatchers: GatewayDispatchers,
-    private val mealRepository: MealRepository) : CurrentMealDisplayInteractor {
+    private val mealRepository: MealRepository,
+    private val currentMealEntryManager: CurrentMealEntryManager) : CurrentMealDisplayInteractor {
 
     override suspend fun request(response: (Meal) -> Unit) = coroutineScope {
         launch(dispatchers.DEFAULT) {
-            mealRepository.observeCurrentMealEntries {
+            currentMealEntryManager.observeAll{
                 val mealSummary = if (it.isEmpty()) {
                     val m = mealRepository.getAllTodayMeal() ?: Meal.empty(0, 0, DateString())
                     m.copy(
+                        calories = 0,
                         numberOfTheDay = m.numberOfTheDay + 1,
                         carbohydrate = Carbohydrate(0f, 0f, 0f),
                         fat = Fat(0f, 0f, 0f),

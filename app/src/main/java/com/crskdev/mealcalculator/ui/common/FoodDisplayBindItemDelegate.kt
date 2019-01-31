@@ -76,13 +76,13 @@ class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDispl
 
             val picture = food.picture?.let {
                 ProjectImageUtils.convertStrToRoundedDrawable(resources, it)
-            } ?: ContextCompat.getDrawable(context, R.drawable.ic_food_black_24dp)?.apply {
-                colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.colorPrimary
-                    )
-                )
+            } ?: ContextCompat.getDrawable(context, R.drawable.ic_fruit_24dp)?.apply {
+//                colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(
+//                    ContextCompat.getColor(
+//                        context,
+//                        R.color.colorPrimary
+//                    )
+//                )
             }
             imageFoodDisplay.setImageDrawable(picture)
             Unit

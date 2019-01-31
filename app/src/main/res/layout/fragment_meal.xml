@@ -16,6 +16,10 @@
     <TextView
         android:background="@drawable/round_rectangle"
         android:id="@+id/textMealSummary"
+        android:paddingStart="8dp"
+        android:gravity="center_vertical"
+        android:textSize="12sp"
+        android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_margin="4dp"
         android:layout_height="80dp" />

@@ -41,7 +41,7 @@ data class Meal(val id: Long = 0,
                 this.fat.unsaturated + other.fat.unsaturated
             ),
             protein = this.protein + other.protein,
-            glycemicLoad = (this.glycemicLoad + other.glycemicLoad) / incrementedNumberOfTheDay
+            glycemicLoad = this.glycemicLoad + other.glycemicLoad
         )
     }
 }

@@ -58,4 +58,7 @@ class FoodRepositoryImpl(private val db: MealCalculatorDatabase) : FoodRepositor
 
     override fun runTransaction(block: FoodRepository.() -> Unit) =
         runTransactionDelegate(db, block)
+
+    override fun findAllByIds(ids: List<Long>): List<Food> =
+        foodDao.findAllByIds(ids).map { it.toDomain() }
 }

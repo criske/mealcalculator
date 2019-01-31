@@ -33,4 +33,7 @@ internal interface FoodDao {
     @Query("SELECT * FROM ${Tables.FOODS} WHERE food_id=:id")
     fun findById(id: Long): FoodDb?
 
+    @Query("SELECT * FROM ${Tables.FOODS} WHERE food_id in (:ids)")
+    fun findAllByIds(ids: List<Long>): List<FoodDb>
+
 }

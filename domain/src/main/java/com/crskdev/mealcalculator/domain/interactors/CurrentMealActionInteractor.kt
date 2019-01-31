@@ -2,6 +2,7 @@ package com.crskdev.mealcalculator.domain.interactors
 
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.domain.entities.MealEntry
+import com.crskdev.mealcalculator.domain.gateway.CurrentMealEntryManager
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import com.crskdev.mealcalculator.domain.interactors.CurrentMealActionInteractor.*
@@ -36,7 +37,7 @@ interface CurrentMealActionInteractor {
         sealed class Error : Throwable(), Response {
             object NegativeQuantity : Error()
             object MealNotStarted : Error()
-            object EmptyMeal: Error()
+            object EmptyMeal : Error()
             class Other(val throwable: Throwable) : Error()
         }
     }
@@ -45,7 +46,8 @@ interface CurrentMealActionInteractor {
 
 class CurrenMealActionInteractorImpl(
     private val dispatchers: GatewayDispatchers,
-    private val mealRepository: MealRepository
+    private val mealRepository: MealRepository,
+    private val currentMealEntryManager: CurrentMealEntryManager
 ) : CurrentMealActionInteractor {
 
 
@@ -78,27 +80,33 @@ class CurrenMealActionInteractorImpl(
                         }
                         is Request.AddEntry -> {
                             checkQuantity(request.entry.quantity)
-                            mealRepository.runTransaction {
-                                val existentMealWithFood =
-                                    existentCurrentMealEntryWithFood(request.entry.food.id)
-                                //update quantity if food already exists and request quantity is different
-                                if (existentMealWithFood?.quantity?.equals(request.entry.quantity)?.not() == true) {
-                                    editCurrentMealEntry(existentMealWithFood.copy(quantity = request.entry.quantity))
-                                } else {
-                                    addCurrentMealEntry(request.entry)
+
+                            val existentMealWithFood =
+                                currentMealEntryManager.getEntryWithFoodId(request.entry.food.id)
+                            //update quantity if food already exists and request quantity is different
+                            if (existentMealWithFood?.food?.id == request.entry.food.id) {
+                                if (request.entry.quantity > 0) {
+                                    currentMealEntryManager.update(
+                                        existentMealWithFood.copy(
+                                            quantity = request.entry.quantity
+                                        )
+                                    )
                                 }
+                            } else {
+                                currentMealEntryManager + request.entry
                             }
+
 
                         }
                         is Request.EditEntry -> {
                             checkQuantity(request.entry.quantity)
-                            mealRepository.editCurrentMealEntry(request.entry)
+                            currentMealEntryManager.update(request.entry)
                         }
                         is Request.RemoveEntry -> {
-                            mealRepository.removeCurrentMealEntry(request.entry)
+                            currentMealEntryManager.minus(request.entry)
                         }
                         is Request.SaveMeal -> {
-                            if(request.meal.calories > 0) {
+                            if (request.meal.calories > 0) {
                                 mealRepository.runTransaction {
                                     val allTodayMeal = getAllTodayMeal()
                                         ?: throw Response.Error.MealNotStarted
@@ -106,7 +114,7 @@ class CurrenMealActionInteractorImpl(
                                     discardCurrentMealEntries()
                                     finalResponse = Response.MealSaved
                                 }
-                            }else{
+                            } else {
                                 finalResponse = Response.Error.EmptyMeal
                             }
                         }

@@ -33,6 +33,12 @@ class MealFragment : DiFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        textMealSummary.setOnClickListener {
+            findNavController().navigate(
+                MealFragmentDirections
+                    .actionMealFragmentToAllDayMealDisplayFragment()
+            )
+        }
         with(recyclerMealEntries) {
             adapter = MealEntriesAdapter(LayoutInflater.from(context)) {
                 when (it) {
@@ -76,11 +82,11 @@ class MealFragment : DiFragment() {
         viewModel.mealSummaryLiveData.observe(this, Observer {
             toolbarMeal.title = "No.${it.numberOfTheDay}"
             val summary =
-                """Calories: ${it.calories.toString().format(2)}kCal Carbs:${it.carbohydrate.total.toString().format(
-                    2
-                )}g Fat.:${it.fat.total.toString().format(2)}g Prot.:${it.protein.toString().format(
-                    2
-                )}g GL:${it.glycemicLoad.toString().format(2)}
+                """Calories: ${it.calories.toString().format(2)} kCal.
+Carbohydrates: ${it.carbohydrate.total.toString().format(2)} g
+Fat: ${it.fat.total.toString().format(2)} g
+Proteins: ${it.protein.toString().format(2)} g
+Glycemic Load: ${it.glycemicLoad.toString().format(2)}
                 """.trimIndent()
             textMealSummary.text = summary
         })

@@ -20,7 +20,11 @@ open class BaseDependencyGraph(protected val context: Context) {
     protected val injectedActivities =
         mutableMapOf<KClass<out AppCompatActivity>, AppCompatActivity>()
 
+    protected val activityScopes = mutableMapOf<AppCompatActivity, MutableList<Any>>()
+
     protected val injectedFragments = mutableMapOf<KClass<out Fragment>, Fragment>()
+
+    protected val fragmentScopes = mutableMapOf<Fragment, MutableList<Any>>()
 
     init {
         context.cast<Application>()
@@ -39,6 +43,8 @@ open class BaseDependencyGraph(protected val context: Context) {
 
                 override fun onActivityDestroyed(activity: Activity) {
                     injectedActivities.remove(activity::class)
+                    activityScopes[activity]?.clear()
+                    activityScopes.remove(activity)
                 }
 
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -49,6 +55,8 @@ open class BaseDependencyGraph(protected val context: Context) {
                                     FragmentManager.FragmentLifecycleCallbacks() {
                                     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
                                         injectedFragments.remove(f::class)
+                                        fragmentScopes[f]?.clear()
+                                        fragmentScopes.remove(f)
                                     }
                                 }, true
                             )
@@ -59,10 +67,12 @@ open class BaseDependencyGraph(protected val context: Context) {
 
     fun inject(fragment: Fragment) {
         injectedFragments[fragment::class] = fragment
+        fragmentScopes[fragment] = mutableListOf<Any>()
     }
 
     fun inject(activity: AppCompatActivity) {
         injectedActivities[activity::class] = activity
+        activityScopes[activity] = mutableListOf<Any>()
     }
 
     protected inline fun <reified F : Fragment> fragment(): F =
@@ -74,5 +84,34 @@ open class BaseDependencyGraph(protected val context: Context) {
         injectedActivities.getOrElse(A::class) {
             throw IllegalAccessException("Fragment ${A::class} was not injected")
         } as A
+
+
+    inline fun <reified F : Fragment, reified T> onFragmentScope(crossinline factory: () -> T) =
+        {
+            val f = fragment<F>()
+            val instances = fragmentScopes[f]!!
+            val instance = instances.firstOrNull { it is T}
+            if (instance == null) {
+                val created = factory()
+                instances.add(created as Any)
+                created
+            } else {
+                instance as T
+            }
+        }
+
+    inline fun <reified A : AppCompatActivity, reified T> onActivityScope(crossinline factory: () -> T) =
+        {
+            val a = activity<A>()
+            val instances = activityScopes[a]!!
+            val instance = instances.firstOrNull { it::class == T::class }
+            if (instance == null) {
+                val created = factory()
+                instances.add(created as Any)
+                created
+            } else {
+                instance as T
+            }
+        }
 
 }

@@ -10,20 +10,21 @@ import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
 import com.crskdev.mealcalculator.domain.entities.Food
-import com.crskdev.mealcalculator.domain.gateway.FoodRepository
-import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
-import com.crskdev.mealcalculator.domain.gateway.MealRepository
+import com.crskdev.mealcalculator.domain.gateway.*
 import com.crskdev.mealcalculator.domain.interactors.*
+import com.crskdev.mealcalculator.platform.PlatformCurrentMealEntryManager
 import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
 import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
+import com.crskdev.mealcalculator.presentation.meal.AllDayMealDisplayViewModel
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.di.BaseDependencyGraph
 import com.crskdev.mealcalculator.ui.food.FindFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragment
 import com.crskdev.mealcalculator.ui.food.UpsertFoodFragmentArgs
+import com.crskdev.mealcalculator.ui.meal.AllDayMealDisplayFragment
 import com.crskdev.mealcalculator.ui.meal.MealFragment
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
 
@@ -104,6 +105,16 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val dispatchers: GatewayDispatchers = PlatformGatewayDispatchers
 
+    val currentMealEntryManager: () -> CurrentMealEntryManager =
+        onFragmentScope<MealFragment, PlatformCurrentMealEntryManager> {
+            PlatformCurrentMealEntryManager(
+                activity(),
+                db,
+                foodRepository,
+                CurrentMealEntryManagerImpl()
+            )
+        }
+
     ///****************************Interactors*****************
 
     val getFoodInteractor: () -> GetFoodInteractor = {
@@ -119,15 +130,19 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
     }
 
     val currentMealActionInteractor: () -> CurrentMealActionInteractor = {
-        CurrenMealActionInteractorImpl(dispatchers, mealRepository)
+        CurrenMealActionInteractorImpl(dispatchers, mealRepository, currentMealEntryManager())
     }
 
     val currentMealEntryDisplayInteractor: () -> CurrentMealEntryDisplayInteractor = {
-        CurrentMealEntryDisplayInteractorImpl(dispatchers, mealRepository)
+        CurrentMealEntryDisplayInteractorImpl(dispatchers, currentMealEntryManager())
     }
 
     val currentMealDisplayInteractor: () -> CurrentMealDisplayInteractor = {
-        CurrentMealDisplayInteractorImpl(dispatchers, mealRepository)
+        CurrentMealDisplayInteractorImpl(dispatchers, mealRepository, currentMealEntryManager())
+    }
+
+    val allDayMealDisplayInteractor: () -> AllDayMealDisplayInteractor = {
+        AllDayMealDisplayInteractorImpl(dispatchers, mealRepository)
     }
 
     //******************************* view models *************************************************
@@ -165,6 +180,12 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 currentMealActionInteractor(),
                 foodActionInteractor()
             )
+        }
+    }
+
+    val allDayMealDisplayViewModel: () -> AllDayMealDisplayViewModel = {
+        viewModelFromProvider(fragment<AllDayMealDisplayFragment>()) {
+            AllDayMealDisplayViewModel(allDayMealDisplayInteractor())
         }
     }
 

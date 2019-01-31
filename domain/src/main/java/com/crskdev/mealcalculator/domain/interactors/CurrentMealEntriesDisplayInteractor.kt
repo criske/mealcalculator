@@ -1,6 +1,7 @@
 package com.crskdev.mealcalculator.domain.interactors
 
 import com.crskdev.mealcalculator.domain.entities.MealEntry
+import com.crskdev.mealcalculator.domain.gateway.CurrentMealEntryManager
 import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import kotlinx.coroutines.coroutineScope
@@ -17,12 +18,12 @@ interface CurrentMealEntryDisplayInteractor {
 
 class CurrentMealEntryDisplayInteractorImpl(
     private val dispatchers: GatewayDispatchers,
-    private val mealRepository: MealRepository
+    private val currentMealEntryManager: CurrentMealEntryManager
 ) : CurrentMealEntryDisplayInteractor {
 
     override suspend fun request(response: (List<MealEntry>) -> Unit) = coroutineScope {
         launch(dispatchers.DEFAULT) {
-            mealRepository.observeCurrentMealEntries {
+            currentMealEntryManager.observeAll {
                 response(it)
             }
         }

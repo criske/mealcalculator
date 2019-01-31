@@ -12,7 +12,6 @@ import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.*
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 
 /**

@@ -57,6 +57,14 @@
         <action
             android:id="@+id/action_mealFragment_to_upsertFoodFragment"
             app:destination="@id/upsertFoodFragment" />
+        <action
+            android:id="@+id/action_mealFragment_to_allDayMealDisplayFragment"
+            app:destination="@id/allDayMealDisplayFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/allDayMealDisplayFragment"
+        android:name="com.crskdev.mealcalculator.ui.meal.AllDayMealDisplayFragment"
+        android:label="fragment_all_day_meal_display"
+        tools:layout="@layout/fragment_all_day_meal_display" />
 
 </navigation>
