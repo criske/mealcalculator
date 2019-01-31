@@ -77,7 +77,9 @@ class MealFragment : DiFragment() {
             Unit
         }
         viewModel.mealEntriesLiveData.observe(this, Observer {
-            recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.submitList(it)
+            recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.apply {
+                submitList(it)
+            }
         })
         viewModel.mealSummaryLiveData.observe(this, Observer {
             toolbarMeal.title = "No.${it.numberOfTheDay}"

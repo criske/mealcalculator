@@ -1,10 +1,14 @@
 package com.crskdev.mealcalculator.ui.meal
 
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.get
 import androidx.core.widget.doAfterTextChanged
@@ -65,7 +69,19 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 
     init {
         with(itemView) {
-            clipToOutline = true
+            editMealEntryQuantity.setOnFocusChangeListener { v, hasFocus ->
+                val e = v.cast<EditText>()
+                if (hasFocus) {
+                    v.post {
+                        e.selectAll()
+                    }
+                } else {
+                    e.setSelection(0, 0)
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                clipToOutline = true
+            }
             buttonMealQuantityAdd.setOnClickListener {
                 mealEntry?.let { m ->
                     try {
@@ -75,6 +91,11 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 
                     }
                 }
+                context.getSystemService<InputMethodManager>()
+                    ?.hideSoftInputFromWindow(
+                        editMealEntryQuantity.windowToken,
+                        0
+                    )
             }
             buttonMealEntryRemove.setOnClickListener {
                 mealEntry?.let { m ->
@@ -86,8 +107,17 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 
     fun bind(mealEntry: MealEntry) {
         this.mealEntry = mealEntry
-        with(itemView){
-            editMealEntryQuantity.setText(mealEntry.quantity.toString())
+        with(itemView) {
+            editMealEntryQuantity.apply {
+                if (mealEntry.quantity == 0) {
+                    requestFocus()
+                    post {
+                        context.getSystemService<InputMethodManager>()
+                            ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+                    }
+                }
+                setText(mealEntry.quantity.toString())
+            }
         }
         foodDisplayItemDelegate.bind(mealEntry.food)
     }
