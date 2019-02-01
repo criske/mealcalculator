@@ -86,7 +86,7 @@ open class BaseDependencyGraph(protected val context: Context) {
         } as A
 
 
-    inline fun <reified F : Fragment, reified T> onFragmentScope(crossinline factory: () -> T) =
+    inline fun <reified F : Fragment, reified T> withinFragmentScope(crossinline factory: () -> T) =
         {
             val f = fragment<F>()
             val instances = fragmentScopes[f]!!
@@ -100,7 +100,7 @@ open class BaseDependencyGraph(protected val context: Context) {
             }
         }
 
-    inline fun <reified A : AppCompatActivity, reified T> onActivityScope(crossinline factory: () -> T) =
+    inline fun <reified A : AppCompatActivity, reified T> withinActivityScope(crossinline factory: () -> T) =
         {
             val a = activity<A>()
             val instances = activityScopes[a]!!

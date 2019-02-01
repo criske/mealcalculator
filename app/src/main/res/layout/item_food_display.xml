@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
+    android:focusable="true"
     android:layout_height="120dp">
 
     <androidx.appcompat.widget.AppCompatTextView

@@ -8,28 +8,25 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import kotlinx.android.synthetic.main.fragment_all_day_meal_display.*
+import kotlinx.android.synthetic.main.fragment_meal_journal_detail.*
 
-/**
- * A simple [Fragment] subclass.
- *
- */
-class AllDayMealDisplayFragment : DiFragment() {
+class MealJournalDetailFragment : DiFragment() {
 
     private val viewModel by lazy {
-        di.allDayMealDisplayViewModel()
+        di.mealJournalDetailViewModel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_all_day_meal_display, container, false)
+        return inflater.inflate(R.layout.fragment_meal_journal_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.allDayMealLiveData.observe(this, Observer {
             val display = """
-                All Day Meals Macros:
+                Date: ${it.date}
+                Meals: ${it.numberOfTheDay}
 
                 Calories: ${it.calories}
                 Carbs: ${it.carbohydrate.total}

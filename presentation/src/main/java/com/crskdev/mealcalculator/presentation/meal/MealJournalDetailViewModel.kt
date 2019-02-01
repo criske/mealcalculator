@@ -3,7 +3,7 @@ package com.crskdev.mealcalculator.presentation.meal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.Meal
-import com.crskdev.mealcalculator.domain.interactors.AllDayMealDisplayInteractor
+import com.crskdev.mealcalculator.domain.interactors.MealJournalDetailInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import kotlinx.coroutines.launch
@@ -12,8 +12,9 @@ import java.util.*
 /**
  * Created by Cristian Pela on 30.01.2019.
  */
-class AllDayMealDisplayViewModel(
-    private val allDayMealDisplayInteractor: AllDayMealDisplayInteractor
+class MealJournalDetailViewModel(
+    private val mealId: Long,
+    private val mealJournalDetailInteractor: MealJournalDetailInteractor
 ) : CoroutineScopedViewModel() {
 
 
@@ -26,12 +27,12 @@ class AllDayMealDisplayViewModel(
 
     fun find() {
         launch {
-            allDayMealDisplayInteractor.request(Date()) {
+            mealJournalDetailInteractor.request(mealId) {
                 when (it) {
-                    is AllDayMealDisplayInteractor.Response.OK -> {
+                    is MealJournalDetailInteractor.Response.OK -> {
                         allDayMealLiveData.mutablePost(it.meal)
                     }
-                    AllDayMealDisplayInteractor.Response.NotFound -> {
+                    MealJournalDetailInteractor.Response.NotFound -> {
                         //todo
                     }
                 }

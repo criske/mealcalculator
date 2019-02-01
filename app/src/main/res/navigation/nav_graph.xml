@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_mealFragment"
             app:destination="@id/mealFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_mealJournalFragment"
+            app:destination="@id/mealJournalFragment" />
     </fragment>
     <fragment
         android:id="@+id/findFoodFragment"
@@ -58,13 +61,26 @@
             android:id="@+id/action_mealFragment_to_upsertFoodFragment"
             app:destination="@id/upsertFoodFragment" />
         <action
-            android:id="@+id/action_mealFragment_to_allDayMealDisplayFragment"
-            app:destination="@id/allDayMealDisplayFragment" />
+            android:id="@+id/action_mealFragment_to_mealJournalDetailFragment"
+            app:destination="@id/mealJournalDetailFragment" />
     </fragment>
     <fragment
-        android:id="@+id/allDayMealDisplayFragment"
-        android:name="com.crskdev.mealcalculator.ui.meal.AllDayMealDisplayFragment"
-        android:label="fragment_all_day_meal_display"
-        tools:layout="@layout/fragment_all_day_meal_display" />
+        android:id="@+id/mealJournalDetailFragment"
+        android:name="com.crskdev.mealcalculator.ui.meal.MealJournalDetailFragment"
+        android:label="fragment_meal_journal_detail"
+        tools:layout="@layout/fragment_meal_journal_detail" >
+        <argument
+            android:name="mealId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/mealJournalFragment"
+        android:name="com.crskdev.mealcalculator.ui.meal.MealJournalFragment"
+        android:label="fragment_meal_journal"
+        tools:layout="@layout/fragment_meal_journal" >
+        <action
+            android:id="@+id/action_mealJournalFragment_to_mealJournalDetailFragment"
+            app:destination="@id/mealJournalDetailFragment" />
+    </fragment>
 
 </navigation>

@@ -17,7 +17,12 @@ internal interface MealDao {
     @Query("SELECT * FROM ${Tables.MEALS_JOURNAL} WHERE date=date('now') LIMIT 1")
     fun getAllTodayMeal(): MealDb?
 
-    @Query("SELECT * FROM ${Tables.MEALS_JOURNAL} ORDER BY date DESC")
+    @Query("SELECT * FROM ${Tables.MEALS_JOURNAL} WHERE m_id=:id")
+    fun getJournalMealById(id: Long): MealDb
+
+    //TODO clear all 0 calories invalid entries
+
+    @Query("SELECT * FROM ${Tables.MEALS_JOURNAL} WHERE calories > 0 ORDER BY date DESC")
     fun getAllJournalMeals(): DataSource.Factory<Int, MealDb>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -28,5 +33,7 @@ internal interface MealDao {
 
     @Query("SELECT m_id FROM ${Tables.MEALS_JOURNAL} WHERE date=date('now')")
     fun getAllTodayMealId(): Long
+
+
 
 }

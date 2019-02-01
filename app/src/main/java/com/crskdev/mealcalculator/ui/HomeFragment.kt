@@ -31,15 +31,22 @@ class HomeFragment : Fragment() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_home_menu_foods -> {
-                        findNavController().navigate(HomeFragmentDirections
-                            .actionHomeFragmentToFindFoodFragment())
+                        findNavController().navigate(
+                            HomeFragmentDirections
+                                .actionHomeFragmentToFindFoodFragment()
+                        )
                     }
-                    R.id.action_home_menu_foods-> {
-                        findNavController().navigate(HomeFragmentDirections
-                            .actionHomeFragmentToUpsertFoodFragment(null, -1))
+                    R.id.action_home_menu_foods -> {
+                        findNavController().navigate(
+                            HomeFragmentDirections
+                                .actionHomeFragmentToUpsertFoodFragment(null, -1)
+                        )
                     }
                     R.id.action_home_menu_meal_journal -> {
-
+                        findNavController().navigate(
+                            HomeFragmentDirections
+                                .actionHomeFragmentToMealJournalFragment()
+                        )
                     }
                 }
                 true

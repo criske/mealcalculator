@@ -65,39 +65,5 @@ internal class Main {
         override fun custom(): CoroutineDispatcher = Dispatchers.Unconfined
     }
 
-//    internal class FoodRepositoryImpl : FoodRepository {
-//        override fun createSingle(food: Food): Long {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
 //
-//        override fun create(vararg food: Food): LongArray {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//
-//        override fun findById(id: Long): Food? {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//        override suspend fun find(like: String, observer: (List<Food>) -> Unit) {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//        override suspend fun findAll(observer: (List<Food>) -> Unit) {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//
-//        override fun edit(food: Food) {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//        override fun delete(food: Food) {
-//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//        }
-//
-//        override fun runTransaction(block: FoodRepository.() -> Unit) {
-//            this.block()
-//        }
-//    }
 }

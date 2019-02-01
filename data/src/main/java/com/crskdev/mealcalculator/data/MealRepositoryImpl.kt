@@ -30,6 +30,9 @@ class MealRepositoryImpl(private val db: MealCalculatorDatabase) : MealRepositor
     override fun getAllTodayMeal(): Meal? =
         mealDao.getAllTodayMeal()?.toDomain()
 
+    override fun getJournalMealById(id: Long): Meal =
+        mealDao.getJournalMealById(id).toDomain()
+
     override suspend fun observeJournalMeals(observer: (List<Meal>) -> Unit) =
         coroutineScope {
             mealDao.getAllJournalMeals()

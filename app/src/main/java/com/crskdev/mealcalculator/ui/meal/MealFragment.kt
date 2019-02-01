@@ -36,7 +36,7 @@ class MealFragment : DiFragment() {
         textMealSummary.setOnClickListener {
             findNavController().navigate(
                 MealFragmentDirections
-                    .actionMealFragmentToAllDayMealDisplayFragment()
+                    .actionMealFragmentToMealJournalDetailFragment(-1)
             )
         }
         with(recyclerMealEntries) {

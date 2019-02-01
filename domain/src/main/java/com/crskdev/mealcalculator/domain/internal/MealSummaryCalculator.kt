@@ -24,6 +24,8 @@ internal class MealSummaryCalculator {
 
         val glycemicLoad = foods.sumByDouble { it.gi.toDouble() }.toFloat()
 
+        assert(glycemicLoad >= 0)
+
         val calories = foods.sumBy { it.calories }
 
         val fats = foods
