@@ -149,6 +149,10 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         MealJournalDisplayInteractorImpl(dispatchers, mealRepository)
     }
 
+    val mealJournalDeleteInteractor: ()-> MealJournalDeleteInteractor = {
+        MealJournalDeleteInteractorImpl(dispatchers, mealRepository)
+    }
+
     //******************************* view models *************************************************
     val upsertFoodViewModel: () -> UpsertFoodViewModel = {
         with(fragment<UpsertFoodFragment>()) {
@@ -198,7 +202,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val mealJournalViewModel: () -> MealJournalViewModel = {
         viewModelFromProvider(fragment<MealJournalFragment>()) {
-            MealJournalViewModel(mealJournalDisplayInteractor())
+            MealJournalViewModel(mealJournalDisplayInteractor(), mealJournalDeleteInteractor())
         }
     }
 

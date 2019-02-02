@@ -70,9 +70,6 @@ class CurrenMealActionInteractorImpl(
                                 discardCurrentMealEntries()
                                 val todayMealNumber = getAllTodayMealCount()
                                 val date = DateString()
-                                if (todayMealNumber == 0) {
-                                    startAllTodayMeal(Meal.empty(0, 0, date))
-                                }
                                 val id = getAllTodayMealId()
                                 val startedMeal = Meal.empty(id, todayMealNumber + 1, date)
                                 response(Response.MealStarted(startedMeal))
@@ -108,9 +105,13 @@ class CurrenMealActionInteractorImpl(
                         is Request.SaveMeal -> {
                             if (request.meal.calories > 0) {
                                 mealRepository.runTransaction {
-                                    val allTodayMeal = getAllTodayMeal()
-                                        ?: throw Response.Error.MealNotStarted
-                                    saveAllToday(allTodayMeal + request.meal)
+                                    if (request.meal.id == 0L) {//not created the daily meal
+                                        startAllTodayMeal(request.meal)
+                                    } else {
+                                        val allTodayMeal = getAllTodayMeal()
+                                            ?: throw Response.Error.MealNotStarted
+                                        saveAllToday(allTodayMeal + request.meal)
+                                    }
                                     discardCurrentMealEntries()
                                     finalResponse = Response.MealSaved
                                 }

@@ -31,5 +31,8 @@ interface MealRepository : Transactionable<MealRepository> {
     suspend fun observeCurrentMealEntries(observer: (List<MealEntry>) -> Unit)
 
     suspend fun observeJournalMeals(observer: (List<Meal>) -> Unit)
+
     fun getJournalMealById(id: Long): Meal
+
+    fun deleteMealFromJournal(id: Long)
 }

@@ -8,6 +8,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchUIUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
@@ -36,6 +39,16 @@ class MealJournalFragment : DiFragment() {
                 )
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            ItemTouchHelper(object :
+                ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
+                override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                                    target: RecyclerView.ViewHolder): Boolean = false
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    viewModel.delete(viewHolder.adapterPosition)
+                }
+            }).attachToRecyclerView(this)
+            Unit
         }
         viewModel.mealsLiveData.observe(this, Observer {
             require(it is PagedList<Meal>)

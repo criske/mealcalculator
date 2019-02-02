@@ -19,6 +19,7 @@ import kotlinx.coroutines.coroutineScope
 @ExperimentalCoroutinesApi
 class MealRepositoryImpl(private val db: MealCalculatorDatabase) : MealRepository {
 
+
     private val mealDao by lazy {
         db.mealDao()
     }
@@ -32,6 +33,10 @@ class MealRepositoryImpl(private val db: MealCalculatorDatabase) : MealRepositor
 
     override fun getJournalMealById(id: Long): Meal =
         mealDao.getJournalMealById(id).toDomain()
+
+    override fun deleteMealFromJournal(id: Long) {
+        mealDao.deleteMealFromJournal(id)
+    }
 
     override suspend fun observeJournalMeals(observer: (List<Meal>) -> Unit) =
         coroutineScope {

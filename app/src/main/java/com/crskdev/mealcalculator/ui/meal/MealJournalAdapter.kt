@@ -57,7 +57,7 @@ class MealVH(v: View, action: (Long) -> Unit) : RecyclerView.ViewHolder(v) {
         this.meal = meal
         with(itemView) {
             textItemMealJournal.text =
-                """Date: ${meal.date}, Total Meals: ${meal.numberOfTheDay} Calories: ${meal.calories} kCal. C:${meal.carbohydrate.total} C:${meal.fat.total} C:${meal.protein} GL:${meal.glycemicLoad}""".trimIndent()
+                """Date: ${meal.date}, Total Meals: ${meal.numberOfTheDay} Calories: ${meal.calories} kCal. C:${meal.carbohydrate.total} F:${meal.fat.total} P:${meal.protein} GL:${meal.glycemicLoad}""".trimIndent()
         }
     }
 
