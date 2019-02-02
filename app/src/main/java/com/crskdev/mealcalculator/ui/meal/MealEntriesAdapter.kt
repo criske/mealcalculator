@@ -1,16 +1,13 @@
 package com.crskdev.mealcalculator.ui.meal
 
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.core.view.ViewCompat
-import androidx.core.view.get
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -21,9 +18,7 @@ import com.crskdev.mealcalculator.domain.entities.MealEntry
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
 import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.item_meal_entry.view.*
-import java.lang.Exception
 
 /**
  * Created by Cristian Pela on 29.01.2019.
@@ -38,7 +33,31 @@ class MealEntriesAdapter(
         override fun areContentsTheSame(oldItem: MealEntry, newItem: MealEntry): Boolean =
             oldItem == newItem
 
+        override fun getChangePayload(oldItem: MealEntry, newItem: MealEntry): Any? {
+            return SparseArray<Any>().apply {
+                if (oldItem.quantity != newItem.quantity) {
+                    this.put(PAYLOAD_QUANTITY, newItem.quantity)
+                }
+                if (oldItem.food != newItem.food) {
+                    this.put(PAYLOAD_FOOD, newItem.food)
+                }
+            }
+        }
     }) {
+
+    companion object {
+        const val PAYLOAD_QUANTITY = 0
+        const val PAYLOAD_FOOD = 1
+    }
+
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return getItem(position).id
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealEntryVH =
         MealEntryVH(
             inflater.inflate(R.layout.item_meal_entry, parent, false),
@@ -49,10 +68,20 @@ class MealEntriesAdapter(
         holder.bind(getItem(position))
     }
 
+    override fun onBindViewHolder(holder: MealEntryVH, position: Int, payloads: MutableList<Any>) {
+        val mealEntry = getItem(position)
+        if (payloads.isNotEmpty()) {
+            holder.bindWithPayload(mealEntry, payloads.first().cast())
+        } else {
+            holder.bind(mealEntry)
+        }
+    }
+
 }
 
 
-class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
+class MealEntryVH(itemView: View,
+                  private val action: (MealEntryAction) -> Unit) :
     RecyclerView.ViewHolder(itemView) {
 
     private var mealEntry: MealEntry? = null
@@ -69,33 +98,32 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 
     init {
         with(itemView) {
-            editMealEntryQuantity.setOnFocusChangeListener { v, hasFocus ->
-                val e = v.cast<EditText>()
-                if (hasFocus) {
-                    v.post {
-                        e.selectAll()
+            with(editMealEntryQuantity) {
+                setOnFocusChangeListener { v, hasFocus ->
+                    val e = v.cast<EditText>()
+                    if (hasFocus) {
+                        v.post {
+                            e.selectAll()
+                        }
+                    } else {
+                        e.setSelection(0, 0)
                     }
-                } else {
-                    e.setSelection(0, 0)
+                }
+                doAfterTextChanged {
+                    mealEntry?.let { m ->
+                        val q = editMealEntryQuantity.text
+                            ?.trim()
+                            ?.takeIf { it.isNotEmpty() }
+                            ?.toString()
+                            ?.toInt()
+                            ?: 0
+                        println("Quantity: $q")
+                        action(MealEntryAction.EditEntry(m.copy(quantity = q)))
+                    }
                 }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 clipToOutline = true
-            }
-            buttonMealQuantityAdd.setOnClickListener {
-                mealEntry?.let { m ->
-                    try {
-                        val q = editMealEntryQuantity.text?.toString()?.toInt()
-                        action(MealEntryAction.EditEntry(m.copy(quantity = q ?: 0)))
-                    } catch (ex: Exception) {
-
-                    }
-                }
-                context.getSystemService<InputMethodManager>()
-                    ?.hideSoftInputFromWindow(
-                        editMealEntryQuantity.windowToken,
-                        0
-                    )
             }
             buttonMealEntryRemove.setOnClickListener {
                 mealEntry?.let { m ->
@@ -107,19 +135,34 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 
     fun bind(mealEntry: MealEntry) {
         this.mealEntry = mealEntry
-        with(itemView) {
-            editMealEntryQuantity.apply {
-                if (mealEntry.quantity == 0) {
-                    requestFocus()
-                    post {
-                        context.getSystemService<InputMethodManager>()
-                            ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
-                    }
+        bindQuantity(mealEntry.quantity)
+        foodDisplayItemDelegate.bind(mealEntry.food)
+    }
+
+    fun bindWithPayload(mealEntry: MealEntry, payload: SparseArray<Any>) {
+        this.mealEntry = mealEntry
+        payload[MealEntriesAdapter.PAYLOAD_QUANTITY]?.cast<Int>()?.also {
+            bindQuantity(it)
+        }
+        payload[MealEntriesAdapter.PAYLOAD_FOOD]?.cast<Food>()?.also {
+            foodDisplayItemDelegate.bind(it)
+        }
+    }
+
+    private fun bindQuantity(quantity: Int) {
+        itemView.editMealEntryQuantity.apply {
+            if (quantity == 0) {
+                requestFocus()
+                post {
+                    context.getSystemService<InputMethodManager>()
+                        ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+                    action(MealEntryAction.RequestFocus(adapterPosition))
                 }
-                setText(mealEntry.quantity.toString())
+            }
+            if (!hasFocus()) {
+                setText(quantity.toString())
             }
         }
-        foodDisplayItemDelegate.bind(mealEntry.food)
     }
 
     fun clear() {
@@ -132,6 +175,7 @@ class MealEntryVH(itemView: View, action: (MealEntryAction) -> Unit) :
 sealed class MealEntryAction {
     class EditEntry(val mealEntry: MealEntry) : MealEntryAction()
     class RemoveEntry(val mealEntry: MealEntry) : MealEntryAction()
+    class RequestFocus(val position: Int) : MealEntryAction()
     sealed class FoodAction(val food: Food) : MealEntryAction() {
         class Edit(food: Food) : FoodAction(food)
         class Delete(food: Food) : FoodAction(food)

@@ -7,11 +7,13 @@ import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.gateway.MealRepository
 import com.crskdev.mealcalculator.domain.interactors.CurrentMealActionInteractor.*
 import com.crskdev.mealcalculator.domain.internal.DateString
+import com.crskdev.mealcalculator.domain.utils.absoluteCoercedValue
 import com.crskdev.mealcalculator.domain.utils.switchSelectOnReceive
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlin.math.absoluteValue
 
 /**
  * Created by Cristian Pela on 24.01.2019.
@@ -76,28 +78,26 @@ class CurrenMealActionInteractorImpl(
                             }
                         }
                         is Request.AddEntry -> {
-                            checkQuantity(request.entry.quantity)
+                            val sanitizedQuantity = sanitizeQuantity(request.entry.quantity)
 
                             val existentMealWithFood =
                                 currentMealEntryManager.getEntryWithFoodId(request.entry.food.id)
                             //update quantity if food already exists and request quantity is different
                             if (existentMealWithFood?.food?.id == request.entry.food.id) {
-                                if (request.entry.quantity > 0) {
+                                if (sanitizedQuantity > 0) {
                                     currentMealEntryManager.update(
-                                        existentMealWithFood.copy(
-                                            quantity = request.entry.quantity
-                                        )
+                                        existentMealWithFood.copy(quantity = sanitizedQuantity)
                                     )
                                 }
                             } else {
-                                currentMealEntryManager + request.entry
+                                currentMealEntryManager + request.entry.copy(quantity = sanitizedQuantity)
                             }
 
 
                         }
                         is Request.EditEntry -> {
-                            checkQuantity(request.entry.quantity)
-                            currentMealEntryManager.update(request.entry)
+                            val sanitizedQuantity = sanitizeQuantity(request.entry.quantity)
+                            currentMealEntryManager.update(request.entry.copy(quantity = sanitizedQuantity))
                         }
                         is Request.RemoveEntry -> {
                             currentMealEntryManager.minus(request.entry)
@@ -131,9 +131,5 @@ class CurrenMealActionInteractorImpl(
             }
         }
 
-    private fun checkQuantity(quantity: Int) {
-        if (quantity < 0)
-            throw Response.Error.NegativeQuantity
-    }
-
+    private fun sanitizeQuantity(quantity: Int): Int = quantity.absoluteCoercedValue
 }

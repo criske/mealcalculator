@@ -49,7 +49,7 @@ class MealViewModel(
         launch {
             mealActionLiveData
                 .distinctUntilChanged()
-                .interval(300, TimeUnit.MILLISECONDS)
+                .interval(3000, TimeUnit.MILLISECONDS)
                 .toChannel { ch ->
                     mealActionInteractor.request(ch) {
                         when (it) {

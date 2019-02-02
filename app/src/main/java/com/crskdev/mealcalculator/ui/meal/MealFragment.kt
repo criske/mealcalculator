@@ -52,6 +52,9 @@ class MealFragment : DiFragment() {
                     is MealEntryAction.FoodAction.Delete -> {
                         viewModel.deleteFood(it.food)
                     }
+                    is MealEntryAction.RequestFocus -> {
+                        recyclerMealEntries.scrollToPosition(it.position)
+                    }
                 }
             }
         }
@@ -80,11 +83,6 @@ class MealFragment : DiFragment() {
         viewModel.mealEntriesLiveData.observe(this, Observer {
             recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.apply {
                 submitList(it)
-            }
-            if(it.isNotEmpty()){
-                view.postDelayed(200) {
-                    recyclerMealEntries.scrollToPosition(0)
-                }
             }
         })
         viewModel.mealSummaryLiveData.observe(this, Observer {

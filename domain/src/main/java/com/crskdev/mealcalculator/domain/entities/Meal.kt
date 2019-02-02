@@ -1,5 +1,8 @@
 package com.crskdev.mealcalculator.domain.entities
 
+import com.crskdev.mealcalculator.domain.utils.absoluteCoercedValue
+import kotlin.math.absoluteValue
+
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
@@ -29,19 +32,20 @@ data class Meal(val id: Long = 0,
         val incrementedNumberOfTheDay = this.numberOfTheDay + 1
         return copy(
             numberOfTheDay = incrementedNumberOfTheDay,
-            calories = this.calories + other.calories,
+            calories = (this.calories + other.calories).absoluteCoercedValue,
             carbohydrate = Carbohydrate(
-                this.carbohydrate.total + other.carbohydrate.total,
-                this.carbohydrate.fiber + other.carbohydrate.fiber,
-                this.carbohydrate.sugar + other.carbohydrate.sugar
+                (this.carbohydrate.total + other.carbohydrate.total).absoluteCoercedValue,
+                (this.carbohydrate.fiber + other.carbohydrate.fiber).absoluteCoercedValue,
+                (this.carbohydrate.sugar + other.carbohydrate.sugar).absoluteCoercedValue
             ),
             fat = Fat(
-                this.fat.total + other.fat.total,
-                this.fat.saturated + other.fat.saturated,
-                this.fat.unsaturated + other.fat.unsaturated
+                (this.fat.total + other.fat.total).absoluteCoercedValue,
+                (this.fat.saturated + other.fat.saturated).absoluteCoercedValue,
+                (this.fat.unsaturated + other.fat.unsaturated).absoluteCoercedValue
             ),
-            protein = this.protein + other.protein,
-            glycemicLoad = this.glycemicLoad + other.glycemicLoad
+            protein = (this.protein + other.protein).absoluteCoercedValue,
+            glycemicLoad = (this.glycemicLoad + other.glycemicLoad).absoluteCoercedValue
         )
     }
+
 }
