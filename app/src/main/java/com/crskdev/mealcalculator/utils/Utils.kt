@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.postDelayed
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.presentation.common.utils.cast
@@ -65,6 +67,12 @@ inline fun RecyclerView.onItemSwipe(swipeDirection: Int = ItemTouchHelper.LEFT, 
     }).attachToRecyclerView(this)
 }
 
+inline val AppCompatActivity.navHostFragmentChildFragmentManager: FragmentManager
+    get() =
+        supportFragmentManager
+            .fragments
+            .first()
+            .childFragmentManager
 
 fun AppCompatActivity.onBackPressedToExit(
     message: String = "Please click BACK again to exit",
@@ -92,6 +100,21 @@ fun AppCompatActivity.onBackPressedToExit(
         }
     }
     return isAboutToExit
+}
+
+private fun traverseFragmentsRec(fragmentManager: FragmentManager, cutPoint: (Fragment) -> Unit) {
+    fragmentManager.fragments.forEach {
+        cutPoint(it)
+        traverseFragmentsRec(it.childFragmentManager, cutPoint)
+    }
+}
+
+fun AppCompatActivity.traverseFragments(cutPoint: (Fragment) -> Unit) {
+    traverseFragmentsRec(supportFragmentManager, cutPoint)
+}
+
+fun Fragment.traverseFragments(cutPoint: (Fragment) -> Unit) {
+    traverseFragmentsRec(childFragmentManager, cutPoint)
 }
 
 inline fun Context.simpleAlertDialog(title: String, msg: String, crossinline onConfirm: () -> Unit): AlertDialog.Builder =

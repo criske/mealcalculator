@@ -1,5 +1,6 @@
 package com.crskdev.mealcalculator.ui.meal
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,12 +13,15 @@ import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
+import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
 import com.crskdev.mealcalculator.utils.showSimpleToast
+import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
+import com.crskdev.mealcalculator.utils.simpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_meal.*
 
-class MealFragment : DiFragment() {
+class MealFragment : DiFragment(), HasBackPressedAwareness {
 
     private val viewModel by lazy {
         di.mealViewModel()
@@ -71,7 +75,12 @@ class MealFragment : DiFragment() {
                             )
                     }
                     R.id.action_menu_meal_save -> {
-                        viewModel.save()
+                        //when using the toolbar context, the dialog show not as compact as when using fragment context. weird?
+                        this@MealFragment.context!!.showSimpleYesNoDialog("Alert", "Are you sure you want to save the meal?")  { b ->
+                            if (b == DialogInterface.BUTTON_POSITIVE) {
+                                viewModel.save()
+                            }
+                        }
                     }
                 }
                 true
@@ -85,7 +94,7 @@ class MealFragment : DiFragment() {
             recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.apply {
                 submitList(it)
             }
-            if(it.isNotEmpty()){
+            if (it.isNotEmpty()) {
                 view.postDelayed(200) {
                     recyclerMealEntries.scrollToPosition(0)
                 }
@@ -121,5 +130,14 @@ Glycemic Load: ${it.glycemicLoad.toString().format(2)}
         selectedFoodViewModel.selectedFoodLiveData.observe(this, Observer {
             viewModel.addFood(it)
         })
+    }
+
+    override fun handleBackPressed(): Boolean {
+        context!!.showSimpleYesNoDialog("Warning", "Exit meal without saving?") {
+            if (DialogInterface.BUTTON_POSITIVE == it) {
+                findNavController().popBackStack()
+            }
+        }
+        return true
     }
 }

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
+import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
 import kotlinx.android.synthetic.main.fragment_meal_journal.*
@@ -50,4 +51,5 @@ class MealJournalFragment : DiFragment() {
             recyclerMealJournal.adapter?.cast<MealJournalAdapter>()?.submitList(it)
         })
     }
+
 }
