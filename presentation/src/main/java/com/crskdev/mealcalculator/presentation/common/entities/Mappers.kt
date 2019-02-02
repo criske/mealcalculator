@@ -21,7 +21,7 @@ fun Carbohydrate.toVM(): CarbohydrateVM =
     CarbohydrateVM(total.toString(), fiber.toString(), sugar.toString())
 
 fun Fat.toVM(): FatVM =
-    FatVM(total.toString(), unsaturated.toString(), saturated.toString())
+    FatVM(total.toString(), saturated.toString(), unsaturated.toString())
 
 fun FoodVM.toDomain(): Food = Food(
     id, name, picture, calories.toInt(),

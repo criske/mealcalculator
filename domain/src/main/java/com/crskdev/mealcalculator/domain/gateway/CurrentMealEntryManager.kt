@@ -41,11 +41,9 @@ class CurrentMealEntryManagerImpl : CurrentMealEntryManager {
 
     override fun plus(mealEntry: MealEntry): Boolean =
         lock.writeLock().withLock {
-            entries.add(mealEntry.copy(id = idGenerator.incrementAndGet())).apply {
-                if (this) {
-                    notifyObservers()
-                }
-            }
+            entries.add(0, mealEntry.copy(id = idGenerator.incrementAndGet()))
+            notifyObservers()
+            true
         }
 
 

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -79,6 +80,11 @@ class MealFragment : DiFragment() {
         viewModel.mealEntriesLiveData.observe(this, Observer {
             recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.apply {
                 submitList(it)
+            }
+            if(it.isNotEmpty()){
+                view.postDelayed(200) {
+                    recyclerMealEntries.scrollToPosition(0)
+                }
             }
         })
         viewModel.mealSummaryLiveData.observe(this, Observer {

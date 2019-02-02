@@ -41,8 +41,9 @@ class MealViewModel(
             }
         }
         launch {
-            currentMealEntryDisplayInteractor.request {
-                mealEntriesLiveData.mutablePost(it)
+            currentMealEntryDisplayInteractor.request { list ->
+                mealEntriesLiveData.mutablePost(list)
+                val focusIndex = list.indexOfFirst { it.quantity == 0 }.takeIf { it != -1 }
             }
         }
         launch {
