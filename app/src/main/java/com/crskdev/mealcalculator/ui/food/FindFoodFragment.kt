@@ -48,9 +48,11 @@ class FindFoodFragment : DiFragment() {
                 findNavController().popBackStack()
             }
             menu.findItem(R.id.action_menu_find_food_search)
-                .actionView.cast<SearchView>()
-                .also { searchView ->
-                    searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                .apply { expandActionView() }
+                .actionView
+                .cast<SearchView>()
+                .apply {
+                    setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                         override fun onQueryTextSubmit(query: String?): Boolean = false
 
                         override fun onQueryTextChange(newText: String?): Boolean {

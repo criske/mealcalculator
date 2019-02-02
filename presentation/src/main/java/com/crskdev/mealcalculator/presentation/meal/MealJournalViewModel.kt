@@ -38,11 +38,9 @@ class MealJournalViewModel(
 
 
     fun delete(mealsIndex: Int) {
-        mealsLiveData.value?.also {
-            it.elementAtOrNull(mealsIndex)?.apply {
-                launch {
-                    mealJournalDeleteInteractor.request(this@apply.id)
-                }
+        mealsLiveData.value?.elementAtOrNull(mealsIndex)?.also {
+            launch {
+                mealJournalDeleteInteractor.request(it.id)
             }
         }
     }

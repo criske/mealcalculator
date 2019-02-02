@@ -2,11 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/containerFoodDisplay"
     android:layout_width="match_parent"
-    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_height="120dp"
     android:clickable="true"
     android:focusable="true"
-    android:layout_height="120dp">
+    android:foreground="?android:attr/selectableItemBackground">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textFoodDisplayName"
@@ -15,10 +16,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
-        android:textSize="16sp"
         android:ellipsize="end"
         android:maxLines="2"
+        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
+        android:textSize="16sp"
         app:autoSizeMaxTextSize="16sp"
         app:autoSizeMinTextSize="12sp"
         app:autoSizeTextType="uniform"
@@ -39,15 +40,15 @@
         tools:text="260 kCal" />
 
     <ImageView
-        android:background="@drawable/round_rectangle"
-        android:scaleType="fitXY"
         android:id="@+id/imageFoodDisplay"
         android:layout_width="@dimen/food_image_size"
         android:layout_height="@dimen/food_image_size"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:background="@drawable/round_rectangle"
         android:contentDescription="@null"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

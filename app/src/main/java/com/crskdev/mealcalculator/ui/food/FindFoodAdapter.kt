@@ -42,7 +42,7 @@ class FindFoodAdapter(private val inflater: LayoutInflater,
 class FindFoodVH(view: View, action: (FoodDisplayItemAction) -> Unit) :
     RecyclerView.ViewHolder(view) {
 
-    private val delegate = FoodDisplayBindItemDelegate(itemView, action)
+    private val delegate = FoodDisplayBindItemDelegate(itemView, itemView, action)
 
     fun bind(food: Food) {
         delegate.bind(food)

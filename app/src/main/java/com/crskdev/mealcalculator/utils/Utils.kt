@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.postDelayed
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import java.io.ByteArrayOutputStream
 
@@ -49,6 +51,20 @@ object ProjectImageUtils {
         }
     }
 }
+
+
+inline fun RecyclerView.onItemSwipe(swipeDirection: Int = ItemTouchHelper.LEFT, crossinline block: (RecyclerView.ViewHolder, Int) -> Unit) {
+    ItemTouchHelper(object :
+        ItemTouchHelper.SimpleCallback(swipeDirection, swipeDirection) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                            target: RecyclerView.ViewHolder): Boolean = false
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            block(viewHolder, direction)
+        }
+    }).attachToRecyclerView(this)
+}
+
 
 fun AppCompatActivity.onBackPressedToExit(
     message: String = "Please click BACK again to exit",

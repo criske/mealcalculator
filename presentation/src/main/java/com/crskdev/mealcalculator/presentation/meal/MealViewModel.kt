@@ -43,13 +43,12 @@ class MealViewModel(
         launch {
             currentMealEntryDisplayInteractor.request { list ->
                 mealEntriesLiveData.mutablePost(list)
-                val focusIndex = list.indexOfFirst { it.quantity == 0 }.takeIf { it != -1 }
             }
         }
         launch {
             mealActionLiveData
                 .distinctUntilChanged()
-                .interval(3000, TimeUnit.MILLISECONDS)
+                .interval(300, TimeUnit.MILLISECONDS)
                 .toChannel { ch ->
                     mealActionInteractor.request(ch) {
                         when (it) {
@@ -90,6 +89,12 @@ class MealViewModel(
         mealActionLiveData.value = CurrentMealActionInteractor.Request.RemoveEntry(entry)
     }
 
+    fun removeEntryIndex(index: Int) {
+        mealEntriesLiveData.value?.elementAtOrNull(index)?.also {
+            removeEntry(it)
+        }
+    }
+
     fun editEntry(entry: MealEntry) {
         mealActionLiveData.value = CurrentMealActionInteractor.Request.EditEntry(entry)
     }
@@ -108,6 +113,7 @@ class MealViewModel(
         }
 
     }
+
 
     sealed class Response {
         object Saved : Response()

@@ -18,7 +18,8 @@ import kotlinx.android.synthetic.main.item_food_display.view.*
 /**
  * Created by Cristian Pela on 29.01.2019.
  */
-class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDisplayItemAction) -> Unit) {
+class FoodDisplayBindItemDelegate(private val itemView: View,
+                                  private val contextMenuHolder: View, action: (FoodDisplayItemAction) -> Unit) {
 
     var food: Food? = null
 
@@ -29,7 +30,7 @@ class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDispl
                     action(FoodDisplayItemAction.Select(it))
                 }
             }
-            setOnCreateContextMenuListener { menu, view, info ->
+            contextMenuHolder.setOnCreateContextMenuListener { menu, _, _ ->
                 with(menu) {
                     MenuInflater(context).inflate(R.menu.menu_conxtextual_food_display_item, this)
                     forEach { item ->
@@ -58,7 +59,6 @@ class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDispl
                         }
                     }
                 }
-
             }
         }
     }
@@ -77,7 +77,7 @@ class FoodDisplayBindItemDelegate(private val itemView: View, action: (FoodDispl
             val picture = food.picture?.let {
                 ProjectImageUtils.convertStrToRoundedDrawable(resources, it)
             } ?: ContextCompat.getDrawable(context, R.drawable.ic_fruit_24dp)?.apply {
-//                colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(
+                //                colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(
 //                    ContextCompat.getColor(
 //                        context,
 //                        R.color.colorPrimary

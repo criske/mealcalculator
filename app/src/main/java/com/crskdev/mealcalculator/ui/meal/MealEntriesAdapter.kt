@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.getSystemService
+import androidx.core.view.postDelayed
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -18,6 +19,7 @@ import com.crskdev.mealcalculator.domain.entities.MealEntry
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
 import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
+import kotlinx.android.synthetic.main.item_food_display.view.*
 import kotlinx.android.synthetic.main.item_meal_entry.view.*
 
 /**
@@ -86,14 +88,15 @@ class MealEntryVH(itemView: View,
 
     private var mealEntry: MealEntry? = null
 
-    private val foodDisplayItemDelegate = FoodDisplayBindItemDelegate(itemView) {
-        when (it) {
-            is FoodDisplayItemAction.Edit -> action(MealEntryAction.FoodAction.Edit(it.food))
-            is FoodDisplayItemAction.Delete -> action(MealEntryAction.FoodAction.Delete(it.food))
-            else -> {
+    private val foodDisplayItemDelegate =
+        FoodDisplayBindItemDelegate(itemView, itemView.containerFoodDisplay) {
+            when (it) {
+                is FoodDisplayItemAction.Edit -> action(MealEntryAction.FoodAction.Edit(it.food))
+                is FoodDisplayItemAction.Delete -> action(MealEntryAction.FoodAction.Delete(it.food))
+                else -> {
+                }
             }
         }
-    }
 
 
     init {
@@ -107,6 +110,8 @@ class MealEntryVH(itemView: View,
                         }
                     } else {
                         e.setSelection(0, 0)
+                        context.getSystemService<InputMethodManager>()
+                            ?.hideSoftInputFromWindow(this.windowToken, 0)
                     }
                 }
                 doAfterTextChanged {
@@ -124,11 +129,6 @@ class MealEntryVH(itemView: View,
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 clipToOutline = true
-            }
-            buttonMealEntryRemove.setOnClickListener {
-                mealEntry?.let { m ->
-                    action(MealEntryAction.RemoveEntry(m))
-                }
             }
         }
     }
@@ -156,7 +156,6 @@ class MealEntryVH(itemView: View,
                 post {
                     context.getSystemService<InputMethodManager>()
                         ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
-                    action(MealEntryAction.RequestFocus(adapterPosition))
                 }
             }
             if (!hasFocus()) {
@@ -175,7 +174,6 @@ class MealEntryVH(itemView: View,
 sealed class MealEntryAction {
     class EditEntry(val mealEntry: MealEntry) : MealEntryAction()
     class RemoveEntry(val mealEntry: MealEntry) : MealEntryAction()
-    class RequestFocus(val position: Int) : MealEntryAction()
     sealed class FoodAction(val food: Food) : MealEntryAction() {
         class Edit(food: Food) : FoodAction(food)
         class Delete(food: Food) : FoodAction(food)

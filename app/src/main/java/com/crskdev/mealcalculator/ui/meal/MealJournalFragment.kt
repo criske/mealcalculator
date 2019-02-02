@@ -15,6 +15,7 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
+import com.crskdev.mealcalculator.utils.onItemSwipe
 import kotlinx.android.synthetic.main.fragment_meal_journal.*
 
 class MealJournalFragment : DiFragment() {
@@ -39,15 +40,9 @@ class MealJournalFragment : DiFragment() {
                 )
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            ItemTouchHelper(object :
-                ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT, ItemTouchHelper.LEFT) {
-                override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-                                    target: RecyclerView.ViewHolder): Boolean = false
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    viewModel.delete(viewHolder.adapterPosition)
-                }
-            }).attachToRecyclerView(this)
+            onItemSwipe { vh, _ ->
+                viewModel.delete(vh.adapterPosition)
+            }
             Unit
         }
         viewModel.mealsLiveData.observe(this, Observer {
