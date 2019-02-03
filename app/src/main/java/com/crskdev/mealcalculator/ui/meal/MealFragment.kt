@@ -95,8 +95,8 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 submitList(it)
             }
             if (it.isNotEmpty()) {
-                view.postDelayed(200) {
-                    recyclerMealEntries.scrollToPosition(0)
+                view.postDelayed(400) {
+                    recyclerMealEntries.smoothScrollToPosition(0)
                 }
             }
         })

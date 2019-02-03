@@ -122,7 +122,6 @@ class MealEntryVH(itemView: View,
                             ?.toString()
                             ?.toInt()
                             ?: 0
-                        println("Quantity: $q")
                         action(MealEntryAction.EditEntry(m.copy(quantity = q)))
                     }
                 }

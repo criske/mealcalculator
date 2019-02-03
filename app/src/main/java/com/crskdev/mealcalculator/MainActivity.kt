@@ -20,10 +20,10 @@ class MainActivity : DiActivity() {
 
     override fun onBackPressed() {
         if (!onBackPressedToExit(isUsingNavHostFragment = true)) {
-            //todo handle child fragments?
             navHostFragmentChildFragmentManager.fragments
                 .firstOrNull()
                 ?.apply {
+                    //todo handle child fragments with HasBackPressedAwareness?
                     if (this is HasBackPressedAwareness) {
                         if (!handleBackPressed())
                             super.onBackPressed()
