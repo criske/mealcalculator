@@ -1,6 +1,8 @@
 package com.crskdev.mealcalculator.ui.meal
 
 import android.os.Build
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.getSystemService
-import androidx.core.view.postDelayed
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,8 +18,8 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
 import com.crskdev.mealcalculator.domain.entities.MealEntry
 import com.crskdev.mealcalculator.presentation.common.utils.cast
-import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
-import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
+import com.crskdev.mealcalculator.ui.food.FoodDisplayBindItemDelegate
+import com.crskdev.mealcalculator.ui.food.FoodDisplayItemAction
 import kotlinx.android.synthetic.main.item_food_display.view.*
 import kotlinx.android.synthetic.main.item_meal_entry.view.*
 
@@ -89,10 +90,17 @@ class MealEntryVH(itemView: View,
     private var mealEntry: MealEntry? = null
 
     private val foodDisplayItemDelegate =
-        FoodDisplayBindItemDelegate(itemView, itemView.containerFoodDisplay) {
+        FoodDisplayBindItemDelegate(
+            itemView,
+            itemView.containerFoodDisplay
+        ) {
             when (it) {
-                is FoodDisplayItemAction.Edit -> action(MealEntryAction.FoodAction.Edit(it.food))
-                is FoodDisplayItemAction.Delete -> action(MealEntryAction.FoodAction.Delete(it.food))
+                is FoodDisplayItemAction.Edit -> action(
+                    MealEntryAction.FoodAction.Edit(it.food)
+                )
+                is FoodDisplayItemAction.Delete -> action(
+                    MealEntryAction.FoodAction.Delete(it.food)
+                )
                 else -> {
                 }
             }
@@ -116,13 +124,15 @@ class MealEntryVH(itemView: View,
                 }
                 doAfterTextChanged {
                     mealEntry?.let { m ->
-                        val q = editMealEntryQuantity.text
+                        editMealEntryQuantity.text
                             ?.trim()
-                            ?.takeIf { it.isNotEmpty() }
-                            ?.toString()
+                            ?.let { if (it.toString().isEmpty()) "0" else it.toString() }
                             ?.toInt()
-                            ?: 0
-                        action(MealEntryAction.EditEntry(m.copy(quantity = q)))
+                            ?.takeIf { m.quantity != it }
+                            ?.also {
+                                action(MealEntryAction.EditEntry(m.copy(quantity = it)))
+                            }
+
                     }
                 }
             }

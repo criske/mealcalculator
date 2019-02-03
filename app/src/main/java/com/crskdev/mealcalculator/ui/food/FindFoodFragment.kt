@@ -15,7 +15,6 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
-import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import kotlinx.android.synthetic.main.fragment_find_food.*

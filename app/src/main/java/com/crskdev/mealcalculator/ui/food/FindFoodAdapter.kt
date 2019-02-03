@@ -8,8 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
-import com.crskdev.mealcalculator.ui.common.FoodDisplayBindItemDelegate
-import com.crskdev.mealcalculator.ui.common.FoodDisplayItemAction
 
 /**
  * Created by Cristian Pela on 28.01.2019.
@@ -42,7 +40,8 @@ class FindFoodAdapter(private val inflater: LayoutInflater,
 class FindFoodVH(view: View, action: (FoodDisplayItemAction) -> Unit) :
     RecyclerView.ViewHolder(view) {
 
-    private val delegate = FoodDisplayBindItemDelegate(itemView, itemView, action)
+    private val delegate =
+        FoodDisplayBindItemDelegate(itemView, itemView, action)
 
     fun bind(food: Food) {
         delegate.bind(food)

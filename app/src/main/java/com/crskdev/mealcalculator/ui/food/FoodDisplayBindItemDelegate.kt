@@ -1,13 +1,9 @@
-package com.crskdev.mealcalculator.ui.common
+package com.crskdev.mealcalculator.ui.food
 
 import android.content.DialogInterface
-import android.graphics.PorterDuff
-import android.view.ContextMenu
 import android.view.MenuInflater
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.graphics.toColorFilter
 import androidx.core.view.forEach
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
@@ -37,7 +33,11 @@ class FoodDisplayBindItemDelegate(private val itemView: View,
                         item.setOnMenuItemClickListener {
                             when (item.itemId) {
                                 R.id.menu_action_food_edit -> {
-                                    food?.also { action(FoodDisplayItemAction.Edit(it)) }
+                                    food?.also { action(
+                                        FoodDisplayItemAction.Edit(
+                                            it
+                                        )
+                                    ) }
                                 }
                                 R.id.menu_action_food_delete -> {
                                     food?.also { f ->
@@ -49,7 +49,11 @@ class FoodDisplayBindItemDelegate(private val itemView: View,
                                             )
                                         ) {
                                             if (it == DialogInterface.BUTTON_POSITIVE) {
-                                                action(FoodDisplayItemAction.Delete(f))
+                                                action(
+                                                    FoodDisplayItemAction.Delete(
+                                                        f
+                                                    )
+                                                )
                                             }
                                         }
                                     }

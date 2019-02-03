@@ -10,9 +10,10 @@ import com.crskdev.mealcalculator.domain.interactors.CurrentMealDisplayInteracto
 import com.crskdev.mealcalculator.domain.interactors.CurrentMealEntryDisplayInteractor
 import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
-import com.crskdev.mealcalculator.presentation.common.livedata.*
+import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
+import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
+import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Cristian Pela on 29.01.2019.
@@ -47,8 +48,7 @@ class MealViewModel(
         }
         launch {
             mealActionLiveData
-                .distinctUntilChanged()
-                .interval(300, TimeUnit.MILLISECONDS)
+                //  .interval(300, TimeUnit.MILLISECONDS)
                 .toChannel { ch ->
                     mealActionInteractor.request(ch) {
                         when (it) {
