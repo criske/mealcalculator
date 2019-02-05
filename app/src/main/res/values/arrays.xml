@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="chart_data">
+        <item>@array/chart_entry_carbohydrate</item>
+        <item>@array/chart_entry_fat</item>
+        <item>@array/chart_entry_protein</item>
+    </array>
+    <array name="chart_entry_carbohydrate">
+        <item>@color/colorCarbs</item>
+        <item>0.6</item>
+    </array>
+    <array name="chart_entry_fat">
+        <item>@color/colorFats</item>
+        <item>0.1</item>
+    </array>
+    <array name="chart_entry_protein">
+        <item>@color/colorProteins</item>
+        <item>0.3</item>
+    </array>
+</resources>

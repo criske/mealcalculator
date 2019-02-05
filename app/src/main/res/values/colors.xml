@@ -8,4 +8,9 @@
     <color name="colorAccentFaint">#F8BBD0</color>
 
     <color name="colorPrimaryComplement">#FCE4EC</color>
+
+
+    <color name="colorCarbs">#7CB342</color>
+    <color name="colorFats">#FFB300</color>
+    <color name="colorProteins">#523939</color>
 </resources>

@@ -87,7 +87,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 true
             }
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                handleBackPressed()
             }
             Unit
         }

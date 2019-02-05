@@ -8,8 +8,10 @@ import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.util.TypedValue
 import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
@@ -153,3 +155,6 @@ inline fun Context.simpleYesNoDialog(title: String, msg: String, crossinline onS
 inline fun Context.showSimpleYesNoDialog(title: String, msg: String, crossinline onSelect: (Int) -> Unit) {
     simpleYesNoDialog(title, msg, onSelect).create().show()
 }
+
+
+fun Context.getColorCompat(@ColorRes colorRes: Int) = ContextCompat.getColor(this, colorRes)

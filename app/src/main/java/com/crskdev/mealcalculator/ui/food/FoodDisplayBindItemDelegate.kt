@@ -7,7 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.ui.common.widget.ChartData
+import com.crskdev.mealcalculator.ui.common.widget.Percent
 import com.crskdev.mealcalculator.utils.ProjectImageUtils
+import com.crskdev.mealcalculator.utils.getColorCompat
 import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
 import kotlinx.android.synthetic.main.item_food_display.view.*
 
@@ -33,11 +36,13 @@ class FoodDisplayBindItemDelegate(private val itemView: View,
                         item.setOnMenuItemClickListener {
                             when (item.itemId) {
                                 R.id.menu_action_food_edit -> {
-                                    food?.also { action(
-                                        FoodDisplayItemAction.Edit(
-                                            it
+                                    food?.also {
+                                        action(
+                                            FoodDisplayItemAction.Edit(
+                                                it
+                                            )
                                         )
-                                    ) }
+                                    }
                                 }
                                 R.id.menu_action_food_delete -> {
                                     food?.also { f ->
@@ -72,11 +77,29 @@ class FoodDisplayBindItemDelegate(private val itemView: View,
         with(itemView) {
             textFoodDisplayName.text = food.name
             textFoodDisplayCalories.text = "${food.calories}kCal."
-            textFoodDisplayMacros.text = buildString {
-                append("C:${food.carbohydrates.total}g\n")
-                append("F:${food.fat.total}g\n")
-                append("P:${food.proteins}g")
-            }
+            chartFoodDisplayMacros.data = listOf(
+                ChartData(
+                    context.getColorCompat(R.color.colorCarbs),
+                    Percent(food.carbohydrates.total * 4 / food.calories)
+                )
+                ,
+                ChartData(
+                    context.getColorCompat(R.color.colorProteins),
+                    Percent(food.proteins * 4 / food.calories)
+                )
+                ,
+                ChartData(
+                    context.getColorCompat(R.color.colorFats),
+                    Percent(food.fat.total * 9 / food.calories)
+                )
+            )
+
+
+//            textFoodDisplayMacros.text = buildString {
+//                append("C:${food.carbohydrates.total}g\n")
+//                append("F:${food.fat.total}g\n")
+//                append("P:${food.proteins}g")
+//            }
 
             val picture = food.picture?.let {
                 ProjectImageUtils.convertStrToRoundedDrawable(resources, it)
@@ -98,7 +121,7 @@ class FoodDisplayBindItemDelegate(private val itemView: View,
         with(itemView) {
             textFoodDisplayName.text = null
             textFoodDisplayCalories.text = null
-            textFoodDisplayMacros.text = null
+            chartFoodDisplayMacros.data = emptyList()
         }
     }
 

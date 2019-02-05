@@ -23,7 +23,7 @@
         app:autoSizeMaxTextSize="16sp"
         app:autoSizeMinTextSize="12sp"
         app:autoSizeTextType="uniform"
-        app:layout_constraintEnd_toStartOf="@+id/textFoodDisplayMacros"
+        app:layout_constraintEnd_toStartOf="@+id/chartFoodDisplayMacros"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Food Name" />
@@ -54,8 +54,8 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@drawable/ic_fruit_24dp" />
 
-    <TextView
-        android:id="@+id/textFoodDisplayMacros"
+    <com.crskdev.mealcalculator.ui.common.widget.BarChartView
+        android:id="@+id/chartFoodDisplayMacros"
         android:layout_width="60dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -64,5 +64,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageFoodDisplay"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="G:10.7g\nF:2g\nP:10g" />
+        tools:data="@array/chart_data"  />
 </androidx.constraintlayout.widget.ConstraintLayout>
