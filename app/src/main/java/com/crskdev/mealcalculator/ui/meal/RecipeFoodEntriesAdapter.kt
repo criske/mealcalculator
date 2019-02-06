@@ -1,8 +1,6 @@
 package com.crskdev.mealcalculator.ui.meal
 
 import android.os.Build
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Food
-import com.crskdev.mealcalculator.domain.entities.MealEntry
+import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.food.FoodDisplayBindItemDelegate
 import com.crskdev.mealcalculator.ui.food.FoodDisplayItemAction
@@ -26,17 +24,18 @@ import kotlinx.android.synthetic.main.item_meal_entry.view.*
 /**
  * Created by Cristian Pela on 29.01.2019.
  */
-class MealEntriesAdapter(
+class RecipeFoodEntriesAdapter(
     private val inflater: LayoutInflater,
-    private val action: (MealEntryAction) -> Unit) : ListAdapter<MealEntry, MealEntryVH>(
-    object : DiffUtil.ItemCallback<MealEntry>() {
-        override fun areItemsTheSame(oldItem: MealEntry, newItem: MealEntry): Boolean =
-            oldItem.id == newItem.id
+    private val action: (RecipeFoodEntryAction) -> Unit) :
+    ListAdapter<RecipeFood, RecipeFoodEntryVH>(
+        object : DiffUtil.ItemCallback<RecipeFood>() {
+            override fun areItemsTheSame(oldItem: RecipeFood, newItem: RecipeFood): Boolean =
+                oldItem.food.id == newItem.food.id
 
-        override fun areContentsTheSame(oldItem: MealEntry, newItem: MealEntry): Boolean =
+            override fun areContentsTheSame(oldItem: RecipeFood, newItem: RecipeFood): Boolean =
             oldItem == newItem
 
-        override fun getChangePayload(oldItem: MealEntry, newItem: MealEntry): Any? {
+            override fun getChangePayload(oldItem: RecipeFood, newItem: RecipeFood): Any? {
             return SparseArray<Any>().apply {
                 if (oldItem.quantity != newItem.quantity) {
                     this.put(PAYLOAD_QUANTITY, newItem.quantity)
@@ -58,20 +57,20 @@ class MealEntriesAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return getItem(position).id
+        return getItem(position).food.id
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealEntryVH =
-        MealEntryVH(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeFoodEntryVH =
+        RecipeFoodEntryVH(
             inflater.inflate(R.layout.item_meal_entry, parent, false),
             action
         )
 
-    override fun onBindViewHolder(holder: MealEntryVH, position: Int) {
+    override fun onBindViewHolder(holder: RecipeFoodEntryVH, position: Int) {
         holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: MealEntryVH, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: RecipeFoodEntryVH, position: Int, payloads: MutableList<Any>) {
         val mealEntry = getItem(position)
         if (payloads.isNotEmpty()) {
             holder.bindWithPayload(mealEntry, payloads.first().cast())
@@ -83,11 +82,11 @@ class MealEntriesAdapter(
 }
 
 
-class MealEntryVH(itemView: View,
-                  private val action: (MealEntryAction) -> Unit) :
+class RecipeFoodEntryVH(itemView: View,
+                        private val action: (RecipeFoodEntryAction) -> Unit) :
     RecyclerView.ViewHolder(itemView) {
 
-    private var mealEntry: MealEntry? = null
+    private var recipeFood: RecipeFood? = null
 
     private val foodDisplayItemDelegate =
         FoodDisplayBindItemDelegate(
@@ -96,10 +95,10 @@ class MealEntryVH(itemView: View,
         ) {
             when (it) {
                 is FoodDisplayItemAction.Edit -> action(
-                    MealEntryAction.FoodAction.Edit(it.food)
+                    RecipeFoodEntryAction.FoodAction.Edit(it.food)
                 )
                 is FoodDisplayItemAction.Delete -> action(
-                    MealEntryAction.FoodAction.Delete(it.food)
+                    RecipeFoodEntryAction.FoodAction.Delete(it.food)
                 )
                 else -> {
                 }
@@ -123,14 +122,14 @@ class MealEntryVH(itemView: View,
                     }
                 }
                 doAfterTextChanged {
-                    mealEntry?.let { m ->
+                    recipeFood?.let { m ->
                         editMealEntryQuantity.text
                             ?.trim()
                             ?.let { if (it.toString().isEmpty()) "0" else it.toString() }
                             ?.toInt()
                             ?.takeIf { m.quantity != it }
                             ?.also {
-                                action(MealEntryAction.EditEntry(m.copy(quantity = it)))
+                                action(RecipeFoodEntryAction.EditEntry(m.copy(quantity = it)))
                             }
 
                     }
@@ -142,18 +141,18 @@ class MealEntryVH(itemView: View,
         }
     }
 
-    fun bind(mealEntry: MealEntry) {
-        this.mealEntry = mealEntry
-        bindQuantity(mealEntry.quantity)
-        foodDisplayItemDelegate.bind(mealEntry.food)
+    fun bind(recipeFood: RecipeFood) {
+        this.recipeFood = recipeFood
+        bindQuantity(recipeFood.quantity)
+        foodDisplayItemDelegate.bind(recipeFood.food)
     }
 
-    fun bindWithPayload(mealEntry: MealEntry, payload: SparseArray<Any>) {
-        this.mealEntry = mealEntry
-        payload[MealEntriesAdapter.PAYLOAD_QUANTITY]?.cast<Int>()?.also {
+    fun bindWithPayload(recipeFood: RecipeFood, payload: SparseArray<Any>) {
+        this.recipeFood = recipeFood
+        payload[RecipeFoodEntriesAdapter.PAYLOAD_QUANTITY]?.cast<Int>()?.also {
             bindQuantity(it)
         }
-        payload[MealEntriesAdapter.PAYLOAD_FOOD]?.cast<Food>()?.also {
+        payload[RecipeFoodEntriesAdapter.PAYLOAD_FOOD]?.cast<Food>()?.also {
             foodDisplayItemDelegate.bind(it)
         }
     }
@@ -180,10 +179,10 @@ class MealEntryVH(itemView: View,
 
 }
 
-sealed class MealEntryAction {
-    class EditEntry(val mealEntry: MealEntry) : MealEntryAction()
-    class RemoveEntry(val mealEntry: MealEntry) : MealEntryAction()
-    sealed class FoodAction(val food: Food) : MealEntryAction() {
+sealed class RecipeFoodEntryAction {
+    class EditEntry(val recipeFood: RecipeFood) : RecipeFoodEntryAction()
+    class RemoveEntry(val recipeFood: RecipeFood) : RecipeFoodEntryAction()
+    sealed class FoodAction(val food: Food) : RecipeFoodEntryAction() {
         class Edit(food: Food) : FoodAction(food)
         class Delete(food: Food) : FoodAction(food)
     }

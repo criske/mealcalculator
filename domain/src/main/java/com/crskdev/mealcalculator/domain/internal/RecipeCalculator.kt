@@ -1,16 +1,18 @@
 package com.crskdev.mealcalculator.domain.internal
 
-import com.crskdev.mealcalculator.domain.entities.*
+import com.crskdev.mealcalculator.domain.entities.Carbohydrate
+import com.crskdev.mealcalculator.domain.entities.Fat
+import com.crskdev.mealcalculator.domain.entities.RecipeFood
 
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-internal class MealSummaryCalculator {
+internal class RecipeCalculator {
 
-    fun calculate(entries: List<MealEntry>): Meal {
+    fun calculate(entries: List<RecipeFood>): RecipeFood.Summary {
         assert(entries.isNotEmpty())
 
-        val foods = entries.map { it.foodBasedOnQuantity() }
+        val foods = entries.map { it.getSummary() }
 
         val carbohydrates = foods
             .map { it.carbohydrates }
@@ -40,15 +42,8 @@ internal class MealSummaryCalculator {
 
         val proteins = foods.sumByDouble { it.proteins.toDouble() }.toFloat()
 
-        val (id, number, date) = entries.first().let {
-            Triple(
-                it.mealId,
-                it.mealNumber,
-                it.mealDate
-            )
-        }
 
-        return Meal(id, number, calories, carbohydrates, fats, proteins, glycemicLoad, date)
+        return RecipeFood.Summary(calories, carbohydrates, fats, proteins, glycemicLoad)
     }
 
 }

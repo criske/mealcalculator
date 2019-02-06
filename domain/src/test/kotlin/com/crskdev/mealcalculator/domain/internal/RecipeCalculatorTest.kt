@@ -9,7 +9,7 @@ import org.junit.Test
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
-class MealSummaryCalculatorTest {
+class RecipeCalculatorTest {
 
     //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2771116/
     @Test
@@ -47,7 +47,7 @@ class MealSummaryCalculatorTest {
             10f,
             12
         )
-        val meal = MealSummaryCalculator().run {
+        val meal = RecipeCalculator().run {
             calculate(
                 listOf(
                     MealEntry(-1, -1, "",1,128, oatmeal),

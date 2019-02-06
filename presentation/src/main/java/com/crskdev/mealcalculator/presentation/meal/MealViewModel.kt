@@ -3,12 +3,8 @@ package com.crskdev.mealcalculator.presentation.meal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.Food
-import com.crskdev.mealcalculator.domain.entities.Meal
-import com.crskdev.mealcalculator.domain.entities.MealEntry
-import com.crskdev.mealcalculator.domain.interactors.CurrentMealActionInteractor
-import com.crskdev.mealcalculator.domain.interactors.CurrentMealDisplayInteractor
-import com.crskdev.mealcalculator.domain.interactors.CurrentMealEntryDisplayInteractor
-import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
+import com.crskdev.mealcalculator.domain.entities.RecipeFood
+import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
@@ -19,74 +15,61 @@ import kotlinx.coroutines.launch
  * Created by Cristian Pela on 29.01.2019.
  */
 class MealViewModel(
-    private val currentMealDisplayInteractor: CurrentMealDisplayInteractor,
-    private val currentMealEntryDisplayInteractor: CurrentMealEntryDisplayInteractor,
-    private val mealActionInteractor: CurrentMealActionInteractor,
+    private val currentMealNumberOfTheDayInteractor: CurrentMealNumberOfTheDayInteractor,
+    private val currentMealSaveInteractor: CurrentMealSaveInteractor,
+    private val recipeSummaryInteractor: RecipeSummaryInteractor,
+    private val recipeFoodEntriesDisplayInteractor: RecipeFoodEntriesDisplayInteractor,
+    private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel() {
 
-    val mealEntriesLiveData: LiveData<List<MealEntry>> = MutableLiveData<List<MealEntry>>()
+    val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()
 
-    val mealSummaryLiveData: LiveData<Meal> = MutableLiveData<Meal>()
+    val mealEntriesLiveData: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
+
+    val mealSummaryLiveData: LiveData<RecipeFood.Summary> =
+        MutableLiveData<RecipeFood.Summary>().apply {
+            value = RecipeFood.Summary.EMPTY
+        }
 
     val responsesLiveData: LiveData<Response> = SingleLiveEvent<Response>()
 
-    private val mealActionLiveData = MutableLiveData<CurrentMealActionInteractor.Request>().apply {
-        value = CurrentMealActionInteractor.Request.StartMeal
-    }
+    private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
 
     init {
         launch {
-            currentMealDisplayInteractor.request {
+            currentMealNumberOfTheDayInteractor.request {
+                mealNumberLiveData.mutablePost(it)
+            }
+        }
+        launch {
+            recipeSummaryInteractor.request {
                 mealSummaryLiveData.mutablePost(it)
             }
         }
         launch {
-            currentMealEntryDisplayInteractor.request { list ->
+            recipeFoodEntriesDisplayInteractor.request { list ->
                 mealEntriesLiveData.mutablePost(list)
             }
         }
         launch {
-            mealActionLiveData
+            recipeFoodActionLiveData
                 //  .interval(300, TimeUnit.MILLISECONDS)
                 .toChannel { ch ->
-                    mealActionInteractor.request(ch) {
-                        when (it) {
-                            is CurrentMealActionInteractor.Response.MealStarted -> {
-                                mealSummaryLiveData.mutablePost(it.meal)
-                            }
-                            is CurrentMealActionInteractor.Response.MealSaved -> {
-                                responsesLiveData.mutablePost(Response.Saved)
-                            }
-                            is CurrentMealActionInteractor.Response.Error -> {
-                                val err = when (it) {
-                                    CurrentMealActionInteractor.Response.Error.NegativeQuantity ->
-                                        Response.Error.NegativeOrZeroQuantity
-                                    CurrentMealActionInteractor.Response.Error.MealNotStarted ->
-                                        Response.Error.MealNotStarted
-                                    is CurrentMealActionInteractor.Response.Error.Other ->
-                                        Response.Error.Other(it.throwable)
-                                    CurrentMealActionInteractor.Response.Error.EmptyMeal ->
-                                        Response.Error.EmptyMeal
-                                }
-                                responsesLiveData.mutablePost(err)
-                            }
-                        }
+                    recipeFoodActionInteractor.request(ch) {
+                        //todo: handle this
                     }
                 }
         }
     }
 
+
     fun addFood(food: Food) {
-        mealSummaryLiveData.value?.let {
-            mealActionLiveData.value = CurrentMealActionInteractor.Request.AddEntry(
-                MealEntry(0, it.id, it.date, it.numberOfTheDay, 0, food)
-            )
-        }
+        recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.AddFood(food)
     }
 
-    fun removeEntry(entry: MealEntry) {
-        mealActionLiveData.value = CurrentMealActionInteractor.Request.RemoveEntry(entry)
+    fun removeEntry(entry: RecipeFood) {
+        recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Remove(entry)
     }
 
     fun removeEntryIndex(index: Int) {
@@ -95,8 +78,8 @@ class MealViewModel(
         }
     }
 
-    fun editEntry(entry: MealEntry) {
-        mealActionLiveData.value = CurrentMealActionInteractor.Request.EditEntry(entry)
+    fun editEntry(entry: RecipeFood) {
+        recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Edit(entry)
     }
 
     fun deleteFood(food: Food) {
@@ -108,10 +91,17 @@ class MealViewModel(
     }
 
     fun save() {
-        mealSummaryLiveData.value?.let {
-            mealActionLiveData.value = CurrentMealActionInteractor.Request.SaveMeal(it)
+        mealEntriesLiveData.value?.also {
+            launch {
+                currentMealSaveInteractor.request(it) {
+                    val response = when (it) {
+                        CurrentMealSaveInteractor.Response.OK -> Response.Saved
+                        CurrentMealSaveInteractor.Response.NotSaved -> Response.Error.MealNotSaved
+                    }
+                    responsesLiveData.mutablePost(response)
+                }
+            }
         }
-
     }
 
 
@@ -121,6 +111,7 @@ class MealViewModel(
             object NegativeOrZeroQuantity : Error()
             object MealNotStarted : Error()
             object EmptyMeal : Error()
+            object MealNotSaved : Error()
             class Other(val throwable: Throwable) : Error()
         }
     }

@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
-import com.crskdev.mealcalculator.presentation.common.livedata.distinctUntilChanged
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
@@ -19,7 +18,6 @@ import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
-import com.crskdev.mealcalculator.utils.simpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_meal.*
 
 class MealFragment : DiFragment(), HasBackPressedAwareness {
@@ -47,15 +45,15 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             )
         }
         with(recyclerMealEntries) {
-            adapter = MealEntriesAdapter(LayoutInflater.from(context)) {
+            adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context)) {
                 when (it) {
-                    is MealEntryAction.EditEntry -> viewModel.editEntry(it.mealEntry)
-                    is MealEntryAction.RemoveEntry -> viewModel.removeEntry(it.mealEntry)
-                    is MealEntryAction.FoodAction.Edit -> findNavController().navigate(
+                    is RecipeFoodEntryAction.EditEntry -> viewModel.editEntry(it.recipeFood)
+                    is RecipeFoodEntryAction.RemoveEntry -> viewModel.removeEntry(it.recipeFood)
+                    is RecipeFoodEntryAction.FoodAction.Edit -> findNavController().navigate(
                         MealFragmentDirections
                             .actionMealFragmentToUpsertFoodFragment(null, it.food.id)
                     )
-                    is MealEntryAction.FoodAction.Delete -> {
+                    is RecipeFoodEntryAction.FoodAction.Delete -> {
                         viewModel.deleteFood(it.food)
                     }
                 }
@@ -77,7 +75,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                     }
                     R.id.action_menu_meal_save -> {
                         //when using the toolbar context, the dialog show not as compact as when using fragment context. weird?
-                        this@MealFragment.context!!.showSimpleYesNoDialog("Alert", "Are you sure you want to save the meal?")  { b ->
+                        this@MealFragment.context!!.showSimpleYesNoDialog(
+                            "Alert",
+                            "Are you sure you want to save the meal?"
+                        ) { b ->
                             if (b == DialogInterface.BUTTON_POSITIVE) {
                                 viewModel.save()
                             }
@@ -92,7 +93,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             Unit
         }
         viewModel.mealEntriesLiveData.observe(this, Observer {
-            recyclerMealEntries.adapter?.cast<MealEntriesAdapter>()?.apply {
+            recyclerMealEntries.adapter?.cast<RecipeFoodEntriesAdapter>()?.apply {
                 submitList(it)
             }
             if (it.isNotEmpty()) {
@@ -101,14 +102,17 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 }
             }
         })
+        viewModel.mealNumberLiveData.observe(this, Observer {
+            toolbarMeal.title = "No.$it"
+        })
         viewModel.mealSummaryLiveData.observe(this, Observer {
-            toolbarMeal.title = "No.${it.numberOfTheDay}"
+
             val summary =
                 """Calories: ${it.calories.toString().format(2)} kCal.
-Carbohydrates: ${it.carbohydrate.total.toString().format(2)} g
+Carbohydrates: ${it.carbohydrates.total.toString().format(2)} g
 Fat: ${it.fat.total.toString().format(2)} g
-Proteins: ${it.protein.toString().format(2)} g
-Glycemic Load: ${it.glycemicLoad.toString().format(2)}
+Proteins: ${it.proteins.toString().format(2)} g
+Glycemic Load: ${it.gi.toString().format(2)}
                 """.trimIndent()
             textMealSummary.text = summary
         })
