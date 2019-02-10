@@ -3,7 +3,7 @@ package com.crskdev.mealcalculator.domain.internal
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
 import com.crskdev.mealcalculator.domain.entities.Food
-import com.crskdev.mealcalculator.domain.entities.MealEntry
+import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import org.junit.Test
 
 /**
@@ -22,7 +22,7 @@ class RecipeCalculatorTest {
             Carbohydrate(58.7f, 10f, 0.7f),
             Fat(7f, 1.3f, 5.7f),
             13.5f,
-            83
+            83F
         )
 
 
@@ -34,7 +34,7 @@ class RecipeCalculatorTest {
             Carbohydrate(14f, 2.4f, 10f),
             Fat(0.2f, 0f, 0.1f),
             0.3f,
-            39
+            39F
         )
 
         val greekYogurt = Food(
@@ -45,14 +45,14 @@ class RecipeCalculatorTest {
             Carbohydrate(3.6f, 0f, 3.2f),
             Fat(0.4f, 0.1f, 0.1f),
             10f,
-            12
+            12F
         )
         val meal = RecipeCalculator().run {
             calculate(
                 listOf(
-                    MealEntry(-1, -1, "",1,128, oatmeal),
-                    MealEntry(-1, -1, "",1,95, apple),
-                    MealEntry(-1, -1, "",1,198, greekYogurt)
+                    RecipeFood(oatmeal, 128),
+                    RecipeFood(apple, 95),
+                    RecipeFood(greekYogurt, 198)
                 )
             )
         }
@@ -63,7 +63,7 @@ class RecipeCalculatorTest {
 //            assertEquals(1.2f, fiber, 0.01f)
 //            assertEquals(5f, sugar, 0.01f)
 //        }
-       // assertEquals(55.53f, meal.glycemicLoad, 0.01f)
+        // assertEquals(55.53f, meal.glycemicLoad, 0.01f)
 
     }
 }

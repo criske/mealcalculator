@@ -5,7 +5,9 @@ package com.crskdev.mealcalculator.domain.entities
  */
 data class Recipe(val id: Long, val name: String)
 
-data class RecipeEntry(val recipeId: Long, val food: RecipeFood)
+data class RecipeDetailed(val id: Long, val name: String, val foods: List<RecipeFood>) {
+    fun toRecipe() = Recipe(id, name)
+}
 
 data class RecipeFood(val food: Food, val quantity: Int) {
 
