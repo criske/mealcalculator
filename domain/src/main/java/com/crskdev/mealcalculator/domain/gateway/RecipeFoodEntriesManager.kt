@@ -110,6 +110,10 @@ class RecipeFoodEntriesManagerImpl : RecipeFoodEntriesManager {
         lock.writeLock().withLock {
             observers.add(observer)
         }
+        lock.readLock().withLock {
+            if (entries.isNotEmpty())
+                observer(getAll())
+        }
     }
 
     override fun notifyEntriesChanged(list: List<RecipeFood>) {
@@ -122,7 +126,10 @@ class RecipeFoodEntriesManagerImpl : RecipeFoodEntriesManager {
 
     override fun notifyObservers() {
         lock.readLock().withLock {
-            observers.forEach { it.invoke(getAll()) }
+            if (entries.isNotEmpty()) {
+                val all = getAll()
+                observers.forEach { it.invoke(all) }
+            }
         }
     }
 
