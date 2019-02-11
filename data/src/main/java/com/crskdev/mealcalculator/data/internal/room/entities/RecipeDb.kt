@@ -48,6 +48,8 @@ internal class RecipeFoodDb(
 
 
 internal class RecipeDetailedDb(
+    @ColumnInfo(name = "rf_id")
+    val id: Long,
     @Embedded
     val recipe: RecipeDb,
     @ColumnInfo(name = "rf_quantity")

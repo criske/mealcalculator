@@ -52,7 +52,7 @@ class RecipeFoodActionInteractorImpl(
                             recipeFoodEntriesManager.notifyObservers()
                         }
                         is RecipeFoodActionInteractor.Request.AddFood -> {
-                            val recipeFood = RecipeFood(request.food, 0)
+                            val recipeFood = RecipeFood(0, request.food, 0)
                             if (!recipeFoodEntriesManager.contains(recipeFood)) {
                                 recipeFoodEntriesManager.add(recipeFood)
                             }

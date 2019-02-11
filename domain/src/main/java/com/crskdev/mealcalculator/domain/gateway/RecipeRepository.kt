@@ -17,11 +17,9 @@ interface RecipeRepository : Transactionable<RecipeRepository> {
 
     fun update(recipe: Recipe)
 
-    fun updateDetailed(recipe: RecipeDetailed)
-
     fun removeRecipeFood(recipeId: Long, food: RecipeFood)
 
-    fun addRecipeFood(recipeId: Long, food: RecipeFood)
+    fun addRecipeFood(recipeId: Long, food: RecipeFood): Long
 
     fun updateRecipeFood(recipeId: Long, food: RecipeFood)
 

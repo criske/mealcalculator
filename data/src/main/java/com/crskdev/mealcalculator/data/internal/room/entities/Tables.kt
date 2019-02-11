@@ -15,9 +15,8 @@ internal object Tables : Iterable<String> {
 
     override fun iterator(): Iterator<String> = object : Iterator<String> {
 
-        val total = 5
-
-        var index = 0
+        private val total = 5
+        private var index = 0
 
         override fun hasNext(): Boolean = index + 1 <= total
 

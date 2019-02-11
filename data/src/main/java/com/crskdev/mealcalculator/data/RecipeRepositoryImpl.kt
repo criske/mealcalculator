@@ -1,7 +1,10 @@
 package com.crskdev.mealcalculator.data
 
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
+import com.crskdev.mealcalculator.data.internal.room.entities.toDb
+import com.crskdev.mealcalculator.data.internal.room.entities.toDomain
 import com.crskdev.mealcalculator.data.internal.runTransactionDelegate
+import com.crskdev.mealcalculator.data.internal.utils.toChannel
 import com.crskdev.mealcalculator.domain.entities.Recipe
 import com.crskdev.mealcalculator.domain.entities.RecipeDetailed
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
@@ -12,46 +15,49 @@ import com.crskdev.mealcalculator.domain.gateway.RecipeRepository
  */
 class RecipeRepositoryImpl(private val db: MealCalculatorDatabase) : RecipeRepository {
 
-    override fun save(recipe: Recipe): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private val dao by lazy {
+        db.recipeDao()
     }
 
-    override fun getRecipeById(id: Long): RecipeDetailed? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun save(recipe: Recipe): Long = dao.insertRecipe(recipe.toDb())
 
-    override fun delete(recipe: Recipe) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getRecipeById(id: Long): RecipeDetailed? =
+        dao.getRecipeDetailedById(id)
+            .takeIf { it.isNotEmpty() }
+            ?.toDomain()
 
-    override fun update(recipe: Recipe) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(recipe: Recipe) =
+        dao.deleteRecipe(recipe.toDb())
 
-    override fun updateDetailed(recipe: RecipeDetailed) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun update(recipe: Recipe) =
+        dao.updateRecipe(recipe.toDb())
 
-    override fun removeRecipeFood(recipeId: Long, food: RecipeFood) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun removeRecipeFood(recipeId: Long, food: RecipeFood) =
+        dao.deleteRecipeFood(food.toDb(recipeId))
 
-    override fun addRecipeFood(recipeId: Long, food: RecipeFood) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
-    override fun updateRecipeFood(recipeId: Long, food: RecipeFood) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun addRecipeFood(recipeId: Long, food: RecipeFood) =
+        dao.insertRecipeFood(food.toDb(recipeId))
 
-    override suspend fun observeAll(observer: (List<Recipe>) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun updateRecipeFood(recipeId: Long, food: RecipeFood) =
+        dao.updateRecipeFood(food.toDb(recipeId))
 
-    override suspend fun observeRecipe(id: Long, observer: (RecipeDetailed) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override suspend fun observeAll(observer: (List<Recipe>) -> Unit) =
+        dao.observeAll().toChannel { ch ->
+            for (list in ch) {
+                observer(list.map { it.toDomain() })
+            }
+        }
+
+    override suspend fun observeRecipe(id: Long, observer: (RecipeDetailed) -> Unit) =
+        dao.observeRecipeDetailedById(id).toChannel { ch ->
+            for (list in ch) {
+                observer(list.toDomain())
+            }
+        }
 
     override fun runTransaction(block: RecipeRepository.() -> Unit) =
         runTransactionDelegate(db, block)
+
+
 }

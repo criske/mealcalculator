@@ -9,7 +9,7 @@ data class RecipeDetailed(val id: Long, val name: String, val foods: List<Recipe
     fun toRecipe() = Recipe(id, name)
 }
 
-data class RecipeFood(val food: Food, val quantity: Int) {
+data class RecipeFood(val id: Long = 0L, val food: Food, val quantity: Int) {
 
 
     class Summary(val calories: Int,

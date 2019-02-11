@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.crskdev.mealcalculator.data.internal.room
 
 import androidx.room.migration.Migration
@@ -16,5 +18,9 @@ internal object Migrations {
             }
         }
     }
+
+    operator fun invoke(): Array<Migration> = arrayOf(
+        MIGRATION_1_2
+    )
 
 }

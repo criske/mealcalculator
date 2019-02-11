@@ -58,7 +58,7 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
                     }
             } else {
                 Room.databaseBuilder(context, MealCalculatorDatabase::class.java, name)
-                    .addMigrations(Migrations.MIGRATION_1_2)
+                    .addMigrations(*Migrations())
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             executor.execute {

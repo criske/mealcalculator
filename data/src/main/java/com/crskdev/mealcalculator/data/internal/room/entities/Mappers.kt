@@ -68,3 +68,16 @@ internal fun MealEntryWithFoodDb.toDomain(): MealEntry =
         mealEntry.quantity,
         food.toDomain()
     )
+
+internal fun Recipe.toDb() = RecipeDb(id, name)
+
+internal fun RecipeDb.toDomain() = Recipe(id, name)
+
+internal fun List<RecipeDetailedDb>.toDomain(): RecipeDetailed {
+    assert(isNotEmpty())
+    val (id, name) = first().let { it.recipe.id to it.recipe.name }
+    val foods = map { RecipeFood(it.id, it.food.toDomain(), it.quantity) }
+    return RecipeDetailed(id, name, foods)
+}
+
+internal fun RecipeFood.toDb(recipeId: Long) = RecipeFoodDb(id, recipeId, food.id, quantity)
