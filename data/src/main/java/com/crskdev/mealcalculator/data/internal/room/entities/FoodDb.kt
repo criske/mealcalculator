@@ -4,14 +4,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.crskdev.mealcalculator.domain.entities.Carbohydrate
-import com.crskdev.mealcalculator.domain.entities.Fat
 
 /**
  * Created by Cristian Pela on 25.01.2019.
  */
 @Entity(tableName = Tables.FOODS)
-internal class FoodDb(
+internal data class FoodDb(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "food_id")
     var id: Long,

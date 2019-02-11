@@ -6,7 +6,7 @@ import androidx.room.*
  * Created by Cristian Pela on 11.02.2019.
  */
 @Entity(tableName = Tables.RECIPES)
-internal class RecipeDb(
+internal data class RecipeDb(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "r_id")
     val id: Long,
@@ -34,7 +34,7 @@ internal class RecipeDb(
         )
     ]
 )
-internal class RecipeFoodDb(
+internal data class RecipeFoodDb(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "rf_id")
     val id: Long,

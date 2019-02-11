@@ -38,6 +38,9 @@ internal interface RecipeDao {
     @Insert
     fun insertRecipe(recipe: RecipeDb): Long
 
+    @Insert
+    fun insertRecipes(vararg recipe: RecipeDb): LongArray
+
     @Update
     fun updateRecipe(recipe: RecipeDb)
 

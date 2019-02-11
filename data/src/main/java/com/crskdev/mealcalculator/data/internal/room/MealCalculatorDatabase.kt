@@ -30,6 +30,8 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
         internal const val NAME = "meal-calculator.db"
 
+        //todo remove singleton pattern let this be handled by a di-framework
+
         @Volatile
         @PublishedApi
         internal var INSTANCE: MealCalculatorDatabase? = null
