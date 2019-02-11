@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import com.crskdev.mealcalculator.data.FoodRepositoryImpl
 import com.crskdev.mealcalculator.data.MealRepositoryImpl
+import com.crskdev.mealcalculator.data.RecipeRepositoryImpl
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
 import com.crskdev.mealcalculator.domain.entities.Carbohydrate
 import com.crskdev.mealcalculator.domain.entities.Fat
@@ -106,6 +107,10 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         MealRepositoryImpl(db)
     }
 
+    val recipeRepository: RecipeRepository by lazy {
+        RecipeRepositoryImpl(db)
+    }
+
     val dispatchers: GatewayDispatchers = PlatformGatewayDispatchers
 
     val recipeFoodEntriesManager: () -> RecipeFoodEntriesManager =
@@ -136,8 +141,12 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         RecipeFoodActionInteractorImpl(dispatchers, recipeFoodEntriesManager())
     }
 
-    val recipeFoodEntriesDisplayInteractor: () -> RecipeFoodEntriesDisplayInteractor = {
-        RecipeFoodEntriesDisplayInteractorImpl(dispatchers, recipeFoodEntriesManager())
+    val currentMealLoadFromRecipeInteractor: () -> CurrentMealLoadFromRecipeInteractor = {
+        CurrentMealLoadFromRecipeInteractorImpl(
+            dispatchers,
+            recipeRepository,
+            recipeFoodEntriesManager()
+        )
     }
 
     val recipeSummaryInteractor: () -> RecipeSummaryInteractor = {
@@ -197,7 +206,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 currentMealNumberOfTheDayInteractor(),
                 currentMealSaveInteractor(),
                 recipeSummaryInteractor(),
-                recipeFoodEntriesDisplayInteractor(),
+                currentMealLoadFromRecipeInteractor(),
                 recipeFoodActionInteractor(),
                 foodActionInteractor()
             )

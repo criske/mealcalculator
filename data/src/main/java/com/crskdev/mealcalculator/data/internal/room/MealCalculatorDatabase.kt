@@ -5,9 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.crskdev.mealcalculator.data.internal.room.entities.FoodDb
-import com.crskdev.mealcalculator.data.internal.room.entities.MealDb
-import com.crskdev.mealcalculator.data.internal.room.entities.MealEntryDb
+import com.crskdev.mealcalculator.data.internal.room.entities.*
 import java.util.concurrent.Executors
 
 /**
@@ -15,8 +13,8 @@ import java.util.concurrent.Executors
  */
 @Database(
     exportSchema = false,
-    version = 1,
-    entities = [FoodDb::class, MealDb::class, MealEntryDb::class]
+    version = 2,
+    entities = [FoodDb::class, MealDb::class, MealEntryDb::class, RecipeDb::class, RecipeFoodDb::class]
 )
 abstract class MealCalculatorDatabase : RoomDatabase() {
 
@@ -26,9 +24,11 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
     internal abstract fun mealEntryDao(): MealEntryDao
 
-
+    internal abstract fun recipeDao(): RecipeDao
 
     companion object {
+
+        internal const val NAME = "meal-calculator.db"
 
         @Volatile
         @PublishedApi
@@ -41,7 +41,7 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
 
         fun persistent(context: Context, block: (MealCalculatorDatabase) -> Unit = {}): MealCalculatorDatabase =
             INSTANCE ?: synchronized(MealCalculatorDatabase::class.java) {
-                INSTANCE ?: buildDatabase(context, "meal-calculator.db", block).also {
+                INSTANCE ?: buildDatabase(context, NAME, block).also {
                     INSTANCE = it
                 }
             }
@@ -58,6 +58,7 @@ abstract class MealCalculatorDatabase : RoomDatabase() {
                     }
             } else {
                 Room.databaseBuilder(context, MealCalculatorDatabase::class.java, name)
+                    .addMigrations(Migrations.MIGRATION_1_2)
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             executor.execute {

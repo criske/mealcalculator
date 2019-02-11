@@ -15,7 +15,6 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
     }
     buildTypes {
@@ -53,14 +52,14 @@ dependencies {
 
     implementation "androidx.room:room-runtime:2.1.0-alpha03"
 
-    implementation "com.google.dagger:dagger:2.20"
-    implementation "com.google.dagger:dagger-android-support:2.20"
-    kapt "com.google.dagger:dagger-compiler:2.20"
-    kapt "com.google.dagger:dagger-android-processor:2.20"
+//    implementation "com.google.dagger:dagger:2.20"
+//    implementation "com.google.dagger:dagger-android-support:2.20"
+//    kapt "com.google.dagger:dagger-compiler:2.20"
+//    kapt "com.google.dagger:dagger-android-processor:2.20"
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+//    testImplementation 'junit:junit:4.12'
+//    androidTestImplementation 'androidx.test:runner:1.1.1'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation project(':presentation')
     implementation project(':domain')

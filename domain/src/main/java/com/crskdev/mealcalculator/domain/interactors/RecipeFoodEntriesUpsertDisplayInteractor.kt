@@ -8,20 +8,17 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 /**
- * Created by Cristian Pela on 24.01.2019.
+ * Created by Cristian Pela on 10.02.2019.
  */
-interface RecipeFoodEntriesDisplayInteractor {
-
+interface RecipeFoodEntriesUpsertDisplayInteractor {
     suspend fun request(recipeId: Long, response: (List<RecipeFood>) -> Unit)
-
 }
 
-class RecipeFoodEntriesDisplayInteractorImpl(
+class RecipeFoodEntriesUpsertDisplayInteractorImpl(
     private val dispatchers: GatewayDispatchers,
     private val recipeFoodEntriesManager: RecipeFoodEntriesManager,
     private val recipeRepository: RecipeRepository
-) : RecipeFoodEntriesDisplayInteractor {
-
+) : RecipeFoodEntriesUpsertDisplayInteractor {
     override suspend fun request(recipeId: Long, response: (List<RecipeFood>) -> Unit) =
         coroutineScope {
             launch(dispatchers.DEFAULT) {
@@ -37,4 +34,6 @@ class RecipeFoodEntriesDisplayInteractorImpl(
             }
             Unit
         }
+
+
 }

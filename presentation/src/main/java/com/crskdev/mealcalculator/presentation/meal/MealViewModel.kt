@@ -18,7 +18,7 @@ class MealViewModel(
     private val currentMealNumberOfTheDayInteractor: CurrentMealNumberOfTheDayInteractor,
     private val currentMealSaveInteractor: CurrentMealSaveInteractor,
     private val recipeSummaryInteractor: RecipeSummaryInteractor,
-    private val recipeFoodEntriesDisplayInteractor: RecipeFoodEntriesDisplayInteractor,
+    private val currentMealLoadFromRecipeInteractor: CurrentMealLoadFromRecipeInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel() {
@@ -45,11 +45,6 @@ class MealViewModel(
         launch {
             recipeSummaryInteractor.request {
                 mealSummaryLiveData.mutablePost(it)
-            }
-        }
-        launch {
-            recipeFoodEntriesDisplayInteractor.request { list ->
-                mealEntriesLiveData.mutablePost(list)
             }
         }
         launch {
@@ -86,6 +81,16 @@ class MealViewModel(
         launch {
             foodActionInteractor.request(FoodActionInteractor.Request.Delete(food)) {
                 //no-op
+            }
+        }
+    }
+
+    fun loadEntriesFromRecipe(recipeId: Long) {
+        launch {
+            currentMealLoadFromRecipeInteractor.request(recipeId) {
+                if (it.isNotEmpty()) {
+                    TODO("Handle showing conflicts")
+                }
             }
         }
     }
