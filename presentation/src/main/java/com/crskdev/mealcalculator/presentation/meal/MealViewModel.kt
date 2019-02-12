@@ -16,9 +16,10 @@ import kotlinx.coroutines.launch
  */
 class MealViewModel(
     private val currentMealNumberOfTheDayInteractor: CurrentMealNumberOfTheDayInteractor,
+    private val currentMealEntriesDisplayInteractor: CurrentMealEntriesDisplayInteractor,
     private val currentMealSaveInteractor: CurrentMealSaveInteractor,
-    private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val currentMealLoadFromRecipeInteractor: CurrentMealLoadFromRecipeInteractor,
+    private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel() {
@@ -37,6 +38,11 @@ class MealViewModel(
     private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
 
     init {
+        launch {
+            currentMealEntriesDisplayInteractor.request {
+                mealEntriesLiveData.mutablePost(it)
+            }
+        }
         launch {
             currentMealNumberOfTheDayInteractor.request {
                 mealNumberLiveData.mutablePost(it)

@@ -142,6 +142,19 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         RecipeFoodActionInteractorImpl(dispatchers, recipeFoodEntriesManager(it))
     }
 
+    val currentMealNumberOfTheDayInteractor: () -> CurrentMealNumberOfTheDayInteractor = {
+        CurrentMealNumberOfTheDayInteractorImpl(dispatchers, mealRepository)
+    }
+
+    val currentMealSaveInteractor: () -> CurrentMealSaveInteractor = {
+        CurrentMealSaveInteractorImpl(dispatchers, mealRepository)
+    }
+
+    val currentMealEntriesDisplayInteractor: (Scope) -> CurrentMealEntriesDisplayInteractor =
+        scoped {
+            CurrentMealEntriesDisplayInteractorImpl(dispatchers, recipeFoodEntriesManager(it))
+        }
+
     val currentMealLoadFromRecipeInteractor: (Scope) -> CurrentMealLoadFromRecipeInteractor =
         scoped {
             CurrentMealLoadFromRecipeInteractorImpl(
@@ -165,14 +178,6 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val mealJournalDeleteInteractor: () -> MealJournalDeleteInteractor = {
         MealJournalDeleteInteractorImpl(dispatchers, mealRepository)
-    }
-
-    val currentMealNumberOfTheDayInteractor: () -> CurrentMealNumberOfTheDayInteractor = {
-        CurrentMealNumberOfTheDayInteractorImpl(dispatchers, mealRepository)
-    }
-
-    val currentMealSaveInteractor: () -> CurrentMealSaveInteractor = {
-        CurrentMealSaveInteractorImpl(dispatchers, mealRepository)
     }
 
     val recipeSaveInteractor: () -> RecipeSaveInteractor = {
@@ -218,9 +223,10 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
             val scope = getScope<MealFragment>()
             MealViewModel(
                 currentMealNumberOfTheDayInteractor(),
+                currentMealEntriesDisplayInteractor(scope),
                 currentMealSaveInteractor(),
-                recipeSummaryInteractor(scope),
                 currentMealLoadFromRecipeInteractor(scope),
+                recipeSummaryInteractor(scope),
                 recipeFoodActionInteractor(scope),
                 foodActionInteractor()
             )

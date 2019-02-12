@@ -75,18 +75,6 @@ open class BaseDependencyGraph(protected val context: Context) {
         }.holder!! as A
 
 
-//    inline fun <reified F : Fragment, reified T> withinFragmentScope(crossinline factory: () -> T) =
-//        {
-//            scoped(factory)(scopes[F::class]!!)
-//        }
-//
-//
-//    inline fun <reified A : AppCompatActivity, reified T> withinActivityScope(crossinline factory: () -> T) =
-//        {
-//            scoped(factory)(scopes[A::class]!!)
-//        }
-
-
     inline fun <reified T> scoped(crossinline factory: (Scope) -> T): (Scope) -> T = {
         val instance = it.get(T::class)
         if (instance == null) {
