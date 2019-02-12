@@ -2,6 +2,11 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/action_home_menu_recipes"
+        android:icon="@drawable/ic_comment_black_24dp"
+        android:title="@string/recipes"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_home_menu_meal_journal"
         android:icon="@drawable/ic_meal_journal_black_24dp"
         android:title="@string/journal"

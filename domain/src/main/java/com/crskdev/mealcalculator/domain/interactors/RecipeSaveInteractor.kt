@@ -36,11 +36,6 @@ class RecipeSaveInteractorImpl(
                 response(RecipeSaveInteractor.Response.EmptyName)
                 return@coroutineScope
             }
-            //todo: allow empty recipeDetailed?
-            if (recipeDetailed.foods.isEmpty()) {
-                response(RecipeSaveInteractor.Response.EmptyRecipe)
-                return@coroutineScope
-            }
 
             launch(dispatchers.IO) {
                 recipeRepository.runTransaction {

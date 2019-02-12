@@ -22,6 +22,11 @@ import kotlinx.android.synthetic.main.fragment_meal.*
 
 class MealFragment : DiFragment(), HasBackPressedAwareness {
 
+    companion object {
+        private const val SEARCH_FOOD_SELECT_CODE = 10001
+        private const val SEARCH_RECIPE_SELECT_CODE = 10002
+    }
+
     private val viewModel by lazy {
         di.mealViewModel()
     }
@@ -69,8 +74,8 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                     R.id.action_menu_meal_add_food -> {
                         findNavController()
                             .navigate(
-                                MealFragmentDirections.ActionMealFragmentToFindFoodFragment()
-                                    .setPopOnSelectItem(true)
+                                MealFragmentDirections
+                                    .ActionMealFragmentToFindFoodFragment(SEARCH_FOOD_SELECT_CODE)
                             )
                     }
                     R.id.action_menu_meal_save -> {
@@ -132,8 +137,9 @@ Glycemic Load: ${it.gi.toString().format(2)}
                 }
             }
         })
-        selectedFoodViewModel.selectedFoodLiveData.observe(this, Observer {
-            viewModel.addFood(it)
+        selectedFoodViewModel.eventLiveData.observe(this, Observer {
+            if (it.code == SEARCH_FOOD_SELECT_CODE)
+                viewModel.addFood(it.data)
         })
     }
 

@@ -12,6 +12,7 @@ import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
+import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
@@ -78,9 +79,12 @@ class FindFoodFragment : DiFragment() {
             adapter = FindFoodAdapter(LayoutInflater.from(context)) {
                 when (it) {
                     is FoodDisplayItemAction.Select -> {
-                        selectedFoodViewModel.selectFood(it.food)
-                        if (FindFoodFragmentArgs.fromBundle(arguments!!).popOnSelectItem)
+                        val args = FindFoodFragmentArgs.fromBundle(arguments!!)
+                        if (args.code != EventBusViewModel.Event.NO_CODE) {
+                            selectedFoodViewModel
+                                .sendEvent(EventBusViewModel.Event(args.code, it.food))
                             findNavController().popBackStack()
+                        }
                     }
                     is FoodDisplayItemAction.Edit -> findNavController().navigate(
                         FindFoodFragmentDirections

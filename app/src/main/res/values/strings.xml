@@ -24,4 +24,10 @@
     <string name="grams">Grams</string>
     <string name="add">Add</string>
     <string name="save">Save</string>
+    <string name="recipes">Recipes</string>
+    <string name="save_as_recipe">Save as Recipe</string>
+    <string name="load_from_recipe">Load from Recipe</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

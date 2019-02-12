@@ -32,9 +32,8 @@
             android:id="@+id/action_findFoodFragment_to_upsertFoodFragment"
             app:destination="@id/upsertFoodFragment" />
         <argument
-            android:name="popOnSelectItem"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:name="code"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/upsertFoodFragment"

@@ -17,14 +17,7 @@ import kotlin.reflect.KClass
  */
 open class BaseDependencyGraph(protected val context: Context) {
 
-    protected val injectedActivities =
-        mutableMapOf<KClass<out AppCompatActivity>, AppCompatActivity>()
-
-    protected val activityScopes = mutableMapOf<AppCompatActivity, MutableList<Any>>()
-
-    protected val injectedFragments = mutableMapOf<KClass<out Fragment>, Fragment>()
-
-    protected val fragmentScopes = mutableMapOf<Fragment, MutableList<Any>>()
+    protected val scopes = mutableMapOf<KClass<*>, Scope>()
 
     init {
         context.cast<Application>()
@@ -42,9 +35,8 @@ open class BaseDependencyGraph(protected val context: Context) {
                 override fun onActivityStopped(activity: Activity?) = Unit
 
                 override fun onActivityDestroyed(activity: Activity) {
-                    injectedActivities.remove(activity::class)
-                    activityScopes[activity]?.clear()
-                    activityScopes.remove(activity)
+                    scopes[activity::class]?.clear()
+                    scopes.remove(activity::class)
                 }
 
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -54,9 +46,8 @@ open class BaseDependencyGraph(protected val context: Context) {
                                 object :
                                     FragmentManager.FragmentLifecycleCallbacks() {
                                     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-                                        injectedFragments.remove(f::class)
-                                        fragmentScopes[f]?.clear()
-                                        fragmentScopes.remove(f)
+                                        scopes[f::class]?.clear()
+                                        scopes.remove(f::class)
                                     }
                                 }, true
                             )
@@ -66,52 +57,67 @@ open class BaseDependencyGraph(protected val context: Context) {
     }
 
     fun inject(fragment: Fragment) {
-        injectedFragments[fragment::class] = fragment
-        fragmentScopes[fragment] = mutableListOf<Any>()
+        scopes[fragment::class] = Scope(fragment)
     }
 
     fun inject(activity: AppCompatActivity) {
-        injectedActivities[activity::class] = activity
-        activityScopes[activity] = mutableListOf<Any>()
+        scopes[activity::class] = Scope(activity)
     }
 
     protected inline fun <reified F : Fragment> fragment(): F =
-        injectedFragments.getOrElse(F::class) {
+        scopes.getOrElse(F::class) {
             throw IllegalAccessException("Fragment ${F::class} was not injected")
-        } as F
+        }.holder!! as F
 
     protected inline fun <reified A : AppCompatActivity> activity(): A =
-        injectedActivities.getOrElse(A::class) {
-            throw IllegalAccessException("Fragment ${A::class} was not injected")
-        } as A
+        scopes.getOrElse(A::class) {
+            throw IllegalAccessException("Activity ${A::class} was not injected")
+        }.holder!! as A
 
 
-    inline fun <reified F : Fragment, reified T> withinFragmentScope(crossinline factory: () -> T) =
-        {
-            val f = fragment<F>()
-            val instances = fragmentScopes[f]!!
-            val instance = instances.firstOrNull { it is T}
-            if (instance == null) {
-                val created = factory()
-                instances.add(created as Any)
-                created
-            } else {
-                instance as T
-            }
+//    inline fun <reified F : Fragment, reified T> withinFragmentScope(crossinline factory: () -> T) =
+//        {
+//            scoped(factory)(scopes[F::class]!!)
+//        }
+//
+//
+//    inline fun <reified A : AppCompatActivity, reified T> withinActivityScope(crossinline factory: () -> T) =
+//        {
+//            scoped(factory)(scopes[A::class]!!)
+//        }
+
+
+    inline fun <reified T> scoped(crossinline factory: (Scope) -> T): (Scope) -> T = {
+        val instance = it.get(T::class)
+        if (instance == null) {
+            val created = factory(it)
+            it.add(created as Any)
+            created
+        } else {
+            instance as T
+        }
+    }
+
+    inline fun <reified T> getScope() = scopes.getOrElse(T::class) {
+        throw IllegalAccessException("Scope for ${T::class} was not found")
+    }
+
+    class Scope(var holder: Any?) {
+
+        private val instances = mutableListOf<Any>()
+
+        fun add(any: Any) {
+            instances.add(any)
         }
 
-    inline fun <reified A : AppCompatActivity, reified T> withinActivityScope(crossinline factory: () -> T) =
-        {
-            val a = activity<A>()
-            val instances = activityScopes[a]!!
-            val instance = instances.firstOrNull { it::class == T::class }
-            if (instance == null) {
-                val created = factory()
-                instances.add(created as Any)
-                created
-            } else {
-                instance as T
-            }
+        fun get(clazz: KClass<*>) =
+            instances.firstOrNull { it::class == clazz }
+
+        fun clear() {
+            holder = null
+            instances.clear()
         }
+    }
 
 }
+

@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 
 import com.crskdev.mealcalculator.R
+import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 
 /**
@@ -33,7 +34,7 @@ class HomeFragment : Fragment() {
                     R.id.action_home_menu_foods -> {
                         findNavController().navigate(
                             HomeFragmentDirections
-                                .actionHomeFragmentToFindFoodFragment()
+                                .actionHomeFragmentToFindFoodFragment(EventBusViewModel.Event.NO_CODE)
                         )
                     }
                     R.id.action_home_menu_foods -> {
