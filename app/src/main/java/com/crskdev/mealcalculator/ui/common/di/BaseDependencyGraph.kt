@@ -19,6 +19,8 @@ open class BaseDependencyGraph(protected val context: Context) {
 
     protected val scopes = mutableMapOf<KClass<*>, Scope>()
 
+    protected val injected = mutableMapOf<KClass<*>, Any>()
+
     init {
         context.cast<Application>()
             .registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
@@ -35,8 +37,9 @@ open class BaseDependencyGraph(protected val context: Context) {
                 override fun onActivityStopped(activity: Activity?) = Unit
 
                 override fun onActivityDestroyed(activity: Activity) {
-                    scopes[activity::class]?.clear()
+                    scopes[activity::class]?.cast<ScopeImpl>()?.clear()
                     scopes.remove(activity::class)
+                    injected.remove(activity::class)
                 }
 
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -46,8 +49,9 @@ open class BaseDependencyGraph(protected val context: Context) {
                                 object :
                                     FragmentManager.FragmentLifecycleCallbacks() {
                                     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-                                        scopes[f::class]?.clear()
+                                        scopes[f::class]?.cast<ScopeImpl>()?.clear()
                                         scopes.remove(f::class)
+                                        injected.remove(f::class)
                                     }
                                 }, true
                             )
@@ -57,29 +61,32 @@ open class BaseDependencyGraph(protected val context: Context) {
     }
 
     fun inject(fragment: Fragment) {
-        scopes[fragment::class] = Scope(fragment)
+        injected[fragment::class] = fragment
+        scopes[fragment::class] = ScopeImpl()
     }
 
     fun inject(activity: AppCompatActivity) {
-        scopes[activity::class] = Scope(activity)
+        injected[activity::class] = activity
+        scopes[activity::class] = ScopeImpl()
     }
 
     protected inline fun <reified F : Fragment> fragment(): F =
-        scopes.getOrElse(F::class) {
+        injected.getOrElse(F::class) {
             throw IllegalAccessException("Fragment ${F::class} was not injected")
-        }.holder!! as F
+        } as F
 
     protected inline fun <reified A : AppCompatActivity> activity(): A =
-        scopes.getOrElse(A::class) {
+        injected.getOrElse(A::class) {
             throw IllegalAccessException("Activity ${A::class} was not injected")
-        }.holder!! as A
+        } as A
 
 
     inline fun <reified T> scoped(crossinline factory: (Scope) -> T): (Scope) -> T = {
-        val instance = it.get(T::class)
+        val scopeImpl = it as ScopeImpl
+        val instance = scopeImpl.get(T::class)
         if (instance == null) {
             val created = factory(it)
-            it.add(created as Any)
+            scopeImpl.add(created as Any)
             created
         } else {
             instance as T
@@ -90,7 +97,7 @@ open class BaseDependencyGraph(protected val context: Context) {
         throw IllegalAccessException("Scope for ${T::class} was not found")
     }
 
-    class Scope(var holder: Any?) {
+    class ScopeImpl : Scope {
 
         private val instances = mutableListOf<Any>()
 
@@ -102,10 +109,11 @@ open class BaseDependencyGraph(protected val context: Context) {
             instances.firstOrNull { it::class == clazz }
 
         fun clear() {
-            holder = null
             instances.clear()
         }
     }
+
+    interface Scope
 
 }
 
