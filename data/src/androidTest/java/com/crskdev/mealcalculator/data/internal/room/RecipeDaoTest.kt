@@ -2,6 +2,7 @@ package com.crskdev.mealcalculator.data.internal.room
 
 import com.crskdev.mealcalculator.data.internal.room.entities.RecipeFoodDb
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 /**
@@ -39,11 +40,11 @@ internal class RecipeDaoTest : BaseDbTest() {
         val recipeEntries = recipeDao.getRecipeDetailedById(idRecipe1)
         assertEquals(2, recipeEntries.size)
         recipeEntries[0].also {
-            assertEquals("food1", it.food.name)
+            assertEquals("food1", it.food!!.name)
             assertEquals(10, it.quantity)
         }
         recipeEntries[1].also {
-            assertEquals("food2", it.food.name)
+            assertEquals("food2", it.food!!.name)
             assertEquals(5, it.quantity)
         }
     }
@@ -51,7 +52,12 @@ internal class RecipeDaoTest : BaseDbTest() {
     @Test
     fun should_recipe2_have_foods_not() {
         val recipeEntries = recipeDao.getRecipeDetailedById(idRecipe2)
-        assertEquals(0, recipeEntries.size)
+        assertEquals(1, recipeEntries.size)
+        with(recipeEntries.first()) {
+            assertNull(food)
+            assertNull(quantity)
+            assertEquals(0, id)
+        }
     }
 
 }

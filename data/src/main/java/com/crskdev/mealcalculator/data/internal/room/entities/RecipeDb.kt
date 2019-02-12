@@ -53,7 +53,7 @@ internal class RecipeDetailedDb(
     @Embedded
     val recipe: RecipeDb,
     @ColumnInfo(name = "rf_quantity")
-    val quantity: Int,
+    val quantity: Int?,
     @Embedded
-    val food: FoodDb
+    val food: FoodDb?
 )

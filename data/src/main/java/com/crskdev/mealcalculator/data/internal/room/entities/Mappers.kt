@@ -76,7 +76,8 @@ internal fun RecipeDb.toDomain() = Recipe(id, name)
 internal fun List<RecipeDetailedDb>.toDomain(): RecipeDetailed {
     assert(isNotEmpty())
     val (id, name) = first().let { it.recipe.id to it.recipe.name }
-    val foods = map { RecipeFood(it.id, it.food.toDomain(), it.quantity) }
+    val foods = filter { it.food != null && it.quantity != null }
+        .map { RecipeFood(it.id, it.food!!.toDomain(), it.quantity!!) }
     return RecipeDetailed(id, name, foods)
 }
 
