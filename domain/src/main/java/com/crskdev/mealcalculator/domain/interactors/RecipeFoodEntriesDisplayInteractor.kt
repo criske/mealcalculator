@@ -9,16 +9,16 @@ import kotlinx.coroutines.launch
 /**
  * Created by Cristian Pela on 12.02.2019.
  */
-interface CurrentMealEntriesDisplayInteractor {
+interface RecipeFoodEntriesDisplayInteractor {
 
     suspend fun request(response: (List<RecipeFood>) -> Unit)
 
 }
 
-class CurrentMealEntriesDisplayInteractorImpl(
+class RecipeFoodEntriesDisplayInteractorImpl(
     private val dispatchers: GatewayDispatchers,
     private val recipeFoodEntriesManager: RecipeFoodEntriesManager) :
-    CurrentMealEntriesDisplayInteractor {
+    RecipeFoodEntriesDisplayInteractor {
 
     override suspend fun request(response: (List<RecipeFood>) -> Unit) = coroutineScope {
         launch(dispatchers.DEFAULT) {

@@ -44,7 +44,7 @@ internal abstract class RecipeDao {
     @Insert
     abstract fun insertRecipeFood(recipeFood: RecipeFoodDb): Long
 
-    @Insert
+    @Update
     abstract fun updateRecipeFood(recipeFood: RecipeFoodDb)
 
     @Delete

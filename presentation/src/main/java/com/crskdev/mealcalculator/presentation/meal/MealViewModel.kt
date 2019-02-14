@@ -3,6 +3,7 @@ package com.crskdev.mealcalculator.presentation.meal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.Food
+import com.crskdev.mealcalculator.domain.entities.RecipeDetailed
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
@@ -16,12 +17,13 @@ import kotlinx.coroutines.launch
  */
 class MealViewModel(
     private val currentMealNumberOfTheDayInteractor: CurrentMealNumberOfTheDayInteractor,
-    private val currentMealEntriesDisplayInteractor: CurrentMealEntriesDisplayInteractor,
+    private val recipeFoodEntriesDisplayInteractor: RecipeFoodEntriesDisplayInteractor,
     private val currentMealSaveInteractor: CurrentMealSaveInteractor,
     private val currentMealLoadFromRecipeInteractor: CurrentMealLoadFromRecipeInteractor,
     private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
-    private val foodActionInteractor: FoodActionInteractor
+    private val foodActionInteractor: FoodActionInteractor,
+    private val recipeSaveInteractor: RecipeSaveInteractor
 ) : CoroutineScopedViewModel() {
 
     val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()
@@ -39,7 +41,7 @@ class MealViewModel(
 
     init {
         launch {
-            currentMealEntriesDisplayInteractor.request {
+            recipeFoodEntriesDisplayInteractor.request {
                 mealEntriesLiveData.mutablePost(it)
             }
         }
@@ -115,14 +117,28 @@ class MealViewModel(
         }
     }
 
+    fun saveAsRecipe(name: String) {
+        mealEntriesLiveData.value?.also {
+            launch {
+                recipeSaveInteractor.request(
+                    RecipeDetailed.EMPTY.copy(name = name, foods = it)
+                ) {
+
+                }
+            }
+        }
+    }
+
 
     sealed class Response {
         object Saved : Response()
+        object SaveAsRecipe : Response()
         sealed class Error : Response() {
             object NegativeOrZeroQuantity : Error()
             object MealNotStarted : Error()
             object EmptyMeal : Error()
             object MealNotSaved : Error()
+            object EmptyRecipeName : Error()
             class Other(val throwable: Throwable) : Error()
         }
     }

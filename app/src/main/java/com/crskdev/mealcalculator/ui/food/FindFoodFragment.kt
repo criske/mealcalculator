@@ -42,7 +42,7 @@ class FindFoodFragment : DiFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(toolbarFoodsSearch) {
-            inflateMenu(R.menu.menu_find_food)
+            inflateMenu(R.menu.menu_food_find)
             setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
             setNavigationOnClickListener {
                 findNavController().popBackStack()

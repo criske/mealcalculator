@@ -97,7 +97,8 @@ open class BaseDependencyGraph(protected val context: Context) {
         throw IllegalAccessException("Scope for ${T::class} was not found")
     }
 
-    class ScopeImpl : Scope {
+
+    class ScopeImpl internal constructor() : Scope {
 
         private val instances = mutableListOf<Any>()
 

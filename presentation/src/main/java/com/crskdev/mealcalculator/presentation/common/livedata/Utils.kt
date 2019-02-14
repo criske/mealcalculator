@@ -23,7 +23,7 @@ fun <T> LiveData<T>.mutableSet(value: T) {
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
-internal suspend fun <T> LiveData<T>.toChannel(mainDispatcher: CoroutineDispatcher = Dispatchers.Main, block: suspend (ReceiveChannel<T>) -> Unit) =
+suspend fun <T> LiveData<T>.toChannel(mainDispatcher: CoroutineDispatcher = Dispatchers.Main, block: suspend (ReceiveChannel<T>) -> Unit) =
     coroutineScope {
         val sendChannel = actor<T> {
             block(channel)

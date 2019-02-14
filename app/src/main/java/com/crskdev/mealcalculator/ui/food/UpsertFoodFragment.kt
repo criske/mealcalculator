@@ -73,13 +73,13 @@ class UpsertFoodFragment : DiFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         with(toolbarUpsertFood) {
-            inflateMenu(R.menu.menu_upsert)
+            inflateMenu(R.menu.menu_food_upsert)
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
             setOnMenuItemClickListener {
                 when(it.itemId){
-                    R.id.action_menu_upsert_save ->{
+                    R.id.action_menu_food_upsert_save -> {
                         viewModel.upsert(extractFoodVM())
                     }
                 }

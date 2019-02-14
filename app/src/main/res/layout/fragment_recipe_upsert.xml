@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.recipe.RecipeUpsertFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarRecipeUpsert"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:theme="@style/AppToolbar.Nav">
+
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/inputRecipeUpsertTitle"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="4dp"
+            android:background="@null"
+            android:ellipsize="end"
+            android:hint="@string/recipe_name"
+            android:singleLine="true" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRecipeUpsert"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="true"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_meal_entry" />
+
+</LinearLayout>

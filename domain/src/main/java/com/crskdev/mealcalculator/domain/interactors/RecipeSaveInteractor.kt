@@ -16,7 +16,7 @@ interface RecipeSaveInteractor {
 
 
     sealed class Response {
-        object OK : Response()
+        class OK(val recipeId: Long) : Response()
         object EmptyName : Response()
         object EmptyRecipe : Response()
     }
@@ -62,7 +62,7 @@ class RecipeSaveInteractorImpl(
                                 updateRecipeFood(id, it.food)
                         }
                     }
-                    response(RecipeSaveInteractor.Response.OK)
+                    response(RecipeSaveInteractor.Response.OK(id))
                 }
 
             }
@@ -81,8 +81,9 @@ internal object RecipeFoodsDiffUtil {
     fun calculate(existent: List<RecipeFood>, updated: List<RecipeFood>): List<Result> {
         val results = mutableListOf<RecipeFoodsDiffUtil.Result>()
         updated.forEach {
-            if (existent.contains(it)) {
-                if (it.quantity != it.quantity) {
+            val containedInExistent = existent.containedFoodWith(it)
+            if (containedInExistent != null) {
+                if (it.quantity != containedInExistent.quantity) {
                     results.add(RecipeFoodsDiffUtil.Result.Update(it))
                 }
             } else {
@@ -90,11 +91,18 @@ internal object RecipeFoodsDiffUtil {
             }
         }
         existent.forEach {
-            if (!updated.contains(it)) {
+            if (!updated.containsFood(it)) {
                 results.add(RecipeFoodsDiffUtil.Result.Delete(it))
             }
         }
         return results
     }
+
+    private fun List<RecipeFood>.containsFood(recipeFood: RecipeFood): Boolean =
+        containedFoodWith(recipeFood) != null
+
+    private fun List<RecipeFood>.containedFoodWith(other: RecipeFood): RecipeFood? =
+        firstOrNull { it.id == other.id && it.food.id == other.food.id }
+
 
 }

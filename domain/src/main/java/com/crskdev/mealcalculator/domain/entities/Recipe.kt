@@ -6,6 +6,11 @@ package com.crskdev.mealcalculator.domain.entities
 data class Recipe(val id: Long, val name: String)
 
 data class RecipeDetailed(val id: Long, val name: String, val foods: List<RecipeFood>) {
+
+    companion object {
+        val EMPTY = RecipeDetailed(0, "", emptyList())
+    }
+
     fun toRecipe() = Recipe(id, name)
 }
 
