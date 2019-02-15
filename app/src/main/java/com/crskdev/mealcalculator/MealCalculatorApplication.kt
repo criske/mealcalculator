@@ -196,7 +196,8 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 recipeSummaryInteractor(scope),
                 recipeFoodActionInteractor(scope),
                 foodActionInteractor(),
-                recipeSaveInteractor()
+                recipeSaveInteractor(),
+                currentMealLoadFromRecipeInteractor(scope)
             )
         }
     }

@@ -15,6 +15,7 @@ import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
+import com.crskdev.mealcalculator.utils.lifecycleRegistry
 import com.crskdev.mealcalculator.utils.onItemSwipe
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
@@ -27,12 +28,22 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         private const val SEARCH_RECIPE_SELECT_CODE = 10002
     }
 
+
     private val viewModel by lazy {
         di.mealViewModel()
     }
 
     private val selectedFoodViewModel by lazy {
         di.selectedFoodViewModel()
+    }
+
+    private val mealConflictDialogHelper by lifecycleRegistry {
+        MealConflictDialogCreator(context!!) {
+            when (it) {
+                ConflictAction.ClearAll -> viewModel.clearConflicts()
+                is ConflictAction.Handled -> viewModel.conflictHandledWith(it.recipeFood)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -111,14 +122,16 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             toolbarMeal.title = "No.$it"
         })
         viewModel.mealSummaryLiveData.observe(this, Observer {
-
+            //todo vm this
             val summary =
-                """Calories: ${it.calories.toString().format(2)} kCal.
+                """
+Calories: ${it.calories.toString().format(2)} kCal.
 Carbohydrates: ${it.carbohydrates.total.toString().format(2)} g
 Fat: ${it.fat.total.toString().format(2)} g
 Proteins: ${it.proteins.toString().format(2)} g
 Glycemic Load: ${it.gi.toString().format(2)}
                 """.trimIndent()
+
             textMealSummary.text = summary
         })
         viewModel.responsesLiveData.observe(this, Observer {
@@ -137,6 +150,11 @@ Glycemic Load: ${it.gi.toString().format(2)}
                 }
             }
         })
+
+        viewModel.conflictLoadFromRecipeFoods.observe(this, Observer {
+            mealConflictDialogHelper.showDialogWith(it)
+        })
+
         selectedFoodViewModel.eventLiveData.observe(this, Observer {
             if (it.code == SEARCH_FOOD_SELECT_CODE)
                 viewModel.addFood(it.data)

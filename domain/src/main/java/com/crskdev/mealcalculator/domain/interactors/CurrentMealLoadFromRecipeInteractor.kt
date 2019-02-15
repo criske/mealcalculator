@@ -15,9 +15,9 @@ interface CurrentMealLoadFromRecipeInteractor {
 
     suspend fun request(recipeId: Long, conflicts: (List<ConflictingRecipeFood>) -> Unit)
 
-    class ConflictingRecipeFood(
+    data class ConflictingRecipeFood(
         val existentQuantity: Int,
-        val recipeQauntity: Int,
+        val recipeQuantity: Int,
         val food: Food
     )
 
@@ -59,7 +59,8 @@ class CurrentMealLoadFromRecipeInteractorImpl(
                 if (conflictingRecipeFoods.isNotEmpty()) {
                     conflictsResponse(conflictingRecipeFoods)
                 }
-                recipeFoodEntriesManager.addAll(nonConflictingRecipeFoods)
+                //current meal does not care about the recipe food id.. also safety net if saving the meal as recipe
+                recipeFoodEntriesManager.addAll(nonConflictingRecipeFoods.map { it.copy(id = 0L) })
             }
             Unit
         }
