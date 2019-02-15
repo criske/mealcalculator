@@ -44,7 +44,7 @@ class CurrentMealLoadFromRecipeInteractorImpl(
                 val nonConflictingRecipeFoods = mutableListOf<RecipeFood>()
                 foodsFromRecipe.forEach { rf ->
                     val exists = existentFoods.firstOrNull { it.food.id == rf.food.id }
-                    if (exists != null) {
+                    if (exists != null && exists.quantity != rf.quantity) {
                         conflictingRecipeFoods.add(
                             CurrentMealLoadFromRecipeInteractor.ConflictingRecipeFood(
                                 exists.quantity,

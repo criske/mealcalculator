@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_marginBottom="2dp"
     android:layout_height="120dp">
 
 
@@ -10,11 +11,11 @@
         android:id="@+id/textItemConflictFoodName"
         android:layout_width="0dp"
         android:layout_height="35dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="marquee"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:singleLine="true"
         app:autoSizeMaxTextSize="18sp"
         app:autoSizeMinTextSize="10sp"

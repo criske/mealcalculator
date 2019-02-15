@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.crskdev.mealcalculator.ui.meal
 
 import android.app.Dialog

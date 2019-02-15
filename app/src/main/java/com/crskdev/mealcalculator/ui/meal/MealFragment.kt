@@ -15,10 +15,7 @@ import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.utils.lifecycleRegistry
-import com.crskdev.mealcalculator.utils.onItemSwipe
-import com.crskdev.mealcalculator.utils.showSimpleToast
-import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
+import com.crskdev.mealcalculator.utils.*
 import kotlinx.android.synthetic.main.fragment_meal.*
 
 class MealFragment : DiFragment(), HasBackPressedAwareness {
@@ -35,6 +32,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
 
     private val selectedFoodViewModel by lazy {
         di.selectedFoodViewModel()
+    }
+
+    private val selectedRecipeViewModel by lazy {
+        di.selectedRecipeViewModel()
     }
 
     private val mealConflictDialogHelper by lifecycleRegistry {
@@ -100,6 +101,19 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                             }
                         }
                     }
+                    R.id.action_menu_meal_load_from_recipe -> {
+                        findNavController()
+                            .navigate(
+                                MealFragmentDirections.actionMealFragmentToRecipesDisplayFragment(
+                                    SEARCH_RECIPE_SELECT_CODE
+                                )
+                            )
+                    }
+                    R.id.action_menu_meal_save_as_recipe -> {
+                        this@MealFragment.context!!.showSimpleInputDialog("Recipe Name") { e ->
+                            viewModel.saveAsRecipe(e.toString())
+                        }
+                    }
                 }
                 true
             }
@@ -158,6 +172,11 @@ Glycemic Load: ${it.gi.toString().format(2)}
         selectedFoodViewModel.eventLiveData.observe(this, Observer {
             if (it.code == SEARCH_FOOD_SELECT_CODE)
                 viewModel.addFood(it.data)
+        })
+
+        selectedRecipeViewModel.eventLiveData.observe(this, Observer {
+            if (it.code == SEARCH_RECIPE_SELECT_CODE)
+                viewModel.loadEntriesFromRecipe(it.data.id)
         })
     }
 

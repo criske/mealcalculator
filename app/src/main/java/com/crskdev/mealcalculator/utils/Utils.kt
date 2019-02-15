@@ -1,16 +1,20 @@
 package com.crskdev.mealcalculator.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.text.Editable
 import android.util.Base64
 import android.util.TypedValue
 import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.postDelayed
@@ -18,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import java.io.ByteArrayOutputStream
 
@@ -156,5 +161,26 @@ inline fun Context.showSimpleYesNoDialog(title: String, msg: String, crossinline
     simpleYesNoDialog(title, msg, onSelect).create().show()
 }
 
+@SuppressLint("RestrictedApi")
+inline fun Context.simpleInputDialog(title: String, crossinline onSubmit: (Editable) -> Unit): AlertDialog.Builder {
+    val margin = 16.dpToPx(resources).toInt()
+    val inputText = AppCompatEditText(ContextThemeWrapper(this, R.style.AppTheme))
+        .apply {
+            setSingleLine()
+        }
+    return AlertDialog.Builder(this)
+        .setTitle(title)
+        .setView(inputText, margin, margin, margin, margin)
+        .setCancelable(true)
+        .setPositiveButton(android.R.string.ok) { d, _ ->
+            d.dismiss()
+            inputText.text?.let { onSubmit(it) }
+        }
+}
+
+
+inline fun Context.showSimpleInputDialog(title: String, crossinline onSubmit: (Editable) -> Unit) {
+    simpleInputDialog(title, onSubmit).create().show()
+}
 
 fun Context.getColorCompat(@ColorRes colorRes: Int) = ContextCompat.getColor(this, colorRes)
