@@ -8,6 +8,7 @@ import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
+import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
 
@@ -32,6 +33,10 @@ class RecipeUpsertViewModel(
         MutableLiveData<RecipeSaveInteractor.Response>()
 
     private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
+
+    val savedStateLiveData: LiveData<Boolean> = MutableLiveData<Boolean>().apply {
+        value = true
+    }
 
     init {
         if (recipeId > 0) {
@@ -63,8 +68,9 @@ class RecipeUpsertViewModel(
     fun setTitle(name: String) {
         recipeLiveData.value?.run {
             val trimmedName = name.trim()
-            if (trimmedName != this.name) {
-                recipeLiveData.mutablePost(copy(name = trimmedName))
+            if (trimmedName != this.name && trimmedName.isNotEmpty()) {
+                savedStateLiveData.mutableSet(false)
+                recipeLiveData.mutableSet(copy(name = trimmedName))
             }
         }
     }
@@ -77,6 +83,7 @@ class RecipeUpsertViewModel(
                         recipeLiveData.value?.run {
                             recipeLiveData.mutablePost(copy(id = it.recipeId))
                         }
+                        savedStateLiveData.mutablePost(true)
                     }
                     actionResponseLiveData.mutablePost(it)
                 }
@@ -85,10 +92,12 @@ class RecipeUpsertViewModel(
     }
 
     fun addFood(food: Food) {
+        savedStateLiveData.mutableSet(false)
         recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.AddFood(food)
     }
 
     fun removeEntry(entry: RecipeFood) {
+        savedStateLiveData.mutableSet(false)
         recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Remove(entry)
     }
 
@@ -99,10 +108,12 @@ class RecipeUpsertViewModel(
     }
 
     fun editEntry(entry: RecipeFood) {
+        savedStateLiveData.mutableSet(false)
         recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Edit(entry)
     }
 
     fun deleteFood(food: Food) {
+        savedStateLiveData.mutableSet(false)
         launch {
             foodActionInteractor.request(FoodActionInteractor.Request.Delete(food)) {
                 //no-op

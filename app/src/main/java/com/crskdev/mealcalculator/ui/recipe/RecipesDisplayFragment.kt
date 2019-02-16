@@ -1,10 +1,12 @@
 package com.crskdev.mealcalculator.ui.recipe
 
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -12,6 +14,8 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
+import com.crskdev.mealcalculator.utils.onItemSwipe
+import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_recipes_display.*
 
 class RecipesDisplayFragment : DiFragment() {
@@ -44,6 +48,9 @@ class RecipesDisplayFragment : DiFragment() {
                 }
                 true
             }
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
         }
         with(recyclerRecipesDisplay) {
             adapter = RecipesAdapter(LayoutInflater.from(context)) {
@@ -56,6 +63,20 @@ class RecipesDisplayFragment : DiFragment() {
                 }
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            onItemSwipe { vh, _ ->
+                postDelayed(100) {
+                    this@RecipesDisplayFragment
+                        .context
+                        ?.showSimpleYesNoDialog("Warning", "Permanently delete this recipe?") {
+                            if (DialogInterface.BUTTON_POSITIVE == it) {
+                                viewModel.delete(vh.adapterPosition)
+                            } else {
+                                //revert the swipe animation
+                                recyclerRecipesDisplay.adapter?.notifyItemChanged(vh.adapterPosition)
+                            }
+                        }
+                }
+            }
         }
         viewModel.recipesLiveData.observe(this, Observer {
             recyclerRecipesDisplay.adapter?.cast<RecipesAdapter>()?.submitList(it)

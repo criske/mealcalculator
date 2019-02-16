@@ -119,26 +119,40 @@ class ConflictingRecipeFoodsAdapter(private val layoutInflater: LayoutInflater,
 
 }
 
-class ConflictingRecipeFoodVH(v: View, action: (ConflictAction) -> Unit) :
+class ConflictingRecipeFoodVH(v: View,
+                              private val action: (ConflictAction) -> Unit) :
     RecyclerView.ViewHolder(v) {
 
     private var conflictingRecipeFood: ConflictingRecipeFood? = null
+
+    companion object {
+        private const val LEFT_QUANTITY = 0
+        private const val RIGHT_QUANTITY = 1
+        private const val COMBINE_QUANTITY = 2
+    }
 
     init {
         with(itemView) {
             textItemConflictFoodQExist.setOnClickListener {
                 conflictingRecipeFood?.let {
-                    action(ConflictAction.Handled(RecipeFood(0, it.food, it.existentQuantity)))
+                    animatedAction(
+                        LEFT_QUANTITY,
+                        ConflictAction.Handled(RecipeFood(0, it.food, it.existentQuantity))
+                    )
                 }
             }
             textItemConflictFoodQFromRecipe.setOnClickListener {
                 conflictingRecipeFood?.let {
-                    action(ConflictAction.Handled(RecipeFood(0, it.food, it.recipeQuantity)))
+                    animatedAction(
+                        RIGHT_QUANTITY,
+                        ConflictAction.Handled(RecipeFood(0, it.food, it.recipeQuantity))
+                    )
                 }
             }
             textItemConflictFoodCombine.setOnClickListener {
                 conflictingRecipeFood?.let {
-                    action(
+                    animatedAction(
+                        COMBINE_QUANTITY,
                         ConflictAction.Handled(
                             RecipeFood(
                                 0, it.food, it.existentQuantity + it.recipeQuantity
@@ -148,6 +162,21 @@ class ConflictingRecipeFoodVH(v: View, action: (ConflictAction) -> Unit) :
                 }
             }
         }
+    }
+
+    private fun animatedAction(type: Int, conflictAction: ConflictAction) {
+        when (type) {
+            LEFT_QUANTITY -> {
+
+            }
+            RIGHT_QUANTITY -> {
+
+            }
+            COMBINE_QUANTITY -> {
+
+            }
+        }
+        action(conflictAction)
     }
 
     fun bind(conflictingRecipeFood: ConflictingRecipeFood) {

@@ -11,6 +11,7 @@
         android:id="@+id/toolbarRecipesDisplay"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
         app:title="@string/recipes" />
 
     <androidx.recyclerview.widget.RecyclerView

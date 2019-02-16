@@ -43,6 +43,24 @@ class MealViewModel(
     val conflictLoadFromRecipeFoods: LiveData<List<ConflictingRecipeFood>> =
         MutableLiveData<List<ConflictingRecipeFood>>().apply {
             value = emptyList()
+//            value = listOf(
+//                ConflictingRecipeFood(
+//                    10, 5,
+//                    Food(
+//                        0, "Foo", null, 0,
+//                        Carbohydrate(0f, 0f, 0f),
+//                        Fat(0f, 0f, 0f), 0f, 0f
+//                    )
+//                ),
+//                ConflictingRecipeFood(
+//                    1000, 50,
+//                    Food(
+//                        1, "Bar", null, 0,
+//                        Carbohydrate(0f, 0f, 0f),
+//                        Fat(0f, 0f, 0f), 0f, 0f
+//                    )
+//                )
+//            )
         }
 
     private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()

@@ -27,10 +27,12 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textItemConflictFoodQExist"
+        android:textColor="@color/colorFats"
         style="@style/TextConflictActionAppearance"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        app:tooltipText="@string/existent_quantity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textItemConflictFoodCombine"
         app:layout_constraintHorizontal_bias="0.5"
@@ -60,6 +62,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        app:tooltipText="@string/from_recipe_quantity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

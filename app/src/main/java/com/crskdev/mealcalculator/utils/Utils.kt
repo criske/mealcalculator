@@ -1,6 +1,7 @@
 package com.crskdev.mealcalculator.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -9,6 +10,8 @@ import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.util.Base64
 import android.util.TypedValue
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
@@ -16,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
@@ -72,6 +76,11 @@ inline fun RecyclerView.onItemSwipe(swipeDirection: Int = ItemTouchHelper.LEFT, 
             block(viewHolder, direction)
         }
     }).attachToRecyclerView(this)
+}
+
+fun Activity.hideSoftKeyboard() {
+    val view = currentFocus ?: View(this)
+    getSystemService<InputMethodManager>()?.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
 inline val AppCompatActivity.navHostFragmentChildFragmentManager: FragmentManager

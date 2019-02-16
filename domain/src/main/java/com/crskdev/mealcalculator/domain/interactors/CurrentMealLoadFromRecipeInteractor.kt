@@ -59,7 +59,8 @@ class CurrentMealLoadFromRecipeInteractorImpl(
                 if (conflictingRecipeFoods.isNotEmpty()) {
                     conflictsResponse(conflictingRecipeFoods)
                 }
-                //current meal does not care about the recipe food id.. also safety net if saving the meal as recipe
+                //current meal does not care about the recipe food id.. also safety net for when saving the meal as recipe
+                //(0L id for primary key means new food to be added)
                 recipeFoodEntriesManager.addAll(nonConflictingRecipeFoods.map { it.copy(id = 0L) })
             }
             Unit

@@ -29,9 +29,6 @@ class RecipesDisplayViewModel(
                 recipesLiveData.mutablePost(it)
             }
         }
-        launch {
-
-        }
     }
 
     fun select(recipe: Recipe) {
