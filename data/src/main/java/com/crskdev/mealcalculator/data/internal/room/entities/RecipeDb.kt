@@ -14,6 +14,14 @@ internal data class RecipeDb(
     val name: String
 )
 
+
+internal data class RecipeDbWithFoodNames(
+    @Embedded
+    val recipe: RecipeDb,
+    @ColumnInfo(name = "food_names")
+    val foodNames: String?
+)
+
 @Entity(
     tableName = Tables.RECIPES_FOODS,
     foreignKeys =

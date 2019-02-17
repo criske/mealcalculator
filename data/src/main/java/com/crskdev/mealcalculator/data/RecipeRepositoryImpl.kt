@@ -43,7 +43,7 @@ class RecipeRepositoryImpl(private val db: MealCalculatorDatabase) : RecipeRepos
         dao.updateRecipeFood(food.toDb(recipeId))
 
     override suspend fun observeAll(observer: (List<Recipe>) -> Unit) =
-        dao.observeAll().toChannel { ch ->
+        dao.observeAllWithFoodNames().toChannel { ch ->
             for (list in ch) {
                 observer(list.map { it.toDomain() })
             }

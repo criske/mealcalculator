@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.interactors.RecipeSaveInteractor
+import com.crskdev.mealcalculator.presentation.common.livedata.distinctUntilChanged
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
@@ -125,7 +126,8 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
             }
             recyclerRecipeUpsert.adapter?.cast<RecipeFoodEntriesAdapter>()?.submitList(it.foods)
         })
-        viewModel.actionResponseLiveData.observe(this, Observer {
+        viewModel.actionResponseLiveData.distinctUntilChanged().observe(this, Observer {
+            //todo see why response is emitted multiple times instead of once... right know is hacky patched with distinct until changed
             when (it) {
                 is RecipeSaveInteractor.Response.OK -> context?.showSimpleToast("Recipe Saved")
                 RecipeSaveInteractor.Response.EmptyName -> context?.showSimpleToast(it.javaClass.simpleName)

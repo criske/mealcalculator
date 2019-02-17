@@ -67,12 +67,14 @@ class RecipeVH(v: View, action: (RecipesAdapter.Action) -> Unit) : RecyclerView.
         this.recipe = recipe
         with(itemView) {
             textItemRecipe.text = recipe.name
+            textItemRecipeFoodNames.text = recipe.foodNames
         }
     }
 
     fun clear() {
         with(itemView) {
             textItemRecipe.text = null
+            textItemRecipeFoodNames.text = null
         }
     }
 

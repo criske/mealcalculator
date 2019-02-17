@@ -3,6 +3,7 @@ package com.crskdev.mealcalculator.data.internal.room
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.crskdev.mealcalculator.data.internal.room.entities.RecipeDb
+import com.crskdev.mealcalculator.data.internal.room.entities.RecipeDbWithFoodNames
 import com.crskdev.mealcalculator.data.internal.room.entities.RecipeDetailedDb
 import com.crskdev.mealcalculator.data.internal.room.entities.RecipeFoodDb
 
@@ -55,5 +56,17 @@ internal abstract class RecipeDao {
 
     @Query("SELECT * FROM recipes")
     abstract fun observeAll(): LiveData<List<RecipeDb>>
+
+    @Query(
+        """
+                SELECT r.*, GROUP_CONCAT(rf.name) food_names FROM recipes r LEFT JOIN (
+                     SELECT  rf.rf_fk_r_id, f.name
+                            FROM foods f, recipes_foods rf
+                                WHERE f.food_id == rf_fk_f_id) rf
+                        ON rf.rf_fk_r_id == r.r_id
+                  GROUP BY r.r_id
+    """
+    )
+    abstract fun observeAllWithFoodNames(): LiveData<List<RecipeDbWithFoodNames>>
 
 }

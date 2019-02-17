@@ -71,7 +71,9 @@ internal fun MealEntryWithFoodDb.toDomain(): MealEntry =
 
 internal fun Recipe.toDb() = RecipeDb(id, name)
 
-internal fun RecipeDb.toDomain() = Recipe(id, name)
+internal fun RecipeDb.toDomain() = Recipe(id, name, null)
+
+internal fun RecipeDbWithFoodNames.toDomain() = Recipe(recipe.id, recipe.name, foodNames)
 
 internal fun List<RecipeDetailedDb>.toDomain(): RecipeDetailed {
     assert(isNotEmpty())

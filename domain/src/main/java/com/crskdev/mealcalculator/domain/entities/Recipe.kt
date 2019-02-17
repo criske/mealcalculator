@@ -3,7 +3,7 @@ package com.crskdev.mealcalculator.domain.entities
 /**
  * Created by Cristian Pela on 05.02.2019.
  */
-data class Recipe(val id: Long, val name: String)
+data class Recipe(val id: Long, val name: String, val foodNames: String?)
 
 data class RecipeDetailed(val id: Long, val name: String, val foods: List<RecipeFood>) {
 
@@ -11,7 +11,7 @@ data class RecipeDetailed(val id: Long, val name: String, val foods: List<Recipe
         val EMPTY = RecipeDetailed(0, "", emptyList())
     }
 
-    fun toRecipe() = Recipe(id, name)
+    fun toRecipe() = Recipe(id, name, foods.joinToString(",") { it.food.name })
 }
 
 data class RecipeFood(val id: Long = 0L, val food: Food, val quantity: Int) {
