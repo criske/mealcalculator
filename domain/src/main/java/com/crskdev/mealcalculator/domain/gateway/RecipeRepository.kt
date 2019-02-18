@@ -11,7 +11,9 @@ interface RecipeRepository : Transactionable<RecipeRepository> {
 
     fun save(recipe: Recipe): Long
 
-    fun getRecipeById(id: Long): RecipeDetailed?
+    fun getRecipeDetailedById(id: Long): RecipeDetailed?
+
+    fun getRecipeById(id: Long): Recipe?
 
     fun delete(recipe: Recipe)
 
@@ -25,6 +27,6 @@ interface RecipeRepository : Transactionable<RecipeRepository> {
 
     suspend fun observeAll(observer: (List<Recipe>) -> Unit)
 
-    suspend fun observeRecipe(id: Long, observer: (RecipeDetailed) -> Unit)
+    suspend fun observeRecipeDetailed(id: Long, observer: (RecipeDetailed) -> Unit)
 
 }

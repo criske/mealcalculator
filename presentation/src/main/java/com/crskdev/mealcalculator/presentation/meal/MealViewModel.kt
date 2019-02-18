@@ -25,8 +25,7 @@ class MealViewModel(
     private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor,
-    private val saveAsRecipeInteractor: RecipeSaveInteractor,
-    private val loadFromRecipeInteractor: CurrentMealLoadFromRecipeInteractor
+    private val saveAsRecipeInteractor: RecipeSaveInteractor
 ) : CoroutineScopedViewModel() {
 
     val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()

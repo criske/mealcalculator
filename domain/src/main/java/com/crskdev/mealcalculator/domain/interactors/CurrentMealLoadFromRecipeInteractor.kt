@@ -33,7 +33,7 @@ class CurrentMealLoadFromRecipeInteractorImpl(
         coroutineScope {
             launch(dispatchers.DEFAULT) {
                 val foodsFromRecipe = recipeRepository
-                    .getRecipeById(recipeId)
+                    .getRecipeDetailedById(recipeId)
                     ?.foods
                     ?: emptyList()
                 val existentFoods = recipeFoodEntriesManager.getAll()

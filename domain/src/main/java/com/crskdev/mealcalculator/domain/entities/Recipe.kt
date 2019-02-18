@@ -3,7 +3,11 @@ package com.crskdev.mealcalculator.domain.entities
 /**
  * Created by Cristian Pela on 05.02.2019.
  */
-data class Recipe(val id: Long, val name: String, val foodNames: String?)
+data class Recipe(val id: Long, val name: String, val foodNames: String?) {
+
+    fun toDetailed(): RecipeDetailed = RecipeDetailed(id, name, emptyList())
+
+}
 
 data class RecipeDetailed(val id: Long, val name: String, val foods: List<RecipeFood>) {
 

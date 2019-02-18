@@ -26,6 +26,12 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <com.crskdev.mealcalculator.ui.common.widget.RecipeSummaryView
+        android:id="@+id/textRecipeUpsertSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerRecipeUpsert"
         android:layout_width="match_parent"

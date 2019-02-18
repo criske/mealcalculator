@@ -21,10 +21,13 @@ class RecipeRepositoryImpl(private val db: MealCalculatorDatabase) : RecipeRepos
 
     override fun save(recipe: Recipe): Long = dao.insertRecipe(recipe.toDb())
 
-    override fun getRecipeById(id: Long): RecipeDetailed? =
+    override fun getRecipeDetailedById(id: Long): RecipeDetailed? =
         dao.getRecipeDetailedById(id)
             .takeIf { it.isNotEmpty() }
             ?.toDomain()
+
+    override fun getRecipeById(id: Long): Recipe? =
+        dao.getRecipeById(id)?.toDomain()
 
     override fun delete(recipe: Recipe) =
         dao.deleteRecipe(recipe.toDb())
@@ -49,7 +52,7 @@ class RecipeRepositoryImpl(private val db: MealCalculatorDatabase) : RecipeRepos
             }
         }
 
-    override suspend fun observeRecipe(id: Long, observer: (RecipeDetailed) -> Unit) =
+    override suspend fun observeRecipeDetailed(id: Long, observer: (RecipeDetailed) -> Unit) =
         dao.observeRecipeDetailedById(id).toChannel { ch ->
             for (list in ch) {
                 observer(list.toDomain())

@@ -1,8 +1,6 @@
 package com.crskdev.mealcalculator.domain.gateway
 
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.withLock
 
 /**
  * Created by Cristian Pela on 31.01.2019.
@@ -39,97 +37,83 @@ class RecipeFoodEntriesManagerImpl : RecipeFoodEntriesManager {
 
     private val observers = mutableListOf<(List<RecipeFood>) -> Unit>()
 
-    private val lock = ReentrantReadWriteLock()
-
+    @Synchronized
     override fun addAll(entries: List<RecipeFood>, autoNotify: Boolean) {
-        lock.writeLock().withLock {
-            this.entries.addAll(0, entries)
-            if (autoNotify)
-                notifyObservers()
-        }
+        this.entries.addAll(0, entries)
+        if (autoNotify)
+            notifyObservers()
     }
 
+    @Synchronized
     override fun add(entry: RecipeFood, autoNotify: Boolean) {
-        lock.writeLock().withLock {
-            this.entries.add(0, entry)
-            if (autoNotify)
-                notifyObservers()
-        }
+        this.entries.add(0, entry)
+        if (autoNotify)
+            notifyObservers()
     }
 
+    @Synchronized
+    override fun plus(entry: RecipeFood): Boolean {
+        entries.add(0, entry)
 
-    override fun plus(entry: RecipeFood): Boolean =
-        lock.writeLock().withLock {
-            entries.add(0, entry)
-            notifyObservers()
-            true
-        }
+        notifyObservers()
+        return true
+    }
 
-
+    @Synchronized
     override fun minus(entry: RecipeFood): Boolean =
-        lock.writeLock().withLock {
-            entries.remove(entry).apply {
-                if (this) {
-                    notifyObservers()
-                }
-            }
-        }
-
-    override fun contains(recipeFood: RecipeFood): Boolean {
-        return lock.readLock().withLock {
-            entries.any { it.food.id == recipeFood.food.id }
-        }
-    }
-
-
-    override fun getAll(): List<RecipeFood> = lock.writeLock().withLock {
-        entries.toList()
-    }
-
-
-    override fun update(entry: RecipeFood) {
-        lock.writeLock().withLock {
-            val position = entries.indexOfFirst {
-                it.food == entry.food
-            }
-            if (position != -1) {
-                entries[position] = entry
+        entries.remove(entry).apply {
+            if (this) {
                 notifyObservers()
             }
         }
+
+    @Synchronized
+    override fun contains(recipeFood: RecipeFood): Boolean {
+        return entries.any { it.food.id == recipeFood.food.id }
     }
 
-    override fun getEntryWithFoodId(id: Long): RecipeFood? =
-        lock.readLock().withLock {
-            entries.firstOrNull {
-                it.food.id == id
-            }
-        }
+    @Synchronized
+    override fun getAll(): List<RecipeFood> =
+        entries.toList()
 
-    override fun observeAll(observer: (List<RecipeFood>) -> Unit) {
-        lock.writeLock().withLock {
-            observers.add(observer)
+    @Synchronized
+    override fun update(entry: RecipeFood) {
+        val position = entries.indexOfFirst {
+            it.food == entry.food
         }
-        lock.readLock().withLock {
-            if (entries.isNotEmpty())
-                observer(getAll())
-        }
-    }
-
-    override fun notifyEntriesChanged(list: List<RecipeFood>) {
-        lock.writeLock().withLock {
-            entries.clear()
-            entries.addAll(list)
+        if (position != -1) {
+            entries[position] = entry
             notifyObservers()
         }
+
     }
 
+    @Synchronized
+    override fun getEntryWithFoodId(id: Long): RecipeFood? =
+        entries.firstOrNull {
+            it.food.id == id
+        }
+
+    @Synchronized
+    override fun observeAll(observer: (List<RecipeFood>) -> Unit) {
+
+        observers.add(observer)
+        if (entries.isNotEmpty())
+            observer(getAll())
+    }
+
+    @Synchronized
+    override fun notifyEntriesChanged(list: List<RecipeFood>) {
+        entries.clear()
+        entries.addAll(list)
+        notifyObservers()
+    }
+
+    @Synchronized
     override fun notifyObservers() {
-        lock.readLock().withLock {
-            if (entries.isNotEmpty()) {
-                val all = getAll()
-                observers.forEach { it.invoke(all) }
-            }
+        if (entries.isNotEmpty()) {
+            val all = getAll()
+            observers.forEach { it.invoke(all) }
         }
     }
 

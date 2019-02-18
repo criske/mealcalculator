@@ -29,6 +29,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import java.io.ByteArrayOutputStream
+import kotlin.properties.Delegates
+import kotlin.properties.ObservableProperty
+import kotlin.reflect.KProperty
 
 /**
  * Created by Cristian Pela on 26.01.2019.
@@ -193,3 +196,25 @@ inline fun Context.showSimpleInputDialog(title: String, crossinline onSubmit: (E
 }
 
 fun Context.getColorCompat(@ColorRes colorRes: Int) = ContextCompat.getColor(this, colorRes)
+
+inline fun <T> Delegates.observableWhenAttached(view: View, initialValue: T,
+                                                crossinline onChange: (property: KProperty<*>, oldValue: T, newValue: T) -> Unit) =
+    object : ObservableProperty<T>(initialValue) {
+        override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
+            if (view.isAttachedToWindow) {
+                onChange(property, oldValue, newValue)
+            } else {
+                val attachListener = object : View.OnAttachStateChangeListener {
+                    val thisListener = this
+                    override fun onViewDetachedFromWindow(v: View?) {
+                        view.removeOnAttachStateChangeListener(thisListener)
+                    }
+
+                    override fun onViewAttachedToWindow(v: View?) {
+                        onChange(property, oldValue, newValue)
+                    }
+                }
+                view.addOnAttachStateChangeListener(attachListener)
+            }
+        }
+    }

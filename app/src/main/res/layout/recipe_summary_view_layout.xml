@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRecipeSummaryViewCalories"
+        style="@style/TextBoxedAppearance.RoundRectNoStroke"
+        android:layout_margin="1dp"
+        android:tag="clip-boxed-bg"
+        tools:text="kCal\n300" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRecipeSummaryViewCarbs"
+        style="@style/TextBoxedAppearance.RoundRectNoStroke"
+        android:layout_margin="1dp"
+        android:background="@color/colorCarbs"
+        android:tag="clip-boxed-bg"
+        tools:text="C\n80" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRecipeSummaryViewFats"
+        style="@style/TextBoxedAppearance.RoundRectNoStroke"
+        android:layout_margin="1dp"
+        android:background="@color/colorFats"
+        android:tag="clip-boxed-bg"
+        tools:text="F\n30" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRecipeSummaryViewProteins"
+        style="@style/TextBoxedAppearance.RoundRectNoStroke"
+        android:layout_margin="1dp"
+        android:background="@color/colorProteins"
+        android:tag="clip-boxed-bg"
+        tools:text="P\n120" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRecipeSummaryViewGL"
+        style="@style/TextBoxedAppearance.RoundRectNoStroke"
+        android:layout_margin="1dp"
+        android:background="@color/colorAccentFaint"
+        android:padding="4dp"
+        android:tag="clip-boxed-bg"
+        tools:text="GL\n25" />
+
+</LinearLayout>
+

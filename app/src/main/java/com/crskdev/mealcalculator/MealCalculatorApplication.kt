@@ -65,7 +65,9 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         RecipeRepositoryImpl(db)
     }
 
-    val dispatchers: GatewayDispatchers = PlatformGatewayDispatchers
+    val dispatchers: GatewayDispatchers by lazy {
+        PlatformGatewayDispatchers(db.queryExecutor)
+    }
 
     val recipeFoodEntriesManager: (Scope) -> RecipeFoodEntriesManager = scoped {
         PlatformRecipeFoodEntriesManager(
@@ -196,8 +198,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 recipeSummaryInteractor(scope),
                 recipeFoodActionInteractor(scope),
                 foodActionInteractor(),
-                recipeSaveInteractor(),
-                currentMealLoadFromRecipeInteractor(scope)
+                recipeSaveInteractor()
             )
         }
     }
@@ -230,6 +231,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
                 RecipeUpsertFragmentArgs.fromBundle(arguments!!).id,
                 recipeLoadInteractor(scope),
                 recipeSaveInteractor(),
+                recipeSummaryInteractor(scope),
                 recipeFoodEntriesDisplayInteractor(scope),
                 recipeFoodActionInteractor(scope),
                 foodActionInteractor()

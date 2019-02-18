@@ -10,6 +10,7 @@ import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -19,6 +20,7 @@ class RecipeUpsertViewModel(
     private val recipeId: Long,
     private val recipeLoadInteractor: RecipeLoadInteractor,
     private val recipeSaveInteractor: RecipeSaveInteractor,
+    private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val recipeFoodEntriesDisplayInteractor: RecipeFoodEntriesDisplayInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor
@@ -28,6 +30,8 @@ class RecipeUpsertViewModel(
     val recipeLiveData: LiveData<RecipeDetailed> = MutableLiveData<RecipeDetailed>().apply {
         value = RecipeDetailed.EMPTY
     }
+
+    val recipeSummaryLiveData: LiveData<RecipeFood.Summary> = MutableLiveData<RecipeFood.Summary>()
 
     val actionResponseLiveData: LiveData<RecipeSaveInteractor.Response> =
         MutableLiveData<RecipeSaveInteractor.Response>()
@@ -41,13 +45,20 @@ class RecipeUpsertViewModel(
     init {
         if (recipeId > 0) {
             launch {
-                recipeLoadInteractor.request(recipeId, true) {
-                    recipeLiveData.mutablePost(it)
+                recipeLoadInteractor.request(recipeId, true, true) {
+                    recipeLiveData.mutablePost(it.copy(foods = emptyList()))
                 }
             }
         }
 
         launch {
+            recipeSummaryInteractor.request {
+                recipeSummaryLiveData.mutablePost(it)
+            }
+        }
+
+        launch {
+            delay(100) // hacky to make sure that recipe name is added
             recipeFoodEntriesDisplayInteractor.request {
                 recipeLiveData.value?.run {
                     recipeLiveData.mutablePost(copy(foods = it))

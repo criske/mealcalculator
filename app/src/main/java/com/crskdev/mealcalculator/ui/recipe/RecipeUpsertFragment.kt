@@ -134,6 +134,15 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                 RecipeSaveInteractor.Response.EmptyRecipe -> context?.showSimpleToast(it.javaClass.simpleName)
             }
         })
+        viewModel.recipeSummaryLiveData.observe(this, Observer {
+            textRecipeUpsertSummary.bind(
+                it.calories,
+                it.carbohydrates.total,
+                it.fat.total,
+                it.proteins,
+                it.gi
+            )
+        })
 
     }
 

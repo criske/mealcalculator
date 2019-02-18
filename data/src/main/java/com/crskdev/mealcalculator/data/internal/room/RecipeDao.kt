@@ -31,7 +31,7 @@ internal abstract class RecipeDao {
     abstract fun observeRecipeDetailedById(id: Long): LiveData<List<RecipeDetailedDb>>
 
     @Query("SELECT * FROM recipes WHERE r_id=:id")
-    abstract fun getRecipeById(id: Long): RecipeDb
+    abstract fun getRecipeById(id: Long): RecipeDb?
 
     @Insert
     abstract fun insertRecipe(recipe: RecipeDb): Long

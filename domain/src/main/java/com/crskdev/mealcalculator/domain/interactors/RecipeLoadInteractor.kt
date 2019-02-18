@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
  * Created by Cristian Pela on 10.02.2019.
  */
 interface RecipeLoadInteractor {
-    suspend fun request(recipeId: Long, editable: Boolean, response: (RecipeDetailed) -> Unit)
+    suspend fun request(recipeId: Long, editable: Boolean, noFoods: Boolean = false, response: (RecipeDetailed) -> Unit)
 }
 
 class RecipeLoadInteractorImpl(
@@ -19,23 +19,27 @@ class RecipeLoadInteractorImpl(
     private val recipeFoodEntriesManager: RecipeFoodEntriesManager,
     private val recipeRepository: RecipeRepository
 ) : RecipeLoadInteractor {
-    override suspend fun request(recipeId: Long, editable: Boolean, response: (RecipeDetailed) -> Unit) =
+    override suspend fun request(recipeId: Long,
+                                 editable: Boolean,
+                                 noFoods: Boolean,
+                                 response: (RecipeDetailed) -> Unit) =
         coroutineScope {
             launch(dispatchers.DEFAULT) {
-                val recipe = recipeRepository.getRecipeById(recipeId)
+                val recipe = recipeRepository.getRecipeDetailedById(recipeId)
                 require(recipe != null)
                 if (editable) {
                     recipeFoodEntriesManager.observeAll {
                         response(recipe.copy(foods = it))
                     }
-                    recipeFoodEntriesManager.addAll(
-                        recipeRepository
-                            .getRecipeById(recipeId)
-                            ?.foods
-                            ?: emptyList()
-                    )
+                    recipeFoodEntriesManager.addAll(recipe.foods)
                 } else {
-                    response(recipe)
+                    response(recipe.let {
+                        if (noFoods) {
+                            it.copy(foods = emptyList())
+                        } else {
+                            it
+                        }
+                    })
                 }
             }
             Unit

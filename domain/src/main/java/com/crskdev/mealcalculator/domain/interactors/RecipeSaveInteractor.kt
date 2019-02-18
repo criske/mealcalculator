@@ -46,7 +46,7 @@ class RecipeSaveInteractorImpl(
                     } else {
                         update(recipe)
                     }
-                    val existentFoods = getRecipeById(id)?.foods ?: emptyList()
+                    val existentFoods = getRecipeDetailedById(id)?.foods ?: emptyList()
                     val diffResults = RecipeFoodsDiffUtil
                         .calculate(
                             existentFoods,
