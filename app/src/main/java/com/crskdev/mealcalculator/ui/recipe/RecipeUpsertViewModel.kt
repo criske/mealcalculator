@@ -7,6 +7,8 @@ import com.crskdev.mealcalculator.domain.entities.RecipeDetailed
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
+import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
+import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
@@ -31,7 +33,10 @@ class RecipeUpsertViewModel(
         value = RecipeDetailed.EMPTY
     }
 
-    val recipeSummaryLiveData: LiveData<RecipeFood.Summary> = MutableLiveData<RecipeFood.Summary>()
+    val recipeSummaryLiveData: LiveData<RecipeFoodVM.SummaryVM> =
+        MutableLiveData<RecipeFoodVM.SummaryVM>().apply {
+            value = RecipeFoodVM.SummaryVM.EMPTY
+        }
 
     val actionResponseLiveData: LiveData<RecipeSaveInteractor.Response> =
         MutableLiveData<RecipeSaveInteractor.Response>()
@@ -53,12 +58,12 @@ class RecipeUpsertViewModel(
 
         launch {
             recipeSummaryInteractor.request {
-                recipeSummaryLiveData.mutablePost(it)
+                recipeSummaryLiveData.mutablePost(it.toVM())
             }
         }
 
         launch {
-            delay(100) // hacky to make sure that recipe name is added
+            delay(100) // hacky way to make sure that recipe name is added
             recipeFoodEntriesDisplayInteractor.request {
                 recipeLiveData.value?.run {
                     recipeLiveData.mutablePost(copy(foods = it))

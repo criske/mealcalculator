@@ -5,6 +5,24 @@ import com.crskdev.mealcalculator.domain.entities.*
 /**
  * Created by Cristian Pela on 26.01.2019.
  */
+
+fun RecipeFood.Summary.toVM() = RecipeFoodVM.SummaryVM(
+    calories.toString(),
+    CarbohydrateVM(
+        carbohydrates.total.toFormat(),
+        carbohydrates.fiber.toFormat(),
+        carbohydrates.sugar.toFormat()
+    ),
+    FatVM(
+        fat.total.toFormat(),
+        fat.saturated.toFormat(),
+        fat.unsaturated.toFormat()
+    ),
+    proteins.toFormat(),
+    gi.toFormat()
+)
+
+
 fun Food.toVM(): FoodVM =
     FoodVM(
         id,
@@ -13,44 +31,62 @@ fun Food.toVM(): FoodVM =
         calories.toString(),
         carbohydrates.toVM(),
         fat.toVM(),
-        proteins.toString(),
-        gi.toString()
+        proteins.toFormat(),
+        gi.toFormat()
     )
 
 fun Carbohydrate.toVM(): CarbohydrateVM =
-    CarbohydrateVM(total.toString(), fiber.toString(), sugar.toString())
+    CarbohydrateVM(total.toFormat(), fiber.toFormat(), sugar.toFormat())
 
 fun Fat.toVM(): FatVM =
-    FatVM(total.toString(), saturated.toString(), unsaturated.toString())
+    FatVM(total.toFormat(), saturated.toFormat(), unsaturated.toFormat())
 
 fun FoodVM.toDomain(): Food = Food(
     id, name, picture, calories.toInt(),
     Carbohydrate(
-        carbohydrates.total.toFloat(),
-        carbohydrates.fiber.toFloat(),
-        carbohydrates.sugar.toFloat()
+        carbohydrates.total.float,
+        carbohydrates.fiber.float,
+        carbohydrates.sugar.float
     ),
     Fat(
-        fat.total.toFloat(),
-        fat.saturated.toFloat(),
-        fat.unsaturated.toFloat()
+        fat.total.float,
+        fat.saturated.float,
+        fat.unsaturated.float
     ),
-    proteins.toFloat(),
-    gi.toFloat()
+    proteins.float,
+    gi.float
 )
 
 fun FoodVM.toDomainUnchecked(): FoodUnchecked =
     FoodUnchecked(
         id, name, picture, calories,
         CarbohydrateUnchecked(
-            carbohydrates.total,
-            carbohydrates.fiber,
-            carbohydrates.sugar
+            carbohydrates.total.toString(),
+            carbohydrates.fiber.toString(),
+            carbohydrates.sugar.toString()
         ),
         FatUnchecked(
-            fat.total,
-            fat.saturated,
-            fat.unsaturated
+            fat.total.toString(),
+            fat.saturated.toString(),
+            fat.unsaturated.toString()
         ),
-        proteins, gi
+        proteins.toString(), gi.toString()
     )
+
+// other mappers
+fun Float.toFormat() = FloatFormat(this)
+
+
+fun String?.toFloatFormat(): FloatFormat = this?.let {
+    try {
+        if (isBlank()) {
+            FloatFormat.ZERO
+        } else {
+            it.toFloat().toFormat()
+        }
+    } catch (ex: Exception) {
+        FloatFormat.ZERO
+    }
+} ?: FloatFormat.ZERO
+
+fun String?.toSafeInt(): Int = this?.toIntOrNull() ?: 0

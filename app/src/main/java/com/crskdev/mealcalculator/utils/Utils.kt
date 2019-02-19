@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import java.io.ByteArrayOutputStream
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
@@ -42,6 +43,8 @@ fun Float.dpToPx(resources: Resources): Float =
 
 fun Int.dpToPx(resources: Resources): Float =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), resources.displayMetrics)
+
+fun Int.dpToPxInt(resources: Resources): Int = dpToPx(resources).roundToInt()
 
 
 object ProjectImageUtils {
@@ -217,4 +220,16 @@ inline fun <T> Delegates.observableWhenAttached(view: View, initialValue: T,
                 view.addOnAttachStateChangeListener(attachListener)
             }
         }
+    }
+
+
+val Resources.screenSize: Pair<Int, Int>
+    get() = Resources.getSystem().displayMetrics.run {
+        widthPixels to heightPixels
+    }
+
+val View.locationOnScreen: Pair<Int, Int>
+    get() = intArrayOf(0, 0).let {
+        getLocationOnScreen(it)
+        it[0] to it[1]
     }

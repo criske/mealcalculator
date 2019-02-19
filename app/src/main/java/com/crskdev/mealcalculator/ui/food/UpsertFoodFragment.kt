@@ -20,6 +20,7 @@ import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.entities.CarbohydrateVM
 import com.crskdev.mealcalculator.presentation.common.entities.FatVM
 import com.crskdev.mealcalculator.presentation.common.entities.FoodVM
+import com.crskdev.mealcalculator.presentation.common.entities.toFloatFormat
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Companion.FIELD_CALORIES
@@ -78,7 +79,7 @@ class UpsertFoodFragment : DiFragment() {
                 findNavController().popBackStack()
             }
             setOnMenuItemClickListener {
-                when(it.itemId){
+                when (it.itemId) {
                     R.id.action_menu_food_upsert_save -> {
                         viewModel.upsert(extractFoodVM())
                     }
@@ -106,14 +107,14 @@ class UpsertFoodFragment : DiFragment() {
             retainedModelLiveData.observe(thisFragment, Observer {
                 editInputUpsertFoodName.editText?.setText(it.name)
                 editInputUpsertFoodCalories.editText?.setText(it.calories)
-                editInputUpsertFoodCarbsTotal.editText?.setText(it.carbohydrates.total)
-                editInputUpsertFoodCarbFiber.editText?.setText(it.carbohydrates.fiber)
-                editInputUpsertFoodCarbSugar.editText?.setText(it.carbohydrates.sugar)
-                editInputUpsertFoodFatTotal.editText?.setText(it.fat.total)
-                editInputUpsertFoodFatUnsaturated.editText?.setText(it.fat.unsaturated)
-                editInputUpsertFoodFatSaturated.editText?.setText(it.fat.saturated)
-                editInputUpsertFoodProteins.editText?.setText(it.proteins)
-                editInputUpsertFoodGI.editText?.setText(it.gi)
+                editInputUpsertFoodCarbsTotal.editText?.setText(it.carbohydrates.total())
+                editInputUpsertFoodCarbFiber.editText?.setText(it.carbohydrates.fiber())
+                editInputUpsertFoodCarbSugar.editText?.setText(it.carbohydrates.sugar())
+                editInputUpsertFoodFatTotal.editText?.setText(it.fat.total())
+                editInputUpsertFoodFatUnsaturated.editText?.setText(it.fat.unsaturated())
+                editInputUpsertFoodFatSaturated.editText?.setText(it.fat.saturated())
+                editInputUpsertFoodProteins.editText?.setText(it.proteins())
+                editInputUpsertFoodGI.editText?.setText(it.gi())
                 imageUpsertFood.setImageDrawable(
                     it.picture?.let { p ->
                         ProjectImageUtils.convertStrToRoundedDrawable(resources, p)
@@ -177,19 +178,19 @@ class UpsertFoodFragment : DiFragment() {
             0,
             editInputUpsertFoodName.editText?.text?.toString() ?: "",
             null,
-            editInputUpsertFoodCalories.editText?.text?.toString() ?: "",
+            editInputUpsertFoodCalories.editText?.text?.toString() ?: "0",
             CarbohydrateVM(
-                editInputUpsertFoodCarbsTotal.editText?.text?.toString() ?: "",
-                editInputUpsertFoodCarbFiber.editText?.text?.toString() ?: "",
-                editInputUpsertFoodCarbSugar.editText?.text?.toString() ?: ""
+                editInputUpsertFoodCarbsTotal.editText?.text?.toString().toFloatFormat(),
+                editInputUpsertFoodCarbFiber.editText?.text?.toString().toFloatFormat(),
+                editInputUpsertFoodCarbSugar.editText?.text?.toString().toFloatFormat()
             ),
             FatVM(
-                editInputUpsertFoodFatTotal.editText?.text?.toString() ?: "",
-                editInputUpsertFoodFatSaturated.editText?.text?.toString() ?: "",
-                editInputUpsertFoodFatUnsaturated.editText?.text?.toString() ?: ""
+                editInputUpsertFoodFatTotal.editText?.text?.toString().toFloatFormat(),
+                editInputUpsertFoodFatSaturated.editText?.text?.toString().toFloatFormat(),
+                editInputUpsertFoodFatUnsaturated.editText?.text?.toString().toFloatFormat()
             ),
-            editInputUpsertFoodProteins.editText?.text?.toString() ?: "",
-            editInputUpsertFoodGI.editText?.text?.toString() ?: ""
+            editInputUpsertFoodProteins.editText?.text?.toString().toFloatFormat(),
+            editInputUpsertFoodGI.editText?.text?.toString().toFloatFormat()
         )
     }
 

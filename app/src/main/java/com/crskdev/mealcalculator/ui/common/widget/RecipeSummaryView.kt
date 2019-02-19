@@ -2,6 +2,7 @@
 
 package com.crskdev.mealcalculator.ui.common.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.forEach
 import com.crskdev.mealcalculator.R
+import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.utils.dpToPx
 import com.crskdev.mealcalculator.utils.getColorCompat
@@ -25,6 +27,12 @@ import kotlin.math.roundToInt
 class RecipeSummaryView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : HorizontalScrollView(context, attrs, defStyleAttr) {
+
+    private val summaryPopupWindow by lazy {
+        RecipeSummaryPopupWindow(context)
+    }
+
+    private var summary: RecipeFoodVM.SummaryVM? = null
 
     init {
         LayoutInflater
@@ -39,6 +47,7 @@ class RecipeSummaryView @JvmOverloads constructor(
                     ?.cast<ColorDrawable>()
                     ?.color
                     ?.also { bg ->
+                        //todo refactor this into util
                         v.background = GradientDrawable().apply {
                             colors = intArrayOf(bg, bg, bg)
                             cornerRadius = 5f.dpToPx(resources)
@@ -53,17 +62,32 @@ class RecipeSummaryView @JvmOverloads constructor(
                             )
                     }
             }
+        textRecipeSummaryViewCalories.setOnClickListener { v ->
+            summary?.also {
+                summaryPopupWindow.showAtLocationWith(it, v)
+            }
+        }
+        textRecipeSummaryViewCarbs.setOnClickListener { v ->
+            summary?.also {
+                summaryPopupWindow.showAtLocationWith(it.carbohydrates, v)
+            }
+        }
+        textRecipeSummaryViewFats.setOnClickListener { v ->
+            summary?.also {
+                summaryPopupWindow.showAtLocationWith(it.fat, v)
+            }
+        }
     }
 
 
-    fun bind(calories: Int, carbohydrates: Float, fats: Float, proteins: Float, gl: Float) {
-        textRecipeSummaryViewCalories.text = "kCal.\n$calories"
-        textRecipeSummaryViewCarbs.text = "C\n" + carbohydrates.format()
-        textRecipeSummaryViewFats.text = "F\n" + fats.format()
-        textRecipeSummaryViewProteins.text = "P\n" + proteins.format()
-        textRecipeSummaryViewGL.text = "GL\n" + gl.format()
+    @SuppressLint("SetTextI18n")
+    fun bind(summary: RecipeFoodVM.SummaryVM) {
+        this.summary = summary
+        textRecipeSummaryViewCalories.text = "kCal.\n${summary.calories}"
+        textRecipeSummaryViewCarbs.text = "C\n" + summary.carbohydrates.total()
+        textRecipeSummaryViewFats.text = "F\n" + summary.fat.total()
+        textRecipeSummaryViewProteins.text = "P\n" + summary.proteins()
+        textRecipeSummaryViewGL.text = "GL\n" + summary.gi()
     }
-
-    private fun Float.format(): String = "%.2f".format(this)
 
 }

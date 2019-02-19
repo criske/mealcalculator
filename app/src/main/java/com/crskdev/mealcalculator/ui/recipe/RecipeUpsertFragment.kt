@@ -135,13 +135,7 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
             }
         })
         viewModel.recipeSummaryLiveData.observe(this, Observer {
-            textRecipeUpsertSummary.bind(
-                it.calories,
-                it.carbohydrates.total,
-                it.fat.total,
-                it.proteins,
-                it.gi
-            )
+            textRecipeUpsertSummary.bind(it)
         })
 
     }

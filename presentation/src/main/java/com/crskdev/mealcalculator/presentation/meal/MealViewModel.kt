@@ -8,6 +8,8 @@ import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.domain.interactors.CurrentMealLoadFromRecipeInteractor.ConflictingRecipeFood
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
+import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
+import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
@@ -32,9 +34,9 @@ class MealViewModel(
 
     val mealEntriesLiveData: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
 
-    val mealSummaryLiveData: LiveData<RecipeFood.Summary> =
-        MutableLiveData<RecipeFood.Summary>().apply {
-            value = RecipeFood.Summary.EMPTY
+    val mealSummaryLiveData: LiveData<RecipeFoodVM.SummaryVM> =
+        MutableLiveData<RecipeFoodVM.SummaryVM>().apply {
+            value = RecipeFoodVM.SummaryVM.EMPTY
         }
 
     val responsesLiveData: LiveData<Response> = SingleLiveEvent<Response>()
@@ -77,7 +79,7 @@ class MealViewModel(
         }
         launch {
             recipeSummaryInteractor.request {
-                mealSummaryLiveData.mutablePost(it)
+                mealSummaryLiveData.mutablePost(it.toVM())
             }
         }
         launch {

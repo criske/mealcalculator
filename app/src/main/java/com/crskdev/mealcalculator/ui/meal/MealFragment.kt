@@ -136,13 +136,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             toolbarMeal.title = "No.$it"
         })
         viewModel.mealSummaryLiveData.observe(this, Observer {
-            textMealSummary.bind(
-                it.calories,
-                it.carbohydrates.total,
-                it.fat.total,
-                it.proteins,
-                it.gi
-            )
+            textMealSummary.bind(it)
         })
         viewModel.responsesLiveData.observe(this, Observer {
             when (it) {
