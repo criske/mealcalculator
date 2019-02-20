@@ -96,7 +96,6 @@ class RecipeFoodEntriesManagerImpl : RecipeFoodEntriesManager {
 
     @Synchronized
     override fun observeAll(observer: (List<RecipeFood>) -> Unit) {
-
         observers.add(observer)
         if (entries.isNotEmpty())
             observer(getAll())

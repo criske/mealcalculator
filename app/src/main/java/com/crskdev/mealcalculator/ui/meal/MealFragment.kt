@@ -10,6 +10,8 @@ import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
@@ -60,6 +62,9 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 MealFragmentDirections
                     .actionMealFragmentToMealJournalDetailFragment(-1)
             )
+        }
+        val scroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
         }
         with(recyclerMealEntries) {
             adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context)) {
@@ -126,11 +131,6 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             recyclerMealEntries.adapter?.cast<RecipeFoodEntriesAdapter>()?.apply {
                 submitList(it)
             }
-            if (it.isNotEmpty()) {
-                view.postDelayed(400) {
-                    recyclerMealEntries.smoothScrollToPosition(0)
-                }
-            }
         })
         viewModel.mealNumberLiveData.observe(this, Observer {
             toolbarMeal.title = "No.$it"
@@ -154,6 +154,13 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 }
             }
         })
+        viewModel.scrollPositionLiveData.observe(this, Observer {
+            scroller.targetPosition = it
+            view.postDelayed(500) {
+                recyclerMealEntries.layoutManager?.cast<LinearLayoutManager>()
+                    ?.startSmoothScroll(scroller)
+            }
+        })
 
         viewModel.conflictLoadFromRecipeFoods.observe(this, Observer {
             mealConflictDialogHelper.showDialogWith(it)
@@ -170,6 +177,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         })
     }
 
+
     override fun handleBackPressed(): Boolean {
         context!!.showSimpleYesNoDialog("Warning", "Exit meal without saving?") {
             if (DialogInterface.BUTTON_POSITIVE == it) {
@@ -179,3 +187,4 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         return true
     }
 }
+

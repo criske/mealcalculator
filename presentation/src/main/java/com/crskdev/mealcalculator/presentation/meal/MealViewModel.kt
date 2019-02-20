@@ -11,7 +11,6 @@ import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
@@ -30,58 +29,36 @@ class MealViewModel(
     private val saveAsRecipeInteractor: RecipeSaveInteractor
 ) : CoroutineScopedViewModel() {
 
-    val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()
-
+    //refactor in a separate model
     val mealEntriesLiveData: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
-
     val mealSummaryLiveData: LiveData<RecipeFoodVM.SummaryVM> =
         MutableLiveData<RecipeFoodVM.SummaryVM>().apply {
             value = RecipeFoodVM.SummaryVM.EMPTY
         }
+    val scrollPositionLiveData: LiveData<Int> = SingleLiveEvent<Int>()
+    private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
+    //------------
 
+    val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()
     val responsesLiveData: LiveData<Response> = SingleLiveEvent<Response>()
-
     val conflictLoadFromRecipeFoods: LiveData<List<ConflictingRecipeFood>> =
         MutableLiveData<List<ConflictingRecipeFood>>().apply {
             value = emptyList()
-//            value = listOf(
-//                ConflictingRecipeFood(
-//                    10, 5,
-//                    Food(
-//                        0, "Foo", null, 0,
-//                        Carbohydrate(0f, 0f, 0f),
-//                        Fat(0f, 0f, 0f), 0f, 0f
-//                    )
-//                ),
-//                ConflictingRecipeFood(
-//                    1000, 50,
-//                    Food(
-//                        1, "Bar", null, 0,
-//                        Carbohydrate(0f, 0f, 0f),
-//                        Fat(0f, 0f, 0f), 0f, 0f
-//                    )
-//                )
-//            )
         }
 
-    private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
+
 
     init {
+        //refactor in a separate model
         launch {
             recipeFoodEntriesDisplayInteractor.request {
-                mealEntriesLiveData.mutablePost(it)
+                mealEntriesLiveData.mutableSet(it)
+                it.indexOfFirst { it.quantity == 0 }.takeIf { it != -1 }?.also {
+                    scrollPositionLiveData.mutableSet(it)
+                }
             }
         }
-        launch {
-            currentMealNumberOfTheDayInteractor.request {
-                mealNumberLiveData.mutablePost(it)
-            }
-        }
-        launch {
-            recipeSummaryInteractor.request {
-                mealSummaryLiveData.mutablePost(it.toVM())
-            }
-        }
+
         launch {
             recipeFoodActionLiveData
                 //  .interval(300, TimeUnit.MILLISECONDS)
@@ -91,6 +68,18 @@ class MealViewModel(
                     }
                 }
         }
+        launch {
+            recipeSummaryInteractor.request {
+                mealSummaryLiveData.mutableSet(it.toVM())
+            }
+        }
+        //--------------------
+        launch {
+            currentMealNumberOfTheDayInteractor.request {
+                mealNumberLiveData.mutableSet(it)
+            }
+        }
+
     }
 
 
@@ -109,6 +98,9 @@ class MealViewModel(
     }
 
     fun editEntry(entry: RecipeFood) {
+        mealEntriesLiveData.value?.indexOfFirst { it.food.id == entry.food.id }?.also {
+            scrollPositionLiveData.mutableSet(it)
+        }
         recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Edit(entry)
     }
 
@@ -124,7 +116,7 @@ class MealViewModel(
         launch {
             currentMealLoadFromRecipeInteractor.request(recipeId) {
                 if (it.isNotEmpty()) {
-                    conflictLoadFromRecipeFoods.mutablePost(it)
+                    conflictLoadFromRecipeFoods.mutableSet(it)
                 }
             }
         }
@@ -151,7 +143,7 @@ class MealViewModel(
                         CurrentMealSaveInteractor.Response.OK -> Response.Saved
                         CurrentMealSaveInteractor.Response.NotSaved -> Response.Error.MealNotSaved
                     }
-                    responsesLiveData.mutablePost(response)
+                    responsesLiveData.mutableSet(response)
                 }
             }
         }

@@ -9,7 +9,6 @@ import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.presentation.common.entities.toVM
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.delay
@@ -51,14 +50,14 @@ class RecipeUpsertViewModel(
         if (recipeId > 0) {
             launch {
                 recipeLoadInteractor.request(recipeId, true, true) {
-                    recipeLiveData.mutablePost(it.copy(foods = emptyList()))
+                    recipeLiveData.mutableSet(it.copy(foods = emptyList()))
                 }
             }
         }
 
         launch {
             recipeSummaryInteractor.request {
-                recipeSummaryLiveData.mutablePost(it.toVM())
+                recipeSummaryLiveData.mutableSet(it.toVM())
             }
         }
 
@@ -66,7 +65,7 @@ class RecipeUpsertViewModel(
             delay(100) // hacky way to make sure that recipe name is added
             recipeFoodEntriesDisplayInteractor.request {
                 recipeLiveData.value?.run {
-                    recipeLiveData.mutablePost(copy(foods = it))
+                    recipeLiveData.mutableSet(copy(foods = it))
                 }
             }
         }
@@ -97,11 +96,11 @@ class RecipeUpsertViewModel(
                 recipeSaveInteractor.request(this@run) {
                     if (it is RecipeSaveInteractor.Response.OK) {
                         recipeLiveData.value?.run {
-                            recipeLiveData.mutablePost(copy(id = it.recipeId))
+                            recipeLiveData.mutableSet(copy(id = it.recipeId))
                         }
-                        savedStateLiveData.mutablePost(true)
+                        savedStateLiveData.mutableSet(true)
                     }
-                    actionResponseLiveData.mutablePost(it)
+                    actionResponseLiveData.mutableSet(it)
                 }
             }
         }

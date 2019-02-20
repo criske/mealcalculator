@@ -7,7 +7,6 @@ import com.crskdev.mealcalculator.domain.interactors.RecipeDeleteInteractor
 import com.crskdev.mealcalculator.domain.interactors.RecipesGetInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,7 @@ class RecipesDisplayViewModel(
     init {
         launch {
             recipesGetInteractor.request {
-                recipesLiveData.mutablePost(it)
+                recipesLiveData.mutableSet(it)
             }
         }
     }

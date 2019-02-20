@@ -39,7 +39,6 @@ class RecipeFoodActionInteractorImpl(
     override suspend fun request(action: ReceiveChannel<RecipeFoodActionInteractor.Request>,
                                  response: (RecipeFoodActionInteractor.Response) -> Unit) =
         supervisorScope {
-
             switchSelectOnReceive(action) { job, request ->
                 launch(job + dispatchers.DEFAULT) {
                     when (request) {

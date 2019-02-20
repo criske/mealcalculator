@@ -3,15 +3,15 @@ package com.crskdev.mealcalculator.presentation.food
 import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.crskdev.mealcalculator.domain.gateway.GatewayDispatchers
 import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.domain.interactors.GetFoodInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
-import com.crskdev.mealcalculator.presentation.common.entities.*
+import com.crskdev.mealcalculator.presentation.common.entities.FoodVM
+import com.crskdev.mealcalculator.presentation.common.entities.toDomainUnchecked
+import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
-import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Error.*
+import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Error.FieldError
 import kotlinx.coroutines.launch
 
 /**
@@ -80,10 +80,10 @@ class UpsertFoodViewModel(
                     getFoodInteractor.request(upsertType.foodId) {
                         when (it) {
                             is GetFoodInteractor.Response.OK -> {
-                                retainedModelLiveData.mutablePost(it.food.toVM())
+                                retainedModelLiveData.mutableSet(it.food.toVM())
                             }
                             is GetFoodInteractor.Response.NotFound -> {
-                                errLiveData.mutablePost(ErrorCollector().apply {
+                                errLiveData.mutableSet(ErrorCollector().apply {
                                     addErrorToCollector(this, FIELD_NONE, Error.FoodNotFound(it.id))
                                 })
                             }
@@ -102,7 +102,7 @@ class UpsertFoodViewModel(
 
     fun restore(foodVM: FoodVM) {
         if (retainedModelLiveData.value == null) {
-            retainedModelLiveData.mutablePost(foodVM)
+            retainedModelLiveData.mutableSet(foodVM)
         }
     }
 
@@ -124,18 +124,18 @@ class UpsertFoodViewModel(
                     FoodActionInteractor.Request.Create(foodVM.copy(picture = it.picture).toDomainUnchecked())
                 }
                 foodActionInteractor.request(request) {
-                    clearErrorsLiveData.mutablePost(Unit)
+                    clearErrorsLiveData.mutableSet(Unit)
                     when (it) {
                         is FoodActionInteractor.Response.Created -> {
-                            retainedModelLiveData.mutablePost(FoodVM.empty())
+                            retainedModelLiveData.mutableSet(FoodVM.empty())
                         }
                         is FoodActionInteractor.Response.Edited -> {
-                            retainedModelLiveData.mutablePost(it.food.toVM())
+                            retainedModelLiveData.mutableSet(it.food.toVM())
                         }
                         is FoodActionInteractor.Response.Error -> {
                             val errCollector = ErrorCollector()
                             handleUpsertError(errCollector, it)
-                            errLiveData.mutablePost(errCollector)
+                            errLiveData.mutableSet(errCollector)
                         }
                     }
                 }

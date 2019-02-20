@@ -8,7 +8,7 @@ import com.crskdev.mealcalculator.domain.interactors.FoodActionInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.distinctUntilChanged
 import com.crskdev.mealcalculator.presentation.common.livedata.interval
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
+import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -35,7 +35,7 @@ class FindFoodViewModel(
                 .toChannel { ch ->
                     findFoodInteractor.request(ch) {
                         when (it) {
-                            is FindFoodInteractor.Response.FoundList -> foodsLiveData.mutablePost(it.list)
+                            is FindFoodInteractor.Response.FoundList -> foodsLiveData.mutableSet(it.list)
                             is FindFoodInteractor.Response.CreateNewFoodWithQueryNameWhenEmpty ->{}
                         }
                     }

@@ -33,19 +33,19 @@ class RecipeFoodEntriesAdapter(
                 oldItem.food.id == newItem.food.id
 
             override fun areContentsTheSame(oldItem: RecipeFood, newItem: RecipeFood): Boolean =
-            oldItem == newItem
+                oldItem == newItem
 
             override fun getChangePayload(oldItem: RecipeFood, newItem: RecipeFood): Any? {
-            return SparseArray<Any>().apply {
-                if (oldItem.quantity != newItem.quantity) {
-                    this.put(PAYLOAD_QUANTITY, newItem.quantity)
-                }
-                if (oldItem.food != newItem.food) {
-                    this.put(PAYLOAD_FOOD, newItem.food)
+                return SparseArray<Any>().apply {
+                    if (oldItem.quantity != newItem.quantity) {
+                        this.put(PAYLOAD_QUANTITY, newItem.quantity)
+                    }
+                    if (oldItem.food != newItem.food) {
+                        this.put(PAYLOAD_FOOD, newItem.food)
+                    }
                 }
             }
-        }
-    }) {
+        }) {
 
     companion object {
         const val PAYLOAD_QUANTITY = 0
@@ -79,6 +79,9 @@ class RecipeFoodEntriesAdapter(
         }
     }
 
+    override fun onViewRecycled(holder: RecipeFoodEntryVH) {
+        holder.clear()
+    }
 }
 
 
@@ -87,6 +90,8 @@ class RecipeFoodEntryVH(itemView: View,
     RecyclerView.ViewHolder(itemView) {
 
     private var recipeFood: RecipeFood? = null
+
+    private var isRecycled = false
 
     private val foodDisplayItemDelegate =
         FoodDisplayBindItemDelegate(
@@ -122,16 +127,18 @@ class RecipeFoodEntryVH(itemView: View,
                     }
                 }
                 doAfterTextChanged {
-                    recipeFood?.let { m ->
-                        editMealEntryQuantity.text
-                            ?.trim()
-                            ?.let { if (it.toString().isEmpty()) "0" else it.toString() }
-                            ?.toInt()
-                            ?.takeIf { m.quantity != it }
-                            ?.also {
-                                action(RecipeFoodEntryAction.EditEntry(m.copy(quantity = it)))
-                            }
+                    if (!isRecycled) {
+                        recipeFood?.let { m ->
+                            editMealEntryQuantity.text
+                                ?.trim()
+                                ?.let { if (it.toString().isEmpty()) "0" else it.toString() }
+                                ?.toInt()
+                                ?.takeIf { m.quantity != it }
+                                ?.also {
+                                    action(RecipeFoodEntryAction.EditEntry(m.copy(quantity = it)))
+                                }
 
+                        }
                     }
                 }
             }
@@ -158,6 +165,7 @@ class RecipeFoodEntryVH(itemView: View,
     }
 
     private fun bindQuantity(quantity: Int) {
+        isRecycled = false
         itemView.editMealEntryQuantity.apply {
             if (quantity == 0) {
                 requestFocus()
@@ -173,7 +181,8 @@ class RecipeFoodEntryVH(itemView: View,
     }
 
     fun clear() {
-        itemView.editMealEntryQuantity.setText("0")
+        isRecycled = true
+        itemView.editMealEntryQuantity.text = null
         foodDisplayItemDelegate.clear()
     }
 

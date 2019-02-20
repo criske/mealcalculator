@@ -42,6 +42,10 @@ class RecipesAdapter(private val inflater: LayoutInflater,
         class Select(recipe: Recipe) : Action(recipe)
         class Edit(recipe: Recipe) : Action(recipe)
     }
+
+    override fun onViewRecycled(holder: RecipeVH) {
+        holder.clear()
+    }
 }
 
 

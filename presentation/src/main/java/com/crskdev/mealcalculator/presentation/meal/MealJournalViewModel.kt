@@ -6,7 +6,7 @@ import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.domain.interactors.MealJournalDeleteInteractor
 import com.crskdev.mealcalculator.domain.interactors.MealJournalDisplayInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
-import com.crskdev.mealcalculator.presentation.common.livedata.mutablePost
+import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,7 @@ class MealJournalViewModel(
         launch {
             requestLiveData.toChannel {
                 mealJournalDisplayInteractor.request(it) {
-                    mealsLiveData.mutablePost(it)
+                    mealsLiveData.mutableSet(it)
                 }
             }
         }
