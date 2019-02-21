@@ -12,8 +12,7 @@ import com.crskdev.mealcalculator.domain.gateway.*
 import com.crskdev.mealcalculator.domain.interactors.*
 import com.crskdev.mealcalculator.platform.PlatformGatewayDispatchers
 import com.crskdev.mealcalculator.platform.PlatformRecipeFoodEntriesManager
-import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
-import com.crskdev.mealcalculator.presentation.common.SelectedRecipeViewModel
+import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel
@@ -153,17 +152,11 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
     //******************************* view models **************************************************
 
     //******************************* bus events view models ***************************************
-    val selectedFoodViewModel: () -> SelectedFoodViewModel = {
+    val eventBusViewModel: () -> EventBusViewModel = {
         viewModelFromProvider(activity<MainActivity>()) {
-            SelectedFoodViewModel()
+            EventBusViewModel()
         }
     }
-    val selectedRecipeViewModel: () -> SelectedRecipeViewModel = {
-        viewModelFromProvider(activity<MainActivity>()) {
-            SelectedRecipeViewModel()
-        }
-    }
-
     //**********************************************************************************************
 
     val upsertFoodViewModel: () -> UpsertFoodViewModel = {
@@ -192,12 +185,8 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
             val scope = getScope<MealFragment>()
             MealViewModel(
                 currentMealNumberOfTheDayInteractor(),
-                recipeFoodEntriesDisplayInteractor(scope),
                 currentMealSaveInteractor(),
                 currentMealLoadFromRecipeInteractor(scope),
-                recipeSummaryInteractor(scope),
-                recipeFoodActionInteractor(scope),
-                foodActionInteractor(),
                 recipeSaveInteractor()
             )
         }
@@ -230,7 +219,15 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
             RecipeUpsertViewModel(
                 RecipeUpsertFragmentArgs.fromBundle(arguments!!).id,
                 recipeLoadInteractor(scope),
-                recipeSaveInteractor(),
+                recipeSaveInteractor()
+            )
+        }
+    }
+
+    val recipeFoodsViewModel: () -> RecipeFoodsViewModel = {
+        viewModelFromProvider(fragment<RecipeFoodsFragment>()) {
+            val scope = getScope(this.parentFragment ?: this)
+            RecipeFoodsViewModel(
                 recipeSummaryInteractor(scope),
                 recipeFoodEntriesDisplayInteractor(scope),
                 recipeFoodActionInteractor(scope),

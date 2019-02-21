@@ -13,7 +13,6 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
-import com.crskdev.mealcalculator.presentation.common.SelectedFoodViewModel
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
@@ -30,8 +29,8 @@ class FindFoodFragment : DiFragment() {
         di.findFoodViewModel()
     }
 
-    private val selectedFoodViewModel: SelectedFoodViewModel by lazy {
-        di.selectedFoodViewModel()
+    private val eventBusViewModel: EventBusViewModel by lazy {
+        di.eventBusViewModel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -81,7 +80,7 @@ class FindFoodFragment : DiFragment() {
                     is FoodDisplayItemAction.Select -> {
                         val args = FindFoodFragmentArgs.fromBundle(arguments!!)
                         if (args.code != EventBusViewModel.Event.NO_CODE) {
-                            selectedFoodViewModel
+                            eventBusViewModel
                                 .sendEvent(EventBusViewModel.Event(args.code, it.food))
                             findNavController().popBackStack()
                         }

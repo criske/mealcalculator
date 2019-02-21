@@ -97,6 +97,10 @@ open class BaseDependencyGraph(protected val context: Context) {
         throw IllegalAccessException("Scope for ${T::class} was not found")
     }
 
+    fun getScope(fragment: Fragment) = scopes.getOrElse(fragment::class) {
+        throw IllegalAccessException("Scope for ${fragment::class} was not found")
+    }
+
 
     class ScopeImpl internal constructor() : Scope {
 

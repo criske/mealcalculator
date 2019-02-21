@@ -8,13 +8,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchUIUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
-import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
 import kotlinx.android.synthetic.main.fragment_meal_journal.*
@@ -46,7 +42,7 @@ class MealJournalFragment : DiFragment() {
             }
             Unit
         }
-        viewModel.mealsLiveData.observe(this, Observer {
+        viewModel.mealsLiveData.observe(viewLifecycleOwner, Observer {
             require(it is PagedList<Meal>)
             recyclerMealJournal.adapter?.cast<MealJournalAdapter>()?.submitList(it)
         })

@@ -24,8 +24,8 @@ class RecipesDisplayFragment : DiFragment() {
         di.recipesDisplayViewModel()
     }
 
-    private val selectedRecipeViewModel by lazy {
-        di.selectedRecipeViewModel()
+    private val eventBusViewModel by lazy {
+        di.eventBusViewModel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -78,13 +78,13 @@ class RecipesDisplayFragment : DiFragment() {
                 }
             }
         }
-        viewModel.recipesLiveData.observe(this, Observer {
+        viewModel.recipesLiveData.observe(viewLifecycleOwner, Observer {
             recyclerRecipesDisplay.adapter?.cast<RecipesAdapter>()?.submitList(it)
         })
-        viewModel.selectedRecipeLiveData.observe(this, Observer {
+        viewModel.selectedRecipeLiveData.observe(viewLifecycleOwner, Observer {
             val args = RecipesDisplayFragmentArgs.fromBundle(arguments!!)
             if (args.code != EventBusViewModel.Event.NO_CODE) {
-                selectedRecipeViewModel.sendEvent(EventBusViewModel.Event(args.code, it))
+                eventBusViewModel.sendEvent(EventBusViewModel.Event(args.code, it))
                 findNavController().popBackStack()
             }
         })
