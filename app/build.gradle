@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'io.fabric'
+
+
 
 android {
     compileSdkVersion 28
@@ -16,6 +19,10 @@ android {
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary true
+
+        manifestPlaceholders = [
+                api_key_crashlyctics: API_KEY_CRASHLYCTICS
+        ]
     }
     buildTypes {
         release {
@@ -29,6 +36,8 @@ repositories {
     google()
     jcenter()
     maven { url "https://jitpack.io" }
+    maven { url "https://maven.google.com/" }
+    maven { url 'https://dl.bintray.com/android/android-tools' }
 }
 
 dependencies {
@@ -52,11 +61,6 @@ dependencies {
 
     implementation "androidx.room:room-runtime:2.1.0-alpha03"
 
-//    implementation "com.google.dagger:dagger:2.20"
-//    implementation "com.google.dagger:dagger-android-support:2.20"
-//    kapt "com.google.dagger:dagger-compiler:2.20"
-//    kapt "com.google.dagger:dagger-android-processor:2.20"
-
 //    testImplementation 'junit:junit:4.12'
 //    androidTestImplementation 'androidx.test:runner:1.1.1'
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -66,6 +70,11 @@ dependencies {
     implementation project(':data')
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+
+
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -73,3 +82,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
+
+

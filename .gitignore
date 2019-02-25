@@ -76,3 +76,4 @@ fastlane/readme.md
 ktlint
 
 /app/google-services.json
+gradle.properties

@@ -4,6 +4,7 @@ package com.crskdev.mealcalculator
 
 import android.app.Application
 import android.content.Context
+import com.crashlytics.android.Crashlytics
 import com.crskdev.mealcalculator.data.FoodRepositoryImpl
 import com.crskdev.mealcalculator.data.MealRepositoryImpl
 import com.crskdev.mealcalculator.data.RecipeRepositoryImpl
@@ -30,6 +31,8 @@ import com.crskdev.mealcalculator.ui.meal.MealJournalDetailFragmentArgs
 import com.crskdev.mealcalculator.ui.meal.MealJournalFragment
 import com.crskdev.mealcalculator.ui.recipe.*
 import com.crskdev.mealcalculator.utils.viewModelFromProvider
+import com.google.firebase.FirebaseApp
+import io.fabric.sdk.android.Fabric
 
 /**
  * Created by Cristian Pela on 28.01.2019.
@@ -40,6 +43,8 @@ class MealCalculatorApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(applicationContext)
+        Fabric.with(applicationContext, Crashlytics())
         dependencyGraph = DependencyGraph(this)
     }
 }
