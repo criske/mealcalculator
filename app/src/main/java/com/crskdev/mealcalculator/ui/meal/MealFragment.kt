@@ -89,7 +89,6 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("Meal fragment ID is $id")
         with(toolbarMeal) {
             inflateMenu(R.menu.menu_meal)
             setOnMenuItemClickListener {
