@@ -6,18 +6,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import com.crskdev.mealcalculator.R
+import com.crskdev.mealcalculator.domain.entities.Recipe
+import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asSourceID
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.utils.*
+import com.crskdev.mealcalculator.ui.recipe.RecipeFoodsEventCodes
+import com.crskdev.mealcalculator.utils.lifecycleRegistry
+import com.crskdev.mealcalculator.utils.showSimpleInputDialog
+import com.crskdev.mealcalculator.utils.showSimpleToast
+import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_meal.*
 
 class MealFragment : DiFragment(), HasBackPressedAwareness {
@@ -25,6 +30,8 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     companion object {
         private const val SEARCH_FOOD_SELECT_CODE = 10001
         private const val SEARCH_RECIPE_SELECT_CODE = 10002
+        private const val RESPONSE_RECIPE_FOODS_TO_SAVE_CODE = 10003
+        private const val RESPONSE_RECIPE_FOODS_TO_SAVE_AS_RECIPE_CODE = 10004
     }
 
 
@@ -32,12 +39,8 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         di.mealViewModel()
     }
 
-    private val selectedFoodViewModel by lazy {
-        di.selectedFoodViewModel()
-    }
-
-    private val selectedRecipeViewModel by lazy {
-        di.selectedRecipeViewModel()
+    private val eventBusViewModel by lazy {
+        di.eventBusViewModel()
     }
 
     private val mealConflictDialogHelper by lifecycleRegistry {
@@ -55,35 +58,38 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         return inflater.inflate(R.layout.fragment_meal, container, false)
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        textMealSummary.setOnClickListener {
-            findNavController().navigate(
-                MealFragmentDirections
-                    .actionMealFragmentToMealJournalDetailFragment(-1)
-            )
-        }
-        val scroller = object : LinearSmoothScroller(context) {
-            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
-        }
-        with(recyclerMealEntries) {
-            adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context)) {
-                when (it) {
-                    is RecipeFoodEntryAction.EditEntry -> viewModel.editEntry(it.recipeFood)
-                    is RecipeFoodEntryAction.RemoveEntry -> viewModel.removeEntry(it.recipeFood)
-                    is RecipeFoodEntryAction.FoodAction.Edit -> findNavController().navigate(
-                        MealFragmentDirections
-                            .actionMealFragmentToUpsertFoodFragment(null, it.food.id)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        eventBusViewModel.eventLiveData.observe(this, Observer {
+            if (it.code.targetId.value != id) {
+                return@Observer
+            }
+            when (it.code.targetSubId.value) {
+                SEARCH_FOOD_SELECT_CODE -> eventBusViewModel
+                    .sendEvent(
+                        EventBusViewModel.Event(
+                            EventBusViewModel.Code(
+                                RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE.asTargetID(),
+                                sourceId = id.asSourceID()
+                            ),
+                            it.data.cast()
+                        )
                     )
-                    is RecipeFoodEntryAction.FoodAction.Delete -> {
-                        viewModel.deleteFood(it.food)
-                    }
+                SEARCH_RECIPE_SELECT_CODE -> viewModel
+                    .loadEntriesFromRecipe(it.data.cast<Recipe>().id)
+                RESPONSE_RECIPE_FOODS_TO_SAVE_CODE -> {
+                    viewModel.save(it.data.cast())
+                }
+                RESPONSE_RECIPE_FOODS_TO_SAVE_AS_RECIPE_CODE -> {
+                    viewModel.pendingSaveAsRecipe(it.data.cast())
                 }
             }
-            onItemSwipe { vh, _ ->
-                viewModel.removeEntryIndex(vh.adapterPosition)
-            }
-        }
+        })
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("Meal fragment ID is $id")
         with(toolbarMeal) {
             inflateMenu(R.menu.menu_meal)
             setOnMenuItemClickListener {
@@ -92,7 +98,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController()
                             .navigate(
                                 MealFragmentDirections
-                                    .ActionMealFragmentToFindFoodFragment(SEARCH_FOOD_SELECT_CODE)
+                                    .ActionMealFragmentToFindFoodFragment(
+                                        this@MealFragment.id,
+                                        SEARCH_FOOD_SELECT_CODE
+                                    )
                             )
                     }
                     R.id.action_menu_meal_save -> {
@@ -102,7 +111,16 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                             "Are you sure you want to save the meal?"
                         ) { b ->
                             if (b == DialogInterface.BUTTON_POSITIVE) {
-                                viewModel.save()
+                                eventBusViewModel
+                                    .sendEvent(
+                                        EventBusViewModel.Event(
+                                            EventBusViewModel.Code(
+                                                RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                                sourceId = this@MealFragment.id.asSourceID(),
+                                                sourceSubId = RESPONSE_RECIPE_FOODS_TO_SAVE_CODE.asSourceID()
+                                            ), Unit
+                                        )
+                                    )
                             }
                         }
                     }
@@ -110,14 +128,23 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController()
                             .navigate(
                                 MealFragmentDirections.actionMealFragmentToRecipesDisplayFragment(
+                                    this@MealFragment.id,
                                     SEARCH_RECIPE_SELECT_CODE
                                 )
                             )
                     }
                     R.id.action_menu_meal_save_as_recipe -> {
-                        this@MealFragment.context!!.showSimpleInputDialog("Recipe Name") { e ->
-                            viewModel.saveAsRecipe(e.toString())
-                        }
+                        eventBusViewModel
+                            .sendEvent(
+                                EventBusViewModel.Event(
+                                    EventBusViewModel.Code(
+                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                        sourceId = this@MealFragment.id.asSourceID(),
+                                        sourceSubId = RESPONSE_RECIPE_FOODS_TO_SAVE_AS_RECIPE_CODE.asSourceID()
+                                    ), Unit
+                                )
+                            )
+
                     }
                 }
                 true
@@ -127,18 +154,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             }
             Unit
         }
-        viewModel.mealEntriesLiveData.observe(this, Observer {
-            recyclerMealEntries.adapter?.cast<RecipeFoodEntriesAdapter>()?.apply {
-                submitList(it)
-            }
-        })
-        viewModel.mealNumberLiveData.observe(this, Observer {
-            toolbarMeal.title = "No.$it"
-        })
-        viewModel.mealSummaryLiveData.observe(this, Observer {
-            textMealSummary.bind(it)
-        })
-        viewModel.responsesLiveData.observe(this, Observer {
+        viewModel.responsesLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
                 MealViewModel.Response.Saved -> {
                     findNavController().popBackStack()
@@ -154,26 +170,20 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 }
             }
         })
-        viewModel.scrollPositionLiveData.observe(this, Observer {
-            scroller.targetPosition = it
-            view.postDelayed(500) {
-                recyclerMealEntries.layoutManager?.cast<LinearLayoutManager>()
-                    ?.startSmoothScroll(scroller)
-            }
-        })
-
-        viewModel.conflictLoadFromRecipeFoods.observe(this, Observer {
+        viewModel.conflictLoadFromRecipeFoods.observe(viewLifecycleOwner, Observer {
             mealConflictDialogHelper.showDialogWith(it)
         })
 
-        selectedFoodViewModel.eventLiveData.observe(this, Observer {
-            if (it.code == SEARCH_FOOD_SELECT_CODE)
-                viewModel.addFood(it.data)
+        viewModel.mealNumberLiveData.observe(viewLifecycleOwner, Observer {
+            toolbarMeal.title = "No.$it"
         })
 
-        selectedRecipeViewModel.eventLiveData.observe(this, Observer {
-            if (it.code == SEARCH_RECIPE_SELECT_CODE)
-                viewModel.loadEntriesFromRecipe(it.data.id)
+        viewModel.asRecipeToBeSaved.observe(viewLifecycleOwner, Observer {
+            if (it.isNotEmpty())
+                this@MealFragment.context!!.showSimpleInputDialog("Recipe Name") { e ->
+                    if (e.isNotBlank())
+                        viewModel.saveAsRecipe(e.toString(), it)
+                }
         })
     }
 
@@ -186,5 +196,6 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         }
         return true
     }
+
 }
 

@@ -35,7 +35,10 @@
             android:id="@+id/action_findFoodFragment_to_upsertFoodFragment"
             app:destination="@id/upsertFoodFragment" />
         <argument
-            android:name="code"
+            android:name="sourceId"
+            app:argType="integer" />
+        <argument
+            android:name="sourceSubId"
             app:argType="integer" />
     </fragment>
     <fragment
@@ -93,7 +96,10 @@
         android:label="fragment_recipes_display"
         tools:layout="@layout/fragment_recipes_display">
         <argument
-            android:name="code"
+            android:name="sourceId"
+            app:argType="integer" />
+        <argument
+            android:name="sourceSubId"
             app:argType="integer" />
         <action
             android:id="@+id/action_recipesDisplayFragment_to_recipeUpsertFragment"

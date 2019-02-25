@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
@@ -24,8 +25,8 @@ class RecipesDisplayFragment : DiFragment() {
         di.recipesDisplayViewModel()
     }
 
-    private val selectedRecipeViewModel by lazy {
-        di.selectedRecipeViewModel()
+    private val eventBusViewModel by lazy {
+        di.eventBusViewModel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -78,13 +79,19 @@ class RecipesDisplayFragment : DiFragment() {
                 }
             }
         }
-        viewModel.recipesLiveData.observe(this, Observer {
+        viewModel.recipesLiveData.observe(viewLifecycleOwner, Observer {
             recyclerRecipesDisplay.adapter?.cast<RecipesAdapter>()?.submitList(it)
         })
-        viewModel.selectedRecipeLiveData.observe(this, Observer {
+        viewModel.selectedRecipeLiveData.observe(viewLifecycleOwner, Observer {
             val args = RecipesDisplayFragmentArgs.fromBundle(arguments!!)
-            if (args.code != EventBusViewModel.Event.NO_CODE) {
-                selectedRecipeViewModel.sendEvent(EventBusViewModel.Event(args.code, it))
+            if (args.sourceId != EventBusViewModel.Event.NO_CODE) {
+                eventBusViewModel.sendEvent(
+                    EventBusViewModel.Event(
+                        args.sourceId.asTargetID(),
+                        args.sourceSubId.asTargetID(),
+                        it
+                    )
+                )
                 findNavController().popBackStack()
             }
         })

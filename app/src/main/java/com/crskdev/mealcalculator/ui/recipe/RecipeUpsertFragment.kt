@@ -10,17 +10,15 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.interactors.RecipeSaveInteractor
-import com.crskdev.mealcalculator.presentation.common.livedata.distinctUntilChanged
+import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asSourceID
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntriesAdapter
-import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntryAction
 import com.crskdev.mealcalculator.utils.hideSoftKeyboard
-import com.crskdev.mealcalculator.utils.onItemSwipe
 import com.crskdev.mealcalculator.utils.showSimpleToast
 import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_recipe_upsert.*
@@ -30,10 +28,11 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
 
     companion object {
         private const val SELECTED_FOOD_RECIPE_UPSERT_CODE = 17777
+        private const val GET_RECIPE_FOODS_FOR_SAVE_CODE = 17778
     }
 
-    private val selectedFoodViewModel by lazy {
-        di.selectedFoodViewModel()
+    private val eventBusViewModel by lazy {
+        di.eventBusViewModel()
     }
 
     private val viewModel by lazy {
@@ -46,6 +45,32 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
         return inflater.inflate(R.layout.fragment_recipe_upsert, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        eventBusViewModel.eventLiveData.observe(this, Observer {
+            if (it.code.targetId.value != id) {
+                return@Observer
+            }
+            when (it.code.targetSubId.value) {
+                SELECTED_FOOD_RECIPE_UPSERT_CODE -> {
+                    eventBusViewModel
+                        .sendEvent(
+                            EventBusViewModel.Event(
+                                EventBusViewModel.Code(
+                                    RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE.asTargetID(),
+                                    sourceId = id.asSourceID()
+                                ), it.data.cast()
+                            )
+                        )
+                }
+                GET_RECIPE_FOODS_FOR_SAVE_CODE -> {
+                    viewModel.save(it.data.cast())
+                }
+            }
+        })
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(toolbarRecipeUpsert) {
             inflateMenu(R.menu.menu_add_save)
@@ -55,13 +80,23 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController().navigate(
                             RecipeUpsertFragmentDirections
                                 .actionRecipeUpsertFragmentToFindFoodFragment(
+                                    this@RecipeUpsertFragment.id,
                                     SELECTED_FOOD_RECIPE_UPSERT_CODE
                                 )
                         )
                     }
                     R.id.action_menu_save -> {
                         activity?.hideSoftKeyboard()
-                        viewModel.save()
+                        eventBusViewModel
+                            .sendEvent(
+                                EventBusViewModel.Event(
+                                    EventBusViewModel.Code(
+                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                        sourceId = this@RecipeUpsertFragment.id.asSourceID(),
+                                        sourceSubId = GET_RECIPE_FOODS_FOR_SAVE_CODE.asSourceID()
+                                    ), Unit
+                                )
+                            )
                     }
                 }
                 true
@@ -81,26 +116,6 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
             }
         }
 
-        with(recyclerRecipeUpsert) {
-            adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context)) {
-                when (it) {
-                    is RecipeFoodEntryAction.EditEntry -> viewModel.editEntry(it.recipeFood)
-                    is RecipeFoodEntryAction.RemoveEntry -> viewModel.removeEntry(it.recipeFood)
-                    is RecipeFoodEntryAction.FoodAction.Edit -> {
-                        findNavController().navigate(
-                            RecipeUpsertFragmentDirections
-                                .actionRecipeUpsertFragmentToUpsertFoodFragment(null, it.food.id)
-                        )
-                    }
-                    is RecipeFoodEntryAction.FoodAction.Delete -> viewModel.deleteFood(it.food)
-                }
-            }
-            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            onItemSwipe { vh, _ ->
-                viewModel.removeEntryIndex(vh.adapterPosition)
-            }
-        }
-
         with(inputRecipeUpsertTitle) {
             doAfterTextChanged { e ->
                 e?.toString()?.takeIf { it.isNotEmpty() }?.also { txt ->
@@ -108,15 +123,7 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                 }
             }
         }
-
-
-        selectedFoodViewModel.eventLiveData.observe(this, Observer {
-            if (it.code == SELECTED_FOOD_RECIPE_UPSERT_CODE) {
-                viewModel.addFood(it.data)
-            }
-        })
-
-        viewModel.recipeLiveData.observe(this, Observer {
+        viewModel.recipeLiveData.observe(viewLifecycleOwner, Observer {
             inputRecipeUpsertTitle.apply {
                 val hasFocus = hasFocus()
                 val isEmpty = (this.text?.toString()?.trim() ?: "").isEmpty()
@@ -124,20 +131,14 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                     setText(it.name)
                 }
             }
-            recyclerRecipeUpsert.adapter?.cast<RecipeFoodEntriesAdapter>()?.submitList(it.foods)
         })
-        viewModel.actionResponseLiveData.distinctUntilChanged().observe(this, Observer {
-            //todo see why response is emitted multiple times instead of once... right know is hacky patched with distinct until changed
+        viewModel.actionResponseLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is RecipeSaveInteractor.Response.OK -> context?.showSimpleToast("Recipe Saved")
                 RecipeSaveInteractor.Response.EmptyName -> context?.showSimpleToast(it.javaClass.simpleName)
                 RecipeSaveInteractor.Response.EmptyRecipe -> context?.showSimpleToast(it.javaClass.simpleName)
             }
         })
-        viewModel.recipeSummaryLiveData.observe(this, Observer {
-            textRecipeUpsertSummary.bind(it)
-        })
-
     }
 
     override fun handleBackPressed(): Boolean {

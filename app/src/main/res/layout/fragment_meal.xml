@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,17 +12,10 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppToolbar.Nav" />
 
-    <com.crskdev.mealcalculator.ui.common.widget.RecipeSummaryView
-        android:id="@+id/textMealSummary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerMealEntries"
+    <fragment
+        android:id="@+id/fragmentRecipeFoodsFragment"
+        android:name="com.crskdev.mealcalculator.ui.recipe.RecipeFoodsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_meal_entry" />
+        tools:layout="@layout/fragment_recipe_foods" />
 </LinearLayout>
