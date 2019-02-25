@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Recipe
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asSourceID
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
@@ -59,13 +61,16 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         eventBusViewModel.eventLiveData.observe(this, Observer {
-            when (it.code.target) {
+            if (it.code.targetId.value != id) {
+                return@Observer
+            }
+            when (it.code.targetSubId.value) {
                 SEARCH_FOOD_SELECT_CODE -> eventBusViewModel
                     .sendEvent(
                         EventBusViewModel.Event(
                             EventBusViewModel.Code(
-                                RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE,
-                                id
+                                RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE.asTargetID(),
+                                sourceId = id.asSourceID()
                             ),
                             it.data.cast()
                         )
@@ -84,6 +89,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("Meal fragment ID is $id")
         with(toolbarMeal) {
             inflateMenu(R.menu.menu_meal)
             setOnMenuItemClickListener {
@@ -92,7 +98,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController()
                             .navigate(
                                 MealFragmentDirections
-                                    .ActionMealFragmentToFindFoodFragment(SEARCH_FOOD_SELECT_CODE)
+                                    .ActionMealFragmentToFindFoodFragment(
+                                        this@MealFragment.id,
+                                        SEARCH_FOOD_SELECT_CODE
+                                    )
                             )
                     }
                     R.id.action_menu_meal_save -> {
@@ -106,8 +115,9 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                                     .sendEvent(
                                         EventBusViewModel.Event(
                                             EventBusViewModel.Code(
-                                                RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE,
-                                                RESPONSE_RECIPE_FOODS_TO_SAVE_CODE
+                                                RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                                sourceId = this@MealFragment.id.asSourceID(),
+                                                sourceSubId = RESPONSE_RECIPE_FOODS_TO_SAVE_CODE.asSourceID()
                                             ), Unit
                                         )
                                     )
@@ -118,6 +128,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController()
                             .navigate(
                                 MealFragmentDirections.actionMealFragmentToRecipesDisplayFragment(
+                                    this@MealFragment.id,
                                     SEARCH_RECIPE_SELECT_CODE
                                 )
                             )
@@ -127,8 +138,9 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                             .sendEvent(
                                 EventBusViewModel.Event(
                                     EventBusViewModel.Code(
-                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE,
-                                        RESPONSE_RECIPE_FOODS_TO_SAVE_AS_RECIPE_CODE
+                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                        sourceId = this@MealFragment.id.asSourceID(),
+                                        sourceSubId = RESPONSE_RECIPE_FOODS_TO_SAVE_AS_RECIPE_CODE.asSourceID()
                                     ), Unit
                                 )
                             )

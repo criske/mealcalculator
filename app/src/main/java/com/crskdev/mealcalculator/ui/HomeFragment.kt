@@ -34,7 +34,10 @@ class HomeFragment : Fragment() {
                     R.id.action_home_menu_foods -> {
                         findNavController().navigate(
                             HomeFragmentDirections
-                                .actionHomeFragmentToFindFoodFragment(EventBusViewModel.Event.NO_CODE)
+                                .actionHomeFragmentToFindFoodFragment(
+                                    EventBusViewModel.Event.NO_CODE,
+                                    EventBusViewModel.Event.NO_CODE
+                                )
                         )
                     }
                     R.id.action_home_menu_meal_journal -> {
@@ -46,7 +49,10 @@ class HomeFragment : Fragment() {
                     R.id.action_home_menu_recipes -> {
                         findNavController().navigate(
                             HomeFragmentDirections
-                                .actionHomeFragmentToRecipesDisplayFragment(EventBusViewModel.Event.NO_CODE)
+                                .actionHomeFragmentToRecipesDisplayFragment(
+                                    EventBusViewModel.Event.NO_CODE,
+                                    EventBusViewModel.Event.NO_CODE
+                                )
                         )
                     }
                 }

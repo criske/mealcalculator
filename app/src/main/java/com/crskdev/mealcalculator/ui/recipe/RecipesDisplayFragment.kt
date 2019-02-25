@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
@@ -83,8 +84,14 @@ class RecipesDisplayFragment : DiFragment() {
         })
         viewModel.selectedRecipeLiveData.observe(viewLifecycleOwner, Observer {
             val args = RecipesDisplayFragmentArgs.fromBundle(arguments!!)
-            if (args.code != EventBusViewModel.Event.NO_CODE) {
-                eventBusViewModel.sendEvent(EventBusViewModel.Event(args.code, it))
+            if (args.sourceId != EventBusViewModel.Event.NO_CODE) {
+                eventBusViewModel.sendEvent(
+                    EventBusViewModel.Event(
+                        args.sourceId.asTargetID(),
+                        args.sourceSubId.asTargetID(),
+                        it
+                    )
+                )
                 findNavController().popBackStack()
             }
         })

@@ -20,13 +20,31 @@ class EventBusViewModel : ViewModel() {
     }
 
     class Event<T>(val code: Code, val data: T) {
-        constructor(target: Int, data: T) : this(Code(target), data)
+        constructor(target: TargetID, data: T) : this(Code(target), data)
+        constructor(target: TargetID, targetSubId: TargetID, data: T) : this(
+            Code(
+                target,
+                targetSubId
+            ), data
+        )
 
         companion object {
             const val NO_CODE = -1
         }
     }
 
-    data class Code(val target: Int, val source: Int = NO_CODE)
+    data class Code(val targetId: TargetID,
+                    val targetSubId: TargetID = TargetID(NO_CODE),
+                    val sourceId: SourceID = SourceID(NO_CODE),
+                    val sourceSubId: SourceID = SourceID(NO_CODE))
 
 }
+
+
+inline class TargetID(val value: Int)
+inline class SourceID(val value: Int)
+
+fun Int.asTargetID(): TargetID = TargetID(this)
+fun Int.asSourceID(): SourceID = SourceID(this)
+fun SourceID.toTargetId(): TargetID = TargetID(value)
+fun TargetID.toSourceId(): SourceID = SourceID(value)

@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.toTargetId
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntriesAdapter
@@ -71,16 +72,19 @@ class RecipeFoodsFragment : DiFragment() {
         })
 
         eventBusViewModel.eventLiveData.observe(viewLifecycleOwner, Observer {
-            when (it.code.target) {
+            when (it.code.targetId.value) {
                 RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE -> {
-                    val returningSource = it.code.source
-                    if (returningSource != EventBusViewModel.Event.NO_CODE) {
+                    val returningTargetId = it.code.sourceId.toTargetId()
+                    if (returningTargetId.value != EventBusViewModel.Event.NO_CODE) {
                         val foods = viewModel.mealEntriesLiveData.value ?: emptyList()
-                        eventBusViewModel.sendEvent(EventBusViewModel.Event(returningSource, foods))
+                        val returningTargetSubId = it.code.sourceSubId.toTargetId()
+                        eventBusViewModel.sendEvent(
+                            EventBusViewModel.Event(returningTargetId, returningTargetSubId, foods)
+                        )
                     }
                 }
                 RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE -> {
-                    if (it.code.source == parentID) {
+                    if (it.code.sourceId.value == parentID) {
                         viewModel.addFood(it.data.cast())
                     }
                 }

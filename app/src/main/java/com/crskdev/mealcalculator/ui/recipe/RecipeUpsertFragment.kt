@@ -13,6 +13,8 @@ import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.interactors.RecipeSaveInteractor
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
+import com.crskdev.mealcalculator.presentation.common.asSourceID
+import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
@@ -46,14 +48,17 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         eventBusViewModel.eventLiveData.observe(this, Observer {
-            when (it.code.target) {
+            if (it.code.targetId.value != id) {
+                return@Observer
+            }
+            when (it.code.targetSubId.value) {
                 SELECTED_FOOD_RECIPE_UPSERT_CODE -> {
                     eventBusViewModel
                         .sendEvent(
                             EventBusViewModel.Event(
                                 EventBusViewModel.Code(
-                                    RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE,
-                                    id
+                                    RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE.asTargetID(),
+                                    sourceId = id.asSourceID()
                                 ), it.data.cast()
                             )
                         )
@@ -75,6 +80,7 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                         findNavController().navigate(
                             RecipeUpsertFragmentDirections
                                 .actionRecipeUpsertFragmentToFindFoodFragment(
+                                    this@RecipeUpsertFragment.id,
                                     SELECTED_FOOD_RECIPE_UPSERT_CODE
                                 )
                         )
@@ -85,8 +91,9 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                             .sendEvent(
                                 EventBusViewModel.Event(
                                     EventBusViewModel.Code(
-                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE,
-                                        GET_RECIPE_FOODS_FOR_SAVE_CODE
+                                        RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE.asTargetID(),
+                                        sourceId = this@RecipeUpsertFragment.id.asSourceID(),
+                                        sourceSubId = GET_RECIPE_FOODS_FOR_SAVE_CODE.asSourceID()
                                     ), Unit
                                 )
                             )
