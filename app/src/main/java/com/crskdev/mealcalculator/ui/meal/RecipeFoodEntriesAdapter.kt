@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.item_meal_entry.view.*
  */
 class RecipeFoodEntriesAdapter(
     private val inflater: LayoutInflater,
+    private val viewHolderFinder: ViewHolderFinder,
     private val action: (RecipeFoodEntryAction) -> Unit) :
     ListAdapter<RecipeFood, RecipeFoodEntryVH>(
         object : DiffUtil.ItemCallback<RecipeFood>() {
@@ -54,6 +55,26 @@ class RecipeFoodEntriesAdapter(
 
     init {
         setHasStableIds(true)
+        registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                payload?.cast<SparseArray<Any>>()?.get(PAYLOAD_QUANTITY)?.also {
+                    focusAt(positionStart, itemCount)
+                }
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                focusAt(positionStart + itemCount - 1, 1)
+            }
+
+            private fun focusAt(positionStart: Int, itemCount: Int) {
+                for (p in positionStart..positionStart + (itemCount - 1).coerceAtLeast(0)) {
+                    viewHolderFinder.findViewHolderAt(p)
+                        ?.cast<RecipeFoodEntryVH>()
+                        ?.also { vh -> vh.focus() }
+                    viewHolderFinder.scrollTo(p)
+                }
+            }
+        })
     }
 
     override fun getItemId(position: Int): Long {
@@ -82,8 +103,16 @@ class RecipeFoodEntriesAdapter(
     override fun onViewRecycled(holder: RecipeFoodEntryVH) {
         holder.clear()
     }
+
 }
 
+interface ViewHolderFinder {
+
+    fun findViewHolderAt(position: Int): RecyclerView.ViewHolder?
+
+    fun scrollTo(position: Int)
+
+}
 
 class RecipeFoodEntryVH(itemView: View,
                         private val action: (RecipeFoodEntryAction) -> Unit) :
@@ -167,15 +196,27 @@ class RecipeFoodEntryVH(itemView: View,
     private fun bindQuantity(quantity: Int) {
         isRecycled = false
         itemView.editMealEntryQuantity.apply {
-            if (quantity == 0) {
-                requestFocus()
-                post {
-                    context.getSystemService<InputMethodManager>()
-                        ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
-                }
-            }
+            //            if (quantity == 0) {
+//                requestFocus()
+//                post {
+//                    context.getSystemService<InputMethodManager>()
+//                        ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+//                }
+//            }
             if (!hasFocus()) {
                 setText(quantity.toString())
+            }
+        }
+    }
+
+    fun focus() {
+        with(itemView) {
+            if (!itemView.hasFocus()) {
+                editMealEntryQuantity.requestFocus()
+                post {
+                    context.getSystemService<InputMethodManager>()
+                        ?.showSoftInput(editMealEntryQuantity, InputMethodManager.SHOW_FORCED)
+                }
             }
         }
     }
@@ -183,6 +224,7 @@ class RecipeFoodEntryVH(itemView: View,
     fun clear() {
         isRecycled = true
         itemView.editMealEntryQuantity.text = null
+        itemView.editMealEntryQuantity.clearFocus()
         foodDisplayItemDelegate.clear()
     }
 

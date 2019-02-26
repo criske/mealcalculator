@@ -11,7 +11,6 @@ import com.crskdev.mealcalculator.domain.interactors.RecipeSummaryInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.presentation.common.entities.toVM
-import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
 import kotlinx.coroutines.launch
@@ -31,17 +30,12 @@ class RecipeFoodsViewModel(
         MutableLiveData<RecipeFoodVM.SummaryVM>().apply {
             value = RecipeFoodVM.SummaryVM.EMPTY
         }
-    val scrollPositionLiveData: LiveData<Int> = SingleLiveEvent<Int>()
-
     private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
 
     init {
         launch {
             recipeFoodEntriesDisplayInteractor.request {
                 mealEntriesLiveData.mutableSet(it)
-                it.indexOfFirst { it.quantity == 0 }.takeIf { it != -1 }?.also {
-                    scrollPositionLiveData.mutableSet(it)
-                }
             }
         }
         launch {
@@ -83,9 +77,6 @@ class RecipeFoodsViewModel(
     }
 
     fun editEntry(entry: RecipeFood) {
-        mealEntriesLiveData.value?.indexOfFirst { it.food.id == entry.food.id }?.also {
-            scrollPositionLiveData.mutableSet(it)
-        }
         recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Edit(entry)
     }
 
