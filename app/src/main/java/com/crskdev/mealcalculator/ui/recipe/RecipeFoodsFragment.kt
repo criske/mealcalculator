@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
@@ -13,6 +14,7 @@ import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import com.crskdev.mealcalculator.presentation.common.toTargetId
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
+import com.crskdev.mealcalculator.ui.meal.MealFragmentDirections
 import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntriesAdapter
 import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntryAction
 import com.crskdev.mealcalculator.ui.meal.ViewHolderFinder
@@ -60,10 +62,10 @@ class RecipeFoodsFragment : DiFragment() {
                     is RecipeFoodEntryAction.EditEntry -> viewModel.editEntry(it.recipeFood)
                     is RecipeFoodEntryAction.RemoveEntry -> viewModel.removeEntry(it.recipeFood)
                     is RecipeFoodEntryAction.FoodAction.Edit -> {
-                        //todo use generic navigation or not?
-//                        findNavController().navigate(MealFragmentDirections
-//                            .actionMealFragmentToUpsertFoodFragment(null, it.food.id)
-                        //)
+                        findNavController().navigate(
+                            MealFragmentDirections
+                                .actionMealFragmentToUpsertFoodFragment(null, it.food.id)
+                        )
                     }
                     is RecipeFoodEntryAction.FoodAction.Delete -> {
                         viewModel.deleteFood(it.food)
