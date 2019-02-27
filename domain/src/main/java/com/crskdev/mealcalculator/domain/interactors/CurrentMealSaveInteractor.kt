@@ -36,11 +36,7 @@ class CurrentMealSaveInteractorImpl(
                             val toAddMeal = Meal(
                                 it.id,
                                 it.numberOfTheDay,
-                                summary.calories,
-                                summary.carbohydrates,
-                                summary.fat,
-                                summary.proteins,
-                                summary.gi,
+                                summary,
                                 it.date
                             )
                             it + toAddMeal
@@ -50,12 +46,7 @@ class CurrentMealSaveInteractorImpl(
                         } else {
                             startAllTodayMeal(
                                 Meal(
-                                    0, 1, summary.calories,
-                                    summary.carbohydrates,
-                                    summary.fat,
-                                    summary.proteins,
-                                    summary.gi,
-                                    DateString()
+                                    0, 1, summary, DateString()
                                 )
                             )
                         }

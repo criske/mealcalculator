@@ -56,22 +56,22 @@ class RecipeFoodEntriesAdapter(
     init {
         setHasStableIds(true)
         registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+
             override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
                 payload?.cast<SparseArray<Any>>()?.get(PAYLOAD_QUANTITY)?.also {
-                    focusAt(positionStart, itemCount)
+                    focusAt(positionStart, 0)
                 }
             }
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                focusAt(positionStart + itemCount - 1, 1)
+                focusAt(positionStart, 0)
             }
 
             private fun focusAt(positionStart: Int, itemCount: Int) {
                 for (p in positionStart..positionStart + (itemCount - 1).coerceAtLeast(0)) {
-                    viewHolderFinder.findViewHolderAt(p)
-                        ?.cast<RecipeFoodEntryVH>()
-                        ?.also { vh -> vh.focus() }
-                    viewHolderFinder.scrollTo(p)
+                    viewHolderFinder.scrollToViewHolder(p) {
+                        it.cast<RecipeFoodEntryVH>().focus()
+                    }
                 }
             }
         })
@@ -108,9 +108,7 @@ class RecipeFoodEntriesAdapter(
 
 interface ViewHolderFinder {
 
-    fun findViewHolderAt(position: Int): RecyclerView.ViewHolder?
-
-    fun scrollTo(position: Int)
+    fun scrollToViewHolder(position: Int, onScrolled: (RecyclerView.ViewHolder) -> Unit)
 
 }
 
@@ -211,7 +209,7 @@ class RecipeFoodEntryVH(itemView: View,
 
     fun focus() {
         with(itemView) {
-            if (!itemView.hasFocus()) {
+            if (!editMealEntryQuantity.hasFocus()) {
                 editMealEntryQuantity.requestFocus()
                 post {
                     context.getSystemService<InputMethodManager>()

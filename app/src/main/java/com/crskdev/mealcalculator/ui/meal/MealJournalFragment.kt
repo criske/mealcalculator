@@ -1,5 +1,6 @@
 package com.crskdev.mealcalculator.ui.meal
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
+import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
 import kotlinx.android.synthetic.main.fragment_meal_journal.*
 
 class MealJournalFragment : DiFragment() {
@@ -38,7 +40,17 @@ class MealJournalFragment : DiFragment() {
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             onItemSwipe { vh, _ ->
-                viewModel.delete(vh.adapterPosition)
+                context.showSimpleYesNoDialog(
+                    "Warning",
+                    "Permanently remove this meal journal entry?"
+                ) {
+                    if (it == DialogInterface.BUTTON_POSITIVE) {
+                        viewModel.delete(vh.adapterPosition)
+                    } else {
+                        adapter?.notifyItemChanged(vh.adapterPosition)
+                    }
+                }
+
             }
             Unit
         }

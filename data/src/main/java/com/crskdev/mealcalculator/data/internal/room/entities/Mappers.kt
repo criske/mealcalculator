@@ -26,11 +26,13 @@ internal fun MealDb.toDomain(): Meal =
     Meal(
         id,
         numberOfTheDay,
-        calories,
-        carbohydrate.toDomain(),
-        fat.toDomain(),
-        protein,
-        glycemicLoad,
+        RecipeFood.Summary(
+            calories,
+            carbohydrate.toDomain(),
+            fat.toDomain(),
+            protein,
+            glycemicLoad
+        ),
         date
     )
 
@@ -38,11 +40,11 @@ internal fun Meal.toDb(): MealDb =
     MealDb(
         id,
         numberOfTheDay,
-        calories,
-        carbohydrate.toDb(),
-        fat.toDb(),
-        protein,
-        glycemicLoad,
+        summary.calories,
+        summary.carbohydrates.toDb(),
+        summary.fat.toDb(),
+        summary.proteins,
+        summary.gi,
         date
     )
 

@@ -43,7 +43,11 @@ class MealCalculatorApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(applicationContext)
-        Fabric.with(applicationContext, Crashlytics())
+        val fabric = Fabric.Builder(this)
+            .kits(Crashlytics())
+            // .debuggable(true)
+            .build()
+        Fabric.with(fabric)
         dependencyGraph = DependencyGraph(this)
     }
 }

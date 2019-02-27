@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
@@ -43,19 +42,29 @@ class RecipeFoodsFragment : DiFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val scroller = object : LinearSmoothScroller(context) {
-            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
-        }
         with(recyclerRecipeFoodsEntries) {
             val viewHolderFinder = object : ViewHolderFinder {
-
-                override fun findViewHolderAt(position: Int): RecyclerView.ViewHolder? =
-                    this@with.findViewHolderForAdapterPosition(position)
-
-                override fun scrollTo(position: Int) {
-                    this@with.scrollToPosition(position)
+                override fun scrollToViewHolder(position: Int, onScrolled: (RecyclerView.ViewHolder) -> Unit) {
+                    val r = this@with
+                    var delayer: Runnable? = null
+                    val listener = object : RecyclerView.OnScrollListener() {
+                        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                            val thisListener = this
+                            if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                                r.removeOnScrollListener(thisListener)
+                                delayer?.also { r.removeCallbacks(it) }
+                                delayer = Runnable {
+                                    r.findViewHolderForLayoutPosition(position)?.also {
+                                        onScrolled(it)
+                                    }
+                                }
+                                r.postDelayed(delayer, 500)
+                            }
+                        }
+                    }
+                    r.addOnScrollListener(listener)
+                    r.scrollToPosition(position)
                 }
-
             }
             adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context), viewHolderFinder) {
                 when (it) {

@@ -60,6 +60,11 @@ class RecipeSummaryView @JvmOverloads constructor(
                             v.cast<TextView>().setTextColor(
                                 context.getColorCompat(android.R.color.white)
                             )
+
+//                        v.layoutParams = v.layoutParams.apply {
+//                            width = 36.dpToPx(resources).roundToInt()
+//                            height = 36.dpToPx(resources).roundToInt()
+//                        }
                     }
             }
         textRecipeSummaryViewCalories.setOnClickListener { v ->

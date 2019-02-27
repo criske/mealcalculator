@@ -10,6 +10,7 @@
         android:id="@+id/recyclerMealJournal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_width="match_parent"
+        tools:listitem="@layout/item_meal_journal"
         android:layout_height="match_parent" />
 
 </FrameLayout>

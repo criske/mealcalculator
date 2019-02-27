@@ -28,15 +28,15 @@ class MealJournalDetailFragment : DiFragment() {
                 Date: ${it.date}
                 Meals: ${it.numberOfTheDay}
 
-                Calories: ${it.calories}
-                Carbs: ${it.carbohydrate.total}
-                    Fiber: ${it.carbohydrate.fiber}
-                    Sugar: ${it.carbohydrate.sugar}
-                Fat: ${it.fat.total}
-                    Saturated: ${it.fat.saturated}
-                    Unsaturated: ${it.fat.unsaturated}
-                Proteins: ${it.protein}
-                Glycemic load: ${it.glycemicLoad}
+                Calories: ${it.summary.calories}
+                Carbs: ${it.summary.carbohydrates.total}
+                    Fiber: ${it.summary.carbohydrates.fiber}
+                    Sugar: ${it.summary.carbohydrates.sugar}
+                Fat: ${it.summary.fat.total}
+                    Saturated: ${it.summary.fat.saturated}
+                    Unsaturated: ${it.summary.fat.unsaturated}
+                Proteins: ${it.summary.proteins}
+                Glycemic load: ${it.summary.gi}
             """.trimIndent()
             textAllDayMealDisplay.text = display
         })

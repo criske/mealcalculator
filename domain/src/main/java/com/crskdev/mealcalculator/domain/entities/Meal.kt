@@ -1,27 +1,17 @@
 package com.crskdev.mealcalculator.domain.entities
 
 import com.crskdev.mealcalculator.domain.utils.absoluteCoercedValue
-import kotlin.math.absoluteValue
 
 /**
  * Created by Cristian Pela on 24.01.2019.
  */
 data class Meal(val id: Long = 0,
                 val numberOfTheDay: Int = 1,
-                val calories: Int,
-                val carbohydrate: Carbohydrate,
-                val fat: Fat,
-                val protein: Float,
-                val glycemicLoad: Float,
+                val summary: RecipeFood.Summary,
                 val date: String) {
     companion object {
         fun empty(id: Long = -1, numberOfTheDay: Int = -1, date: String): Meal =
-            Meal(
-                id, numberOfTheDay, 0,
-                Carbohydrate(0f, 0f, 0f),
-                Fat(0f, 0f, 0f),
-                0f, 0f, date
-            )
+            Meal(id, numberOfTheDay, RecipeFood.Summary.EMPTY, date)
     }
 
 
@@ -30,21 +20,24 @@ data class Meal(val id: Long = 0,
             "In order to compound two meals they must have same id and date"
         }
         val incrementedNumberOfTheDay = this.numberOfTheDay + 1
+        val summary = RecipeFood.Summary(
+            this.summary.calories + this.summary.calories,
+            Carbohydrate(
+                (this.summary.carbohydrates.total + other.summary.carbohydrates.total).absoluteCoercedValue,
+                (this.summary.carbohydrates.fiber + other.summary.carbohydrates.fiber).absoluteCoercedValue,
+                (this.summary.carbohydrates.sugar + other.summary.carbohydrates.sugar).absoluteCoercedValue
+            ),
+            Fat(
+                (this.summary.fat.total + other.summary.fat.total).absoluteCoercedValue,
+                (this.summary.fat.saturated + other.summary.fat.saturated).absoluteCoercedValue,
+                (this.summary.fat.unsaturated + other.summary.fat.unsaturated).absoluteCoercedValue
+            ),
+            (this.summary.proteins + other.summary.proteins).absoluteCoercedValue,
+            (this.summary.gi + other.summary.gi).absoluteCoercedValue
+        )
         return copy(
             numberOfTheDay = incrementedNumberOfTheDay,
-            calories = (this.calories + other.calories).absoluteCoercedValue,
-            carbohydrate = Carbohydrate(
-                (this.carbohydrate.total + other.carbohydrate.total).absoluteCoercedValue,
-                (this.carbohydrate.fiber + other.carbohydrate.fiber).absoluteCoercedValue,
-                (this.carbohydrate.sugar + other.carbohydrate.sugar).absoluteCoercedValue
-            ),
-            fat = Fat(
-                (this.fat.total + other.fat.total).absoluteCoercedValue,
-                (this.fat.saturated + other.fat.saturated).absoluteCoercedValue,
-                (this.fat.unsaturated + other.fat.unsaturated).absoluteCoercedValue
-            ),
-            protein = (this.protein + other.protein).absoluteCoercedValue,
-            glycemicLoad = (this.glycemicLoad + other.glycemicLoad).absoluteCoercedValue
+            summary = summary
         )
     }
 

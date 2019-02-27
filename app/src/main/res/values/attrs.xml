@@ -3,4 +3,7 @@
     <declare-styleable name="BarChart">
         <attr name="data" />
     </declare-styleable>
+    <declare-styleable name="RecipeSummaryView">
+        <attr name="boxDimension" format="dimension" />
+    </declare-styleable>
 </resources>

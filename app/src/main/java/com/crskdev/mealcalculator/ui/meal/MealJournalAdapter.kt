@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Meal
+import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
+import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import kotlinx.android.synthetic.main.item_meal_journal.view.*
 
 /**
@@ -56,13 +58,19 @@ class MealVH(v: View, action: (Long) -> Unit) : RecyclerView.ViewHolder(v) {
     fun bind(meal: Meal) {
         this.meal = meal
         with(itemView) {
-            textItemMealJournal.text =
-                """Date: ${meal.date}, Total Meals: ${meal.numberOfTheDay} Calories: ${meal.calories} kCal. C:${meal.carbohydrate.total} F:${meal.fat.total} P:${meal.protein} GL:${meal.glycemicLoad}""".trimIndent()
+            recipeSummaryMealJournal.bind(meal.summary.toVM())
+            textMealJournalDate.text = meal.date
+            textMealJournalNumber.text = meal.numberOfTheDay.toString()
         }
     }
 
     fun clear() {
         meal = null
-        itemView.textItemMealJournal.text = null
+        with(itemView) {
+            recipeSummaryMealJournal.bind(RecipeFoodVM.SummaryVM.EMPTY)
+            textMealJournalDate.text = null
+            textMealJournalNumber.text = null
+        }
+
     }
 }
