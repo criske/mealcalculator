@@ -2,6 +2,7 @@ package com.crskdev.mealcalculator.ui.recipe
 
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntriesAdapter
 import com.crskdev.mealcalculator.ui.meal.RecipeFoodEntryAction
 import com.crskdev.mealcalculator.ui.meal.ViewHolderFinder
 import com.crskdev.mealcalculator.utils.onItemSwipe
+import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import kotlinx.android.synthetic.main.fragment_recipe_foods.*
 
 class RecipeFoodsFragment : DiFragment() {
@@ -46,19 +48,14 @@ class RecipeFoodsFragment : DiFragment() {
             val viewHolderFinder = object : ViewHolderFinder {
                 override fun scrollToViewHolder(position: Int, onScrolled: (RecyclerView.ViewHolder) -> Unit) {
                     val r = this@with
-                    var delayer: Runnable? = null
                     val listener = object : RecyclerView.OnScrollListener() {
                         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                             val thisListener = this
-                            if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                                 r.removeOnScrollListener(thisListener)
-                                delayer?.also { r.removeCallbacks(it) }
-                                delayer = Runnable {
-                                    r.findViewHolderForLayoutPosition(position)?.also {
-                                        onScrolled(it)
-                                    }
+                                r.findViewHolderForLayoutPosition(position)?.also {
+                                    onScrolled(it)
                                 }
-                                r.postDelayed(delayer, 500)
                             }
                         }
                     }
@@ -66,6 +63,7 @@ class RecipeFoodsFragment : DiFragment() {
                     r.scrollToPosition(position)
                 }
             }
+            GravitySnapHelper(Gravity.BOTTOM).attachToRecyclerView(this)
             adapter = RecipeFoodEntriesAdapter(LayoutInflater.from(context), viewHolderFinder) {
                 when (it) {
                     is RecipeFoodEntryAction.EditEntry -> viewModel.editEntry(it.recipeFood)

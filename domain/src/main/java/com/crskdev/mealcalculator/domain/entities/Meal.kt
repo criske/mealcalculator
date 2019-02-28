@@ -21,7 +21,7 @@ data class Meal(val id: Long = 0,
         }
         val incrementedNumberOfTheDay = this.numberOfTheDay + 1
         val summary = RecipeFood.Summary(
-            this.summary.calories + this.summary.calories,
+            this.summary.calories + other.summary.calories,
             Carbohydrate(
                 (this.summary.carbohydrates.total + other.summary.carbohydrates.total).absoluteCoercedValue,
                 (this.summary.carbohydrates.fiber + other.summary.carbohydrates.fiber).absoluteCoercedValue,
