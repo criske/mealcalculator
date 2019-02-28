@@ -47,7 +47,17 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         MealConflictDialogCreator(context!!) {
             when (it) {
                 ConflictAction.ClearAll -> viewModel.clearConflicts()
-                is ConflictAction.Handled -> viewModel.conflictHandledWith(it.recipeFood)
+                is ConflictAction.Handled -> {
+                    viewModel.conflictHandledWith(it.recipeFood)
+                    eventBusViewModel.sendEvent(
+                        EventBusViewModel.Event(
+                            EventBusViewModel.Code(
+                                targetId = RecipeFoodsEventCodes.EDIT_FOOD_TO_RECIPE.asTargetID(),
+                                sourceId = this@MealFragment.id.asSourceID()
+                            ), it.recipeFood
+                        )
+                    )
+                }
             }
         }
     }
@@ -92,6 +102,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         with(toolbarMeal) {
             inflateMenu(R.menu.menu_meal)
             setOnMenuItemClickListener {
+                activity?.currentFocus?.clearFocus()
                 when (it.itemId) {
                     R.id.action_menu_meal_add_food -> {
                         findNavController()

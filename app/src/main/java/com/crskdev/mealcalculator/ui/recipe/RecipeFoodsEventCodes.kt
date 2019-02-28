@@ -8,4 +8,6 @@ object RecipeFoodsEventCodes {
     const val GET_RECIPE_FOODS_CODE: Int = 77770
 
     const val ADD_FOOD_TO_RECIPE: Int = 77771
+
+    const val EDIT_FOOD_TO_RECIPE: Int = 77772
 }

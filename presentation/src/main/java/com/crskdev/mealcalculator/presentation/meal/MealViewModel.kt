@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crskdev.mealcalculator.domain.entities.RecipeDetailed
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
-import com.crskdev.mealcalculator.domain.interactors.*
+import com.crskdev.mealcalculator.domain.interactors.CurrentMealLoadFromRecipeInteractor
 import com.crskdev.mealcalculator.domain.interactors.CurrentMealLoadFromRecipeInteractor.ConflictingRecipeFood
+import com.crskdev.mealcalculator.domain.interactors.CurrentMealNumberOfTheDayInteractor
+import com.crskdev.mealcalculator.domain.interactors.CurrentMealSaveInteractor
+import com.crskdev.mealcalculator.domain.interactors.RecipeSaveInteractor
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
@@ -30,8 +33,6 @@ class MealViewModel(
         }
 
     val asRecipeToBeSaved: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
-
-    private val recipeFoodActionLiveData = MutableLiveData<RecipeFoodActionInteractor.Request>()
 
     init {
         launch {
@@ -62,7 +63,6 @@ class MealViewModel(
                 v.filter { it.food.id != recipeFood.food.id }
             )
         }
-        recipeFoodActionLiveData.value = RecipeFoodActionInteractor.Request.Edit(recipeFood)
     }
 
     fun save(foods: List<RecipeFood>) {

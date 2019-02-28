@@ -42,6 +42,33 @@ class RecipeFoodsFragment : DiFragment() {
         return inflater.inflate(R.layout.fragment_recipe_foods, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        eventBusViewModel.eventLiveData.observe(this, Observer {
+            when (it.code.targetId.value) {
+                RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE -> {
+                    val returningTargetId = it.code.sourceId.toTargetId()
+                    if (returningTargetId.value != EventBusViewModel.Event.NO_CODE) {
+                        val foods = viewModel.mealEntriesLiveData.value ?: emptyList()
+                        val returningTargetSubId = it.code.sourceSubId.toTargetId()
+                        eventBusViewModel.sendEvent(
+                            EventBusViewModel.Event(returningTargetId, returningTargetSubId, foods)
+                        )
+                    }
+                }
+                RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE -> {
+                    if (it.code.sourceId.value == parentID) {
+                        viewModel.addFood(it.data.cast())
+                    }
+                }
+                RecipeFoodsEventCodes.EDIT_FOOD_TO_RECIPE -> {
+                    if (it.code.sourceId.value == parentID) {
+                        viewModel.editEntry(it.data.cast())
+                    }
+                }
+            }
+        })
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(recyclerRecipeFoodsEntries) {
@@ -90,26 +117,6 @@ class RecipeFoodsFragment : DiFragment() {
         })
         viewModel.mealSummaryLiveData.observe(viewLifecycleOwner, Observer {
             textRecipeFoodsSummary.bind(it)
-        })
-
-        eventBusViewModel.eventLiveData.observe(viewLifecycleOwner, Observer {
-            when (it.code.targetId.value) {
-                RecipeFoodsEventCodes.GET_RECIPE_FOODS_CODE -> {
-                    val returningTargetId = it.code.sourceId.toTargetId()
-                    if (returningTargetId.value != EventBusViewModel.Event.NO_CODE) {
-                        val foods = viewModel.mealEntriesLiveData.value ?: emptyList()
-                        val returningTargetSubId = it.code.sourceSubId.toTargetId()
-                        eventBusViewModel.sendEvent(
-                            EventBusViewModel.Event(returningTargetId, returningTargetSubId, foods)
-                        )
-                    }
-                }
-                RecipeFoodsEventCodes.ADD_FOOD_TO_RECIPE -> {
-                    if (it.code.sourceId.value == parentID) {
-                        viewModel.addFood(it.data.cast())
-                    }
-                }
-            }
         })
     }
 }
