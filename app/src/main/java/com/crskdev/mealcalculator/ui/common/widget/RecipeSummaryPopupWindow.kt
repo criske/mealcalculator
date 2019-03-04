@@ -4,8 +4,6 @@ package com.crskdev.mealcalculator.ui.common.widget
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +37,7 @@ class RecipeSummaryPopupWindow(val context: Context) : PopupWindow(
             //todo obtain them window background color
             val color = Color.WHITE
             //todo refactor this into util
+            textSize = 12f
             background = GradientDrawable().apply {
                 colors = intArrayOf(color, color, color)
                 cornerRadius = 5f.dpToPx(resources)
@@ -65,9 +64,7 @@ class RecipeSummaryPopupWindow(val context: Context) : PopupWindow(
     fun showAtLocationWith(summary: RecipeFoodVM.SummaryVM,
                            parent: View,
                            x: Int = 0,
-                           y: Int = 8.dpToPxInt(resources)) {
-        //bottom default
-        showAsDropDownCompat(parent, x, y)
+                           y: Int = 0) {
         bind(summary) {
             """
 Calories: $calories
@@ -81,14 +78,14 @@ Proteins: ${proteins()}
 Glycemic load: ${gi()}
         """.trimIndent()
         }
+        //bottom default
+        showAsDropDownCompat(parent, x, y)
     }
 
     fun showAtLocationWith(carbohydrate: CarbohydrateVM,
                            parent: View,
                            x: Int = 0,
-                           y: Int = 8.dpToPxInt(resources)) {
-        //bottom default
-        showAsDropDownCompat(parent, x, y)
+                           y: Int = 0) {
         bind(carbohydrate) {
             """
 Total: ${total()}
@@ -96,14 +93,14 @@ Fiber: ${fiber()}
 Sugar: ${sugar()}
             """.trimIndent()
         }
+        //bottom default
+        showAsDropDownCompat(parent, x, y)
     }
 
     fun showAtLocationWith(fat: FatVM,
                            parent: View,
                            x: Int = 0,
-                           y: Int = 8.dpToPxInt(resources)) {
-        //bottom default
-        showAsDropDownCompat(parent, x, y)
+                           y: Int = 0) {
         bind(fat) {
             """
 Total: ${total()}
@@ -111,19 +108,19 @@ Saturated: ${saturated()}
 Unsaturated: ${unsaturated()}
             """.trimIndent()
         }
+        //bottom default
+        showAsDropDownCompat(parent, x, y)
     }
 
     private fun showAsDropDownCompat(parent: View, x: Int, y: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            showAsDropDown(parent, x, y, Gravity.BOTTOM)
-        } else {
-            showAsDropDown(parent, x, parent.height - height)
-        }
+        showAsDropDown(parent, x, 0)
     }
 
     private inline fun <T> bind(t: T, data: T.() -> String) {
         textView.text = t.run(data)
         update()
+        textView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        height = textView.measuredHeight
         textView.requestFocus()
     }
 
