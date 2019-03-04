@@ -1,25 +1,20 @@
 package com.crskdev.mealcalculator.platform
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.room.InvalidationTracker
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.gateway.FoodRepository
 import com.crskdev.mealcalculator.domain.gateway.RecipeFoodEntriesManager
-import com.crskdev.mealcalculator.ui.meal.MealFragment
 
 /**
  * Created by Cristian Pela on 31.01.2019.
  */
 class PlatformRecipeFoodEntriesManager(
-    activityProvider: () -> AppCompatActivity?,
-    db: MealCalculatorDatabase,
+    private val db: MealCalculatorDatabase,
     foodRepository: FoodRepository,
     private val delegate: RecipeFoodEntriesManager) : RecipeFoodEntriesManager by delegate {
 
-    val dbTrackObserver = object : InvalidationTracker.Observer("foods") {
+    private val dbTrackObserver = object : InvalidationTracker.Observer("foods") {
         override fun onInvalidated(tables: MutableSet<String>) {
             val entries = this@PlatformRecipeFoodEntriesManager.getAll()
             val entriesFoodChanged = foodRepository.findAllByIds(entries.map { it.food.id })
@@ -38,14 +33,10 @@ class PlatformRecipeFoodEntriesManager(
 
     init {
         db.invalidationTracker.addObserver(dbTrackObserver)
-        activityProvider()?.supportFragmentManager?.registerFragmentLifecycleCallbacks(object :
-            FragmentManager.FragmentLifecycleCallbacks() {
-            override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-                if (f::class == MealFragment::class) {
-                    db.invalidationTracker.removeObserver(dbTrackObserver)
-                }
-            }
-        }, true)
+    }
+
+    fun unTrackDbChanges() {
+        db.invalidationTracker.removeObserver(dbTrackObserver)
     }
 
 

@@ -79,13 +79,16 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
         PlatformGatewayDispatchers(db.queryExecutor)
     }
 
-    val recipeFoodEntriesManager: (Scope) -> RecipeFoodEntriesManager = scoped {
+    val recipeFoodEntriesManager: (Scope) -> RecipeFoodEntriesManager = scoped { scope ->
         PlatformRecipeFoodEntriesManager(
-            activityProvider<MainActivity>(),
             db,
             foodRepository,
             RecipeFoodEntriesManagerImpl()
-        )
+        ).apply {
+            scope.onOutOfScope = {
+                this.unTrackDbChanges()
+            }
+        }
     }
 
     ///****************************Interactors*****************

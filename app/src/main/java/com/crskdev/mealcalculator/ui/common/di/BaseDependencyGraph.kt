@@ -114,7 +114,10 @@ open class BaseDependencyGraph(protected val context: Context) {
 
     class ScopeImpl internal constructor() : Scope {
 
+        override var onOutOfScope: () -> Unit = {}
+
         private val instances = mutableListOf<Any>()
+
 
         fun add(any: Any) {
             instances.add(any)
@@ -124,11 +127,15 @@ open class BaseDependencyGraph(protected val context: Context) {
             instances.firstOrNull { it::class == clazz }
 
         fun clear() {
+            onOutOfScope.invoke()
             instances.clear()
         }
     }
 
-    interface Scope
+    interface Scope {
+
+        var onOutOfScope: () -> Unit
+    }
 
 }
 
