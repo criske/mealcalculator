@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
@@ -45,7 +44,7 @@ class FindFoodFragment : DiFragment() {
             inflateMenu(R.menu.menu_food_find)
             setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
             menu.findItem(R.id.action_menu_find_food_search)
                 .apply { expandActionView() }
@@ -66,10 +65,7 @@ class FindFoodFragment : DiFragment() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_menu_find_food_new -> {
-                        findNavController().navigate(
-                            FindFoodFragmentDirections
-                                .actionFindFoodFragmentToUpsertFoodFragment(null, 0)
-                        )
+                        viewModel.routeToUpsertFoodNew()
                     }
                 }
                 true
@@ -89,13 +85,10 @@ class FindFoodFragment : DiFragment() {
                                         it.food
                                     )
                                 )
-                            findNavController().popBackStack()
+                            viewModel.routeBack()
                         }
                     }
-                    is FoodDisplayItemAction.Edit -> findNavController().navigate(
-                        FindFoodFragmentDirections
-                            .actionFindFoodFragmentToUpsertFoodFragment(null, it.food.id)
-                    )
+                    is FoodDisplayItemAction.Edit -> viewModel.routeToUpsertFoodEdit(it.food.id)
                     is FoodDisplayItemAction.Delete -> viewModel.delete(it.food)
                 }
             }

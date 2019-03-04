@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
@@ -31,12 +30,15 @@ class MealJournalFragment : DiFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        with(toolbarMealJournal) {
+            setNavigationOnClickListener {
+                viewModel.routeBack()
+            }
+        }
+
         with(recyclerMealJournal) {
             adapter = MealJournalAdapter(LayoutInflater.from(context)) {
-                findNavController().navigate(
-                    MealJournalFragmentDirections
-                        .actionMealJournalFragmentToMealJournalDetailFragment(it)
-                )
+                //TODO add direction to detailed recipe entry
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             onItemSwipe { vh, _ ->

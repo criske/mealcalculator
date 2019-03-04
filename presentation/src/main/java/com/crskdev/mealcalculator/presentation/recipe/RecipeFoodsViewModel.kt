@@ -1,4 +1,4 @@
-package com.crskdev.mealcalculator.ui.recipe
+package com.crskdev.mealcalculator.presentation.recipe
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,17 +13,19 @@ import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
+import com.crskdev.mealcalculator.presentation.food.UpsertFoodRouter
 import kotlinx.coroutines.launch
 
 /**
  * Created by Cristian Pela on 20.02.2019.
  */
 class RecipeFoodsViewModel(
+    private val router: UpsertFoodRouter,
     private val recipeSummaryInteractor: RecipeSummaryInteractor,
     private val recipeFoodEntriesDisplayInteractor: RecipeFoodEntriesDisplayInteractor,
     private val recipeFoodActionInteractor: RecipeFoodActionInteractor,
     private val foodActionInteractor: FoodActionInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), UpsertFoodRouter by router {
 
     val mealEntriesLiveData: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
     val mealSummaryLiveData: LiveData<RecipeFoodVM.SummaryVM> =

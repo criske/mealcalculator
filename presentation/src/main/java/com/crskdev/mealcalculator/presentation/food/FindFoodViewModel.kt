@@ -17,9 +17,10 @@ import java.util.concurrent.TimeUnit
  * Created by Cristian Pela on 26.01.2019.
  */
 class FindFoodViewModel(
+    private val router: FindFoodViewModelRouter,
     private val findFoodInteractor: FindFoodInteractor,
     private val foodActionInteractor: FoodActionInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), FindFoodViewModelRouter by router {
 
     private val searchLiveData = MutableLiveData<String>().apply {
         value = ""

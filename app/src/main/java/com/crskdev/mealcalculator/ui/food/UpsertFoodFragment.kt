@@ -15,7 +15,6 @@ import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.entities.CarbohydrateVM
 import com.crskdev.mealcalculator.presentation.common.entities.FatVM
@@ -76,7 +75,7 @@ class UpsertFoodFragment : DiFragment() {
         with(toolbarUpsertFood) {
             inflateMenu(R.menu.menu_food_upsert)
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
             setOnMenuItemClickListener {
                 when (it.itemId) {

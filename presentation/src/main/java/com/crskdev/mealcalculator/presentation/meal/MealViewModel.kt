@@ -18,11 +18,12 @@ import kotlinx.coroutines.launch
  * Created by Cristian Pela on 29.01.2019.
  */
 class MealViewModel(
+    private val mealRouter: MealViewModelRouter,
     private val currentMealNumberOfTheDayInteractor: CurrentMealNumberOfTheDayInteractor,
     private val currentMealSaveInteractor: CurrentMealSaveInteractor,
     private val currentMealLoadFromRecipeInteractor: CurrentMealLoadFromRecipeInteractor,
     private val saveAsRecipeInteractor: RecipeSaveInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), MealViewModelRouter by mealRouter {
 
 
     val mealNumberLiveData: LiveData<Int> = MutableLiveData<Int>()

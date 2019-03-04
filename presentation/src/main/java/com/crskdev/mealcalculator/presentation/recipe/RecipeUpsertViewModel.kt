@@ -1,4 +1,4 @@
-package com.crskdev.mealcalculator.ui.recipe
+package com.crskdev.mealcalculator.presentation.recipe
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,9 +15,10 @@ import kotlinx.coroutines.launch
  */
 class RecipeUpsertViewModel(
     private val recipeId: Long,
+    private val router: RecipeUpsertViewModelRouter,
     private val recipeLoadInteractor: RecipeLoadInteractor,
     private val recipeSaveInteractor: RecipeSaveInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), RecipeUpsertViewModelRouter by router {
 
     val recipeLiveData: LiveData<RecipeDetailed> = MutableLiveData<RecipeDetailed>().apply {
         value = RecipeDetailed.EMPTY

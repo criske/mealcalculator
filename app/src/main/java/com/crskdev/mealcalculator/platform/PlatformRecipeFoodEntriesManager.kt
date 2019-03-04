@@ -1,9 +1,9 @@
 package com.crskdev.mealcalculator.platform
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.room.InvalidationTracker
-import com.crskdev.mealcalculator.MainActivity
 import com.crskdev.mealcalculator.data.internal.room.MealCalculatorDatabase
 import com.crskdev.mealcalculator.domain.entities.RecipeFood
 import com.crskdev.mealcalculator.domain.gateway.FoodRepository
@@ -14,7 +14,7 @@ import com.crskdev.mealcalculator.ui.meal.MealFragment
  * Created by Cristian Pela on 31.01.2019.
  */
 class PlatformRecipeFoodEntriesManager(
-    activityProvider: () -> MainActivity?,
+    activityProvider: () -> AppCompatActivity?,
     db: MealCalculatorDatabase,
     foodRepository: FoodRepository,
     private val delegate: RecipeFoodEntriesManager) : RecipeFoodEntriesManager by delegate {

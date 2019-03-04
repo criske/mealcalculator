@@ -1,4 +1,4 @@
-package com.crskdev.mealcalculator.ui.recipe
+package com.crskdev.mealcalculator.presentation.recipe
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,9 +14,10 @@ import kotlinx.coroutines.launch
  * Created by Cristian Pela on 12.02.2019.
  */
 class RecipesDisplayViewModel(
+    private val router: RecipesDisplayViewModelRouter,
     private val recipesGetInteractor: RecipesGetInteractor,
     private val recipeDeleteInteractor: RecipeDeleteInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), RecipesDisplayViewModelRouter by router {
 
     val recipesLiveData: LiveData<List<Recipe>> = MutableLiveData<List<Recipe>>()
 

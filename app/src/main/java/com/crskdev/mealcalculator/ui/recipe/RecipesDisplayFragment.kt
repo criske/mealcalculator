@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
@@ -40,27 +39,24 @@ class RecipesDisplayFragment : DiFragment() {
             inflateMenu(R.menu.menu_add)
             setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.action_menu_add ->
-                        findNavController().navigate(
-                            RecipesDisplayFragmentDirections
-                                .actionRecipesDisplayFragmentToRecipeUpsertFragment(0)
-                        )
+                    R.id.action_menu_add -> {
+                        viewModel.routeToRecipeUpsertNew()
+                    }
 
                 }
                 true
             }
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
         }
         with(recyclerRecipesDisplay) {
             adapter = RecipesAdapter(LayoutInflater.from(context)) {
                 when (it) {
                     is RecipesAdapter.Action.Select -> viewModel.select(it.recipe)
-                    is RecipesAdapter.Action.Edit -> findNavController().navigate(
-                        RecipesDisplayFragmentDirections
-                            .actionRecipesDisplayFragmentToRecipeUpsertFragment(it.recipe.id)
-                    )
+                    is RecipesAdapter.Action.Edit -> {
+                        viewModel.routeToRecipeUpsertEdit(it.recipe.id)
+                    }
                 }
             }
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
@@ -92,7 +88,7 @@ class RecipesDisplayFragment : DiFragment() {
                         it
                     )
                 )
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
         })
 

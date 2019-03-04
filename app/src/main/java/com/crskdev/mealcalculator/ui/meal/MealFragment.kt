@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.entities.Recipe
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
@@ -35,11 +33,11 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     }
 
 
-    private val viewModel by lazy {
+    private val viewModel: MealViewModel by lazy {
         di.mealViewModel()
     }
 
-    private val eventBusViewModel by lazy {
+    private val eventBusViewModel: EventBusViewModel by lazy {
         di.eventBusViewModel()
     }
 
@@ -105,14 +103,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                 activity?.currentFocus?.clearFocus()
                 when (it.itemId) {
                     R.id.action_menu_meal_add_food -> {
-                        findNavController()
-                            .navigate(
-                                MealFragmentDirections
-                                    .ActionMealFragmentToFindFoodFragment(
-                                        this@MealFragment.id,
-                                        SEARCH_FOOD_SELECT_CODE
-                                    )
-                            )
+                        viewModel.routeToFindFood(
+                            this@MealFragment.id.asSourceID(),
+                            SEARCH_FOOD_SELECT_CODE.asSourceID()
+                        )
                     }
                     R.id.action_menu_meal_save -> {
                         //when using the toolbar context, the dialog show not as compact as when using fragment context. weird?
@@ -135,13 +129,10 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         }
                     }
                     R.id.action_menu_meal_load_from_recipe -> {
-                        findNavController()
-                            .navigate(
-                                MealFragmentDirections.actionMealFragmentToRecipesDisplayFragment(
-                                    this@MealFragment.id,
-                                    SEARCH_RECIPE_SELECT_CODE
-                                )
-                            )
+                        viewModel.routeToRecipesDisplay(
+                            this@MealFragment.id.asSourceID(),
+                            SEARCH_RECIPE_SELECT_CODE.asSourceID()
+                        )
                     }
                     R.id.action_menu_meal_save_as_recipe -> {
                         eventBusViewModel
@@ -167,7 +158,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
         viewModel.responsesLiveData.observe(viewLifecycleOwner, Observer {
             when (it) {
                 MealViewModel.Response.Saved -> {
-                    findNavController().popBackStack()
+                    viewModel.routeBack()
                 }
                 is MealViewModel.Response.Error -> {
                     val err = if (it is MealViewModel.Response.Error.Other) {
@@ -201,7 +192,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
     override fun handleBackPressed(): Boolean {
         context!!.showSimpleYesNoDialog("Warning", "Exit meal without saving?") {
             if (DialogInterface.BUTTON_POSITIVE == it) {
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
         }
         return true

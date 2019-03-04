@@ -8,14 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.crskdev.mealcalculator.R
 import com.crskdev.mealcalculator.domain.interactors.RecipeSaveInteractor
 import com.crskdev.mealcalculator.presentation.common.EventBusViewModel
 import com.crskdev.mealcalculator.presentation.common.asSourceID
 import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
+import com.crskdev.mealcalculator.presentation.recipe.RecipeUpsertViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.hideSoftKeyboard
@@ -35,7 +34,7 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
         di.eventBusViewModel()
     }
 
-    private val viewModel by lazy {
+    private val viewModel: RecipeUpsertViewModel by lazy {
         di.recipeUpsertViewModel()
     }
 
@@ -77,12 +76,9 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_menu_add -> {
-                        findNavController().navigate(
-                            RecipeUpsertFragmentDirections
-                                .actionRecipeUpsertFragmentToFindFoodFragment(
-                                    this@RecipeUpsertFragment.id,
-                                    SELECTED_FOOD_RECIPE_UPSERT_CODE
-                                )
+                        viewModel.routeToFindFood(
+                            this@RecipeUpsertFragment.id.asSourceID(),
+                            SELECTED_FOOD_RECIPE_UPSERT_CODE.asSourceID()
                         )
                     }
                     R.id.action_menu_save -> {
@@ -107,11 +103,11 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
                         .context
                         ?.showSimpleYesNoDialog("Alert", "Leave without saving?") {
                             if (it == DialogInterface.BUTTON_POSITIVE) {
-                                findNavController().popBackStack()
+                                viewModel.routeBack()
                             }
                         }
                 } else {
-                    findNavController().popBackStack()
+                    viewModel.routeBack()
                 }
             }
         }
@@ -147,7 +143,7 @@ class RecipeUpsertFragment : DiFragment(), HasBackPressedAwareness {
         }
         context?.showSimpleYesNoDialog("Alert", "Leave without saving?") {
             if (it == DialogInterface.BUTTON_POSITIVE) {
-                findNavController().popBackStack()
+                viewModel.routeBack()
             }
         }
         return true

@@ -8,15 +8,17 @@ import com.crskdev.mealcalculator.domain.interactors.MealJournalDisplayInteracto
 import com.crskdev.mealcalculator.presentation.common.CoroutineScopedViewModel
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
 import com.crskdev.mealcalculator.presentation.common.livedata.toChannel
+import com.crskdev.mealcalculator.presentation.common.router.BackRouter
 import kotlinx.coroutines.launch
 
 /**
  * Created by Cristian Pela on 01.02.2019.
  */
 class MealJournalViewModel(
+    private val backRouter: BackRouter,
     private val mealJournalDisplayInteractor: MealJournalDisplayInteractor,
     private val mealJournalDeleteInteractor: MealJournalDeleteInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), BackRouter by backRouter {
 
 
     val mealsLiveData: LiveData<List<Meal>> = MutableLiveData<List<Meal>>()

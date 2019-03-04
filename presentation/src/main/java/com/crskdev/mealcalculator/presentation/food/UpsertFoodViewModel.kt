@@ -11,6 +11,7 @@ import com.crskdev.mealcalculator.presentation.common.entities.toDomainUnchecked
 import com.crskdev.mealcalculator.presentation.common.entities.toVM
 import com.crskdev.mealcalculator.presentation.common.livedata.SingleLiveEvent
 import com.crskdev.mealcalculator.presentation.common.livedata.mutableSet
+import com.crskdev.mealcalculator.presentation.common.router.BackRouter
 import com.crskdev.mealcalculator.presentation.food.UpsertFoodViewModel.Error.FieldError
 import kotlinx.coroutines.launch
 
@@ -19,9 +20,10 @@ import kotlinx.coroutines.launch
  */
 class UpsertFoodViewModel(
     private val upsertType: UpsertType,
+    private val backRouter: BackRouter,
     private val getFoodInteractor: GetFoodInteractor,
     private val foodActionInteractor: FoodActionInteractor
-) : CoroutineScopedViewModel() {
+) : CoroutineScopedViewModel(), BackRouter by backRouter {
 
     companion object {
         const val FIELD_NAME = 1
