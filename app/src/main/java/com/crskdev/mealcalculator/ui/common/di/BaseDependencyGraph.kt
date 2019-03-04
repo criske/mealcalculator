@@ -75,6 +75,16 @@ open class BaseDependencyGraph(protected val context: Context) {
             throw IllegalAccessException("Fragment ${F::class} was not injected")
         } as F
 
+    protected inline fun <reified A : AppCompatActivity> activityProvider(): () -> A? =
+        {
+            injected[A::class] as A?
+        }
+
+    protected inline fun <reified F : Fragment> fragmentProvider(): () -> F? =
+        {
+            injected[F::class] as F?
+        }
+
     protected inline fun <reified A : AppCompatActivity> activity(): A =
         injected.getOrElse(A::class) {
             throw IllegalAccessException("Activity ${A::class} was not injected")

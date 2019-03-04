@@ -14,7 +14,7 @@ import com.crskdev.mealcalculator.ui.meal.MealFragment
  * Created by Cristian Pela on 31.01.2019.
  */
 class PlatformRecipeFoodEntriesManager(
-    activity: MainActivity,
+    activityProvider: () -> MainActivity?,
     db: MealCalculatorDatabase,
     foodRepository: FoodRepository,
     private val delegate: RecipeFoodEntriesManager) : RecipeFoodEntriesManager by delegate {
@@ -38,7 +38,7 @@ class PlatformRecipeFoodEntriesManager(
 
     init {
         db.invalidationTracker.addObserver(dbTrackObserver)
-        activity.supportFragmentManager.registerFragmentLifecycleCallbacks(object :
+        activityProvider()?.supportFragmentManager?.registerFragmentLifecycleCallbacks(object :
             FragmentManager.FragmentLifecycleCallbacks() {
             override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
                 if (f::class == MealFragment::class) {

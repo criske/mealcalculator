@@ -79,7 +79,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
 
     val recipeFoodEntriesManager: (Scope) -> RecipeFoodEntriesManager = scoped {
         PlatformRecipeFoodEntriesManager(
-            activity(),
+            activityProvider(),
             db,
             foodRepository,
             RecipeFoodEntriesManagerImpl()
