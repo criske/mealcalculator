@@ -85,7 +85,7 @@ class DependencyGraph(context: Context) : BaseDependencyGraph(context) {
             foodRepository,
             RecipeFoodEntriesManagerImpl()
         ).apply {
-            scope.onOutOfScope = {
+            scope.onOutOfScope {
                 this.unTrackDbChanges()
             }
         }

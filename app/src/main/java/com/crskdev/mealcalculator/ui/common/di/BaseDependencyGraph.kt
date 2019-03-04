@@ -114,9 +114,9 @@ open class BaseDependencyGraph(protected val context: Context) {
 
     class ScopeImpl internal constructor() : Scope {
 
-        override var onOutOfScope: () -> Unit = {}
-
         private val instances = mutableListOf<Any>()
+
+        private val onOutOfScopeListeners: MutableList<() -> Unit> = mutableListOf()
 
 
         fun add(any: Any) {
@@ -127,14 +127,21 @@ open class BaseDependencyGraph(protected val context: Context) {
             instances.firstOrNull { it::class == clazz }
 
         fun clear() {
-            onOutOfScope.invoke()
+            onOutOfScopeListeners.forEach {
+                it.invoke()
+            }
             instances.clear()
+            onOutOfScopeListeners.clear()
+        }
+
+        override fun onOutOfScope(listener: () -> Unit) {
+            onOutOfScopeListeners.add(listener)
         }
     }
 
     interface Scope {
 
-        var onOutOfScope: () -> Unit
+        fun onOutOfScope(listener: () -> Unit)
     }
 
 }

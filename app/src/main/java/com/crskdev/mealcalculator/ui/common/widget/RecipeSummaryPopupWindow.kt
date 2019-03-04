@@ -30,8 +30,6 @@ class RecipeSummaryPopupWindow(val context: Context) : PopupWindow(
     true
 ) {
 
-    private val resources = context.resources
-
     private val textView: TextView by lazy {
         contentView.findViewById<TextView>(android.R.id.text1)!!.apply {
             //todo obtain them window background color
@@ -113,7 +111,7 @@ Unsaturated: ${unsaturated()}
     }
 
     private fun showAsDropDownCompat(parent: View, x: Int, y: Int) {
-        showAsDropDown(parent, x, 0)
+        showAsDropDown(parent, x, y)
     }
 
     private inline fun <T> bind(t: T, data: T.() -> String) {
