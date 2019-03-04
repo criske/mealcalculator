@@ -3,4 +3,5 @@
     <dimen name="food_image_size">100dp</dimen>
     <dimen name="food_input_dim">100dp</dimen>
     <dimen name="default_round_radius">5dp</dimen>
+    <dimen name="default_border_thick">0.5dp</dimen>
 </resources>

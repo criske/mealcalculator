@@ -4,6 +4,7 @@ package com.crskdev.mealcalculator.ui.common.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.TextView
+import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.forEach
 import com.crskdev.mealcalculator.R
@@ -19,14 +21,11 @@ import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.utils.dpToPx
 import com.crskdev.mealcalculator.utils.getColorCompat
 import kotlinx.android.synthetic.main.recipe_summary_view_layout.view.*
-import kotlin.math.roundToInt
 
 /**
  * Created by Cristian Pela on 18.02.2019.
  */
-class RecipeSummaryView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : HorizontalScrollView(context, attrs, defStyleAttr) {
+class RecipeSummaryView : HorizontalScrollView {
 
     private val summaryPopupWindow by lazy {
         RecipeSummaryPopupWindow(context)
@@ -34,7 +33,25 @@ class RecipeSummaryView @JvmOverloads constructor(
 
     private var summary: RecipeFoodVM.SummaryVM? = null
 
-    init {
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        initView(attrs)
+    }
+
+    private fun initView(attrs: AttributeSet?) {
+
+        var isDecorated = true
+        context.withStyledAttributes(attrs, R.styleable.RecipeSummaryView) {
+            isDecorated = getBoolean(R.styleable.RecipeSummaryView_decorated, true)
+        }
+
+
         LayoutInflater
             .from(context)
             .inflate(R.layout.recipe_summary_view_layout, this, true)
@@ -42,24 +59,34 @@ class RecipeSummaryView @JvmOverloads constructor(
             .getChildAt(0)
             .cast<ViewGroup>().forEach { v ->
                 v.takeIf { it is TextView }
-                    ?.background
-                    ?.takeIf { it is ColorDrawable }
-                    ?.cast<ColorDrawable>()
-                    ?.color
-                    ?.also { bg ->
+                    ?.cast<TextView>()
+                    ?.also { v ->
                         //todo refactor this into util
-                        v.background = GradientDrawable().apply {
-                            colors = intArrayOf(bg, bg, bg)
-                            cornerRadius = 5f.dpToPx(resources)
-                            setStroke(
-                                1f.dpToPx(resources).roundToInt(),
-                                context.getColorCompat(R.color.colorPrimary)
-                            )
+                        val bgColor = if (v.background is ColorDrawable)
+                            v.background.cast<ColorDrawable>().color
+                        else
+                            Color.WHITE
+
+                        v.background = if (isDecorated) {
+                            GradientDrawable().apply {
+                                colors = intArrayOf(bgColor, bgColor, bgColor)
+                                cornerRadius = 5f.dpToPx(resources)
+                                setStroke(
+                                    resources.getDimensionPixelSize(R.dimen.default_border_thick),
+                                    context.getColorCompat(R.color.colorPrimary)
+                                )
+                            }
+                        } else {
+                            null
                         }
-                        if (ColorUtils.calculateLuminance(bg) < 0.5)
-                            v.cast<TextView>().setTextColor(
-                                context.getColorCompat(android.R.color.white)
-                            )
+
+
+                        if (isDecorated) {
+                            if (ColorUtils.calculateLuminance(bgColor) < 0.5)
+                                v.setTextColor(Color.WHITE)
+                        } else {
+                            v.setTextColor(Color.DKGRAY)
+                        }
 
 //                        v.layoutParams = v.layoutParams.apply {
 //                            width = 36.dpToPx(resources).roundToInt()

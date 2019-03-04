@@ -194,13 +194,6 @@ class RecipeFoodEntryVH(itemView: View,
     private fun bindQuantity(quantity: Int) {
         isRecycled = false
         itemView.editMealEntryQuantity.apply {
-            //            if (quantity == 0) {
-//                requestFocus()
-//                post {
-//                    context.getSystemService<InputMethodManager>()
-//                        ?.showSoftInput(this, InputMethodManager.SHOW_FORCED)
-//                }
-//            }
             if (!hasFocus()) {
                 setText(quantity.toString())
             }

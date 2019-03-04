@@ -21,7 +21,6 @@ import com.crskdev.mealcalculator.presentation.common.entities.RecipeFoodVM
 import com.crskdev.mealcalculator.utils.dpToPx
 import com.crskdev.mealcalculator.utils.dpToPxInt
 import com.crskdev.mealcalculator.utils.getColorCompat
-import kotlin.math.roundToInt
 
 /**
  * Created by Cristian Pela on 19.02.2019.
@@ -44,7 +43,7 @@ class RecipeSummaryPopupWindow(val context: Context) : PopupWindow(
                 colors = intArrayOf(color, color, color)
                 cornerRadius = 5f.dpToPx(resources)
                 setStroke(
-                    1f.dpToPx(resources).roundToInt(),
+                    resources.getDimensionPixelSize(R.dimen.default_border_thick),
                     context.getColorCompat(R.color.colorPrimary)
                 )
             }
