@@ -65,6 +65,7 @@ class MealVH(v: View, action: (Long) -> Unit) : RecyclerView.ViewHolder(v) {
     }
 
     fun clear() {
+        print("CLEAR")
         meal = null
         with(itemView) {
             recipeSummaryMealJournal.bind(RecipeFoodVM.SummaryVM.EMPTY)

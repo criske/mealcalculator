@@ -25,7 +25,7 @@ class UpsertFoodRouterImpl(provider: () -> Fragment?) : PlatformBaseRouter(provi
         findNavController()?.navigate(
             R.id.upsertFoodFragment, bundleOf(
                 "name" to withName,
-                "id" to 0
+                "id" to 0L
             )
         )
     }
