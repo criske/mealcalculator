@@ -41,7 +41,7 @@
     <style name="TextInputLayoutAppearance" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
         <!-- reference our hint & error styles -->
         <item name="android:textSize">14sp</item>
-        <item name="android:inputType">number</item>
+        <item name="android:inputType">numberDecimal</item>
         <item name="android:maxLines">1</item>
         <item name="boxBackgroundColor">@android:color/darker_gray</item>
         <item name="hintTextAppearance">@style/HintText</item>
