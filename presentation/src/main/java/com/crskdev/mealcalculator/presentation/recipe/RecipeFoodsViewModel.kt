@@ -27,7 +27,10 @@ class RecipeFoodsViewModel(
     private val foodActionInteractor: FoodActionInteractor
 ) : CoroutineScopedViewModel(), UpsertFoodRouter by router {
 
-    val mealEntriesLiveData: LiveData<List<RecipeFood>> = MutableLiveData<List<RecipeFood>>()
+    val mealEntriesLiveData: LiveData<List<RecipeFood>> =
+        MutableLiveData<List<RecipeFood>>().apply {
+            value = emptyList()
+        }
     val mealSummaryLiveData: LiveData<RecipeFoodVM.SummaryVM> =
         MutableLiveData<RecipeFoodVM.SummaryVM>().apply {
             value = RecipeFoodVM.SummaryVM.EMPTY

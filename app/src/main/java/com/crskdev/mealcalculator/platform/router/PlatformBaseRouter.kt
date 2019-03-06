@@ -19,15 +19,14 @@ open class PlatformBaseRouter(private val fragmentProvider: () -> Fragment?) {
 
     protected class NavControllerWrapper(private val controller: NavController) {
 
-        fun navigate(@IdRes id: Int, bundle: Bundle? = null) {
-            controller.navigate(
-                id, bundle, NavOptions.Builder()
-                    .setEnterAnim(R.animator.slide_in_left)
-                    .setExitAnim(R.animator.slide_out_right)
-                    .setPopEnterAnim(R.animator.slide_in_right)
-                    .setPopExitAnim(R.animator.slide_out_left)
-                    .build()
-            )
+        fun navigate(@IdRes id: Int, bundle: Bundle? = null,
+                     navOptions: NavOptions? = NavOptions.Builder()
+                         .setEnterAnim(R.animator.slide_in_left)
+                         .setExitAnim(R.animator.slide_out_right)
+                         .setPopEnterAnim(R.animator.slide_in_right)
+                         .setPopExitAnim(R.animator.slide_out_left)
+                         .build()) {
+            controller.navigate(id, bundle, navOptions)
         }
 
         fun popBackStack(@IdRes destinationId: Int? = null, inclusive: Boolean = true) {

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.Design.Light.NoActionBar">
@@ -41,6 +41,8 @@
     <style name="TextInputLayoutAppearance" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
         <!-- reference our hint & error styles -->
         <item name="android:textSize">14sp</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLines">1</item>
         <item name="boxBackgroundColor">@android:color/darker_gray</item>
         <item name="hintTextAppearance">@style/HintText</item>
         <item name="errorTextAppearance">@style/ErrorText</item>
@@ -49,6 +51,8 @@
         <item name="colorControlNormal">@android:color/white</item>
         <item name="colorControlActivated">@android:color/holo_blue_dark</item>
         <item name="colorControlHighlight">@android:color/darker_gray</item>
+        <item name="android:importantForAutofill" tools:ignore="NewApi">noExcludeDescendants</item>
+        <item name="android:selectAllOnFocus">true</item>
     </style>
 
     <style name="TextBoxedAppearance">

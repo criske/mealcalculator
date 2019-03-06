@@ -70,6 +70,7 @@ class RecipeFoodsFragment : DiFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        postponeEnterTransition()
         with(recyclerRecipeFoodsEntries) {
             val viewHolderFinder = object : ViewHolderFinder {
                 override fun scrollToViewHolder(position: Int, onScrolled: (RecyclerView.ViewHolder) -> Unit) {
@@ -110,6 +111,7 @@ class RecipeFoodsFragment : DiFragment() {
             recyclerRecipeFoodsEntries.adapter?.cast<RecipeFoodEntriesAdapter>()?.apply {
                 submitList(it)
             }
+            startPostponedEnterTransition()
         })
         viewModel.mealSummaryLiveData.observe(viewLifecycleOwner, Observer {
             textRecipeFoodsSummary.bind(it)

@@ -72,7 +72,9 @@
                 app:layout_constraintTop_toTopOf="@+id/imageUpsertFood">
 
                 <com.google.android.material.textfield.TextInputEditText
-
+                    android:ellipsize="end"
+                    android:inputType="none"
+                    android:maxLines="2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="18sp" />

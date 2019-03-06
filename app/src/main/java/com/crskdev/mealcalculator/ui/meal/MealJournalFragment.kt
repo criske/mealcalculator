@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.crskdev.mealcalculator.R
-import com.crskdev.mealcalculator.domain.entities.Meal
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.utils.onItemSwipe
@@ -31,40 +29,39 @@ class MealJournalFragment : DiFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //TODO: looks choppy when applying transitions
-        view.postDelayed(500) {
-            with(toolbarMealJournal) {
-                setNavigationOnClickListener {
-                    viewModel.routeBack()
-                }
+        postponeEnterTransition()
+        with(toolbarMealJournal) {
+            setNavigationOnClickListener {
+                viewModel.routeBack()
             }
-
-            with(recyclerMealJournal) {
-                adapter = MealJournalAdapter(LayoutInflater.from(context)) {
-                    //TODO add direction to detailed recipe entry
-                }
-                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-                onItemSwipe { vh, _ ->
-                    context.showSimpleYesNoDialog(
-                        "Warning",
-                        "Permanently remove this meal journal entry?"
-                    ) {
-                        if (it == DialogInterface.BUTTON_POSITIVE) {
-                            viewModel.delete(vh.adapterPosition)
-                        } else {
-                            adapter?.notifyItemChanged(vh.adapterPosition)
-                        }
-                    }
-
-                }
-                Unit
-            }
-            viewModel.mealsLiveData.observe(viewLifecycleOwner, Observer {
-                require(it is PagedList<Meal>)
-                recyclerMealJournal.adapter?.cast<MealJournalAdapter>()?.submitList(it)
-            })
         }
 
+        with(recyclerMealJournal) {
+            adapter = MealJournalAdapter(LayoutInflater.from(context)) {
+                //TODO add direction to detailed recipe entry
+            }
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            onItemSwipe { vh, _ ->
+                context.showSimpleYesNoDialog(
+                    "Warning",
+                    "Permanently remove this meal journal entry?"
+                ) {
+                    if (it == DialogInterface.BUTTON_POSITIVE) {
+                        viewModel.delete(vh.adapterPosition)
+                    } else {
+                        adapter?.notifyItemChanged(vh.adapterPosition)
+                    }
+                }
+
+            }
+            Unit
+        }
+        viewModel.mealsLiveData.observe(viewLifecycleOwner, Observer {
+            if (it is PagedList)
+                recyclerMealJournal.adapter?.cast<MealJournalAdapter>()?.submitList(it)
+            startPostponedEnterTransition()
+        })
     }
 
 }
+

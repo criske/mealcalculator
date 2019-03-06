@@ -2,7 +2,6 @@ package com.crskdev.mealcalculator.ui.meal
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +16,7 @@ import com.crskdev.mealcalculator.presentation.meal.MealViewModel
 import com.crskdev.mealcalculator.ui.common.HasBackPressedAwareness
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
 import com.crskdev.mealcalculator.ui.recipe.RecipeFoodsEventCodes
-import com.crskdev.mealcalculator.utils.lifecycleRegistry
-import com.crskdev.mealcalculator.utils.showSimpleInputDialog
-import com.crskdev.mealcalculator.utils.showSimpleToast
-import com.crskdev.mealcalculator.utils.showSimpleYesNoDialog
+import com.crskdev.mealcalculator.utils.*
 import kotlinx.android.synthetic.main.fragment_meal.*
 
 class MealFragment : DiFragment(), HasBackPressedAwareness {
@@ -101,6 +97,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
             inflateMenu(R.menu.menu_meal)
             setOnMenuItemClickListener {
                 activity?.currentFocus?.clearFocus()
+                activity?.hideSoftKeyboard()
                 when (it.itemId) {
                     R.id.action_menu_meal_add_food -> {
                         viewModel.routeToFindFood(
@@ -167,7 +164,6 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
                         it.toString()
                     }
                     context?.showSimpleToast(err)
-                    Log.e("MealFragment", err)
                 }
             }
         })
@@ -190,6 +186,7 @@ class MealFragment : DiFragment(), HasBackPressedAwareness {
 
 
     override fun handleBackPressed(): Boolean {
+        activity?.hideSoftKeyboard()
         context!!.showSimpleYesNoDialog("Warning", "Exit meal without saving?") {
             if (DialogInterface.BUTTON_POSITIVE == it) {
                 viewModel.routeBack()

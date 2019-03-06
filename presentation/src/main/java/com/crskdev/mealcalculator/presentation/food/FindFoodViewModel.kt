@@ -26,7 +26,9 @@ class FindFoodViewModel(
         value = ""
     }
 
-    val foodsLiveData: LiveData<List<Food>> = MutableLiveData<List<Food>>()
+    val foodsLiveData: LiveData<List<Food>> = MutableLiveData<List<Food>>().apply {
+        value = emptyList()
+    }
 
     init {
         launch {

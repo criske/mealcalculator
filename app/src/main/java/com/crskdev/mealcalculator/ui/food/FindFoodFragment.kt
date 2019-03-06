@@ -16,7 +16,7 @@ import com.crskdev.mealcalculator.presentation.common.asTargetID
 import com.crskdev.mealcalculator.presentation.common.utils.cast
 import com.crskdev.mealcalculator.presentation.food.FindFoodViewModel
 import com.crskdev.mealcalculator.ui.common.di.DiFragment
-import com.crskdev.mealcalculator.utils.showSimpleToast
+import com.crskdev.mealcalculator.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.fragment_find_food.*
 
 /**
@@ -31,6 +31,11 @@ class FindFoodFragment : DiFragment() {
 
     private val eventBusViewModel: EventBusViewModel by lazy {
         di.eventBusViewModel()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        postponeEnterTransition()
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +70,7 @@ class FindFoodFragment : DiFragment() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_menu_find_food_new -> {
+                        activity?.hideSoftKeyboard()
                         viewModel.routeToUpsertFoodNew()
                     }
                 }
@@ -85,6 +91,7 @@ class FindFoodFragment : DiFragment() {
                                         it.food
                                     )
                                 )
+                            activity?.hideSoftKeyboard()
                             viewModel.routeBack()
                         }
                     }
@@ -97,12 +104,10 @@ class FindFoodFragment : DiFragment() {
         viewModel.foodsLiveData.observe(viewLifecycleOwner, Observer {
             if (it is PagedList) {
                 recyclerFoodsSearch.adapter?.cast<FindFoodAdapter>()?.submitList(it)
-            } else {
-                context?.showSimpleToast("Result list must be a Paged List. Current ${it::class}\"")
             }
+            startPostponedEnterTransition()
         })
 
+
     }
-
-
 }
