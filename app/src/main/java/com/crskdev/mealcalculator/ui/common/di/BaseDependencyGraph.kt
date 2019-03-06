@@ -17,9 +17,9 @@ import kotlin.reflect.KClass
  */
 open class BaseDependencyGraph(protected val context: Context) {
 
-    protected val scopes = mutableMapOf<KClass<*>, Scope>()
+    val scopes = mutableMapOf<KClass<*>, Scope>()
 
-    protected val injected = mutableMapOf<KClass<*>, Any>()
+    val injected = mutableMapOf<KClass<*>, Any>()
 
     init {
         context.cast<Application>()
