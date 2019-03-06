@@ -8,4 +8,4 @@
 ![Screenshot](screenshots/IMG_20190306_145516.jpg)
 
 
-![Appetize.io Demo](https://appetize.io/app/ajewwyagxfyg1h2u9b8ktunaxr)
+[Appetize.io Demo](https://appetize.io/app/ajewwyagxfyg1h2u9b8ktunaxr)
